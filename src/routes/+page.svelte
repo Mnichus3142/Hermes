@@ -1,2 +1,10 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<!-- * Login page * -->
+
+<script lang="ts">
+    import LoginMobile from "$lib/components/loginMobile.svelte";
+    import Loader from "$lib/components/loader.svelte";
+</script>
+
+<main class="h-full w-full">
+    <Loader />
+</main>
