@@ -15,6 +15,52 @@
 }
 
 /* Variables declaration */
+@theme {
+    --font-title: "Tajawal", serif;
+    --font-text: "Raleway", serif;
+}
+
 @theme inline {
     --color-main-100: var(--acme-main-100);
+}
+
+/* Font for titles */
+.titleFont {
+    @apply text-3xl font-title font-medium;
+}
+
+/* Font for normal text */
+.textFont {
+    @apply text-lg font-text font-normal;
+}
+
+/* Style for span containing elements */
+.spanStyle {
+    @apply relative w-48 h-10 flex items-center justify-center;
+}
+
+.spanStyle > * {
+    @apply transition-all;
+}
+
+.spanStyle > label {
+    @apply text-gray-400;
+}
+
+.spanStyle:hover > label, .inputField:focus + label {
+    @apply -translate-y-8 text-gray-800;
+}
+
+/* Style for input field */
+.inputField {
+    @apply w-full h-10 px-2 py-1 border-2 border-gray-300 rounded-md;
+}
+
+.inputField:focus, .inputField:hover {
+    @apply border-orange-300 outline-none;
+}
+
+/* Style for external login buttons */
+.loginButton {
+    @apply bg-red-500;
 }
