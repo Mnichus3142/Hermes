@@ -1,1 +1,20 @@
 @import "tailwindcss";
+
+/* Light theme */
+:root {
+    --acme-main-100: oklch(96.44% 0.001 286.38);
+    --acme-main-200: oklch(50.37% 0.006 274.88);
+    --acme-main-300: oklch(41.33% 0.007 274.83);
+    --acme-main-400: oklch(32.12% 0.005 271.24);
+    --acme-main-500: oklch(23.09% 0.006 271.15);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+    --acme-canvas-color: oklch(0.21 0.034 264.665);
+}
+
+/* Variables declaration */
+@theme inline {
+    --color-main-100: var(--acme-main-100);
+}
