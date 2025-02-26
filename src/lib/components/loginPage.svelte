@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
+    import { checkPasswords } from '$lib/functions/checkPasswords';
 
     // Constants
     const animationDuration: number = 400;
@@ -13,16 +14,20 @@
     let password: string = '';
     let confirmPassword: string = '';
 
+    $: if(password || confirmPassword) {
+        console.log(checkPasswords(password, confirmPassword));
+    };
+
     // Function to toggle between login and register forms
     const toggleForms = () => {
         loginVisible = !loginVisible;
         clearPassword();
-    }
+    };
 
     // Function to clear password field
     const clearPassword = () => {
         password = '';
-    }
+    };
 </script>
 
 <main class="fixed inset-0 flex items-center justify-center overflow-hidden">
@@ -109,17 +114,17 @@
                     <!-- Register card elements -->
                     <h2 class="mb-8 titleFont">Register</h2>
                     <span class="spanStyle">
-                        <input required id="username" type="text" bind:value={username} class="inputField absolute"/>
+                        <input required id="username" type="text" bind:value={username} class="inputField"/>
                         <label for="username" class="textFont absolute left-3">Username</label>
                     </span>
 
                     <span class="spanStyle">
-                        <input required id="password" type="text" bind:value={password} class="inputField absolute"/>
+                        <input required id="password" type="text" bind:value={password} class="inputField"/>
                         <label for="password" class="textFont absolute left-3">Password</label>
                     </span>
 
                     <span class="spanStyle">
-                        <input required id="confirmPassword" type="text" bind:value={confirmPassword} class="inputField absolute"/>
+                        <input required id="confirmPassword" type="text" bind:value={confirmPassword} class="inputField"/>
                         <label for="confirmPassword" class="textFont absolute left-3">Confirm password</label>
                     </span>
                     <button class="textFont loginButton w-64 h-14 border-2 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100 transition-all" aria-label="Login button">

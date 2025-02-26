@@ -43,7 +43,7 @@
     @apply relative w-64 h-10 flex items-center justify-center transition-all;
 }
 
-.spanStyle:has(~ .spanStyle:hover), .spanStyle:has(+ .spanStyle .inputField:focus), .spanStyle:has(+ .spanStyle .inputField:valid) {
+.spanStyle:has(~ .spanStyle:hover), .spanStyle:has(~ .spanStyle .inputField:focus), .spanStyle:has(~ .spanStyle .inputField:valid) {
     @apply -translate-y-4;
 }
 
