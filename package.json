@@ -22,6 +22,7 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"@tailwindcss/vite": "^4.0.8"
+		"@tailwindcss/vite": "^4.0.8",
+		"postgres": "^3.4.5"
 	}
 }

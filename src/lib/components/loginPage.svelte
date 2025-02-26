@@ -2,6 +2,7 @@
     import { fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import { checkPasswords } from '$lib/functions/checkPasswords';
+    import type { checkPasswordsType } from '$lib/types/checkPasswords';
 
     // Constants
     const animationDuration: number = 400;
@@ -11,16 +12,26 @@
 
     // Form fields
     let username: string = '';
-    let password: string = '';
-    let confirmPassword: string = '';
 
     // First span animation condition
     let firstSpanAnimation: boolean = false;
     let secondOrThirdSpanActive: boolean = false;
 
+    // Variables for password checking
+    let passwordCheck: checkPasswordsType = {
+        doPasswordsMatch: false,
+        firstPassword: '',
+        secondPassword: '',
+        message: ''
+    };
+
     // Function to check if password contain something
-    $: if (password || confirmPassword) {
+    $: if (passwordCheck.firstPassword || passwordCheck.secondPassword) {
         swapFirstSpanAnimation();
+        if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
+            passwordCheck = checkPasswords(passwordCheck);
+            console.log(passwordCheck.doPasswordsMatch)
+        }
     };
 
     // Function to toggle between login and register forms
@@ -31,20 +42,20 @@
 
     // Function to clear password field
     const clearPassword = () => {
-        password = '';
+        passwordCheck.secondPassword = '';
     };
 
     // Function to swap first span animation boolean
     const swapFirstSpanAnimation = (mouseEvent: string = 'none') => {
-        if (password.length > 0 && confirmPassword.length > 0) {
+        if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
             firstSpanAnimation = true;
         } 
 
-        else if ((mouseEvent === 'confirmaor' && password.length > 0) || (mouseEvent === 'password' && confirmPassword.length > 0)) {
+        else if ((mouseEvent === 'confirmaor' && passwordCheck.firstPassword.length > 0) || (mouseEvent === 'password' && passwordCheck.secondPassword.length > 0)) {
             firstSpanAnimation = true;
         }
 
-        else if (secondOrThirdSpanActive && mouseEvent === 'confirmaor') {
+        else if (secondOrThirdSpanActive && (mouseEvent === 'confirmaor' || mouseEvent === 'password')) {
             firstSpanAnimation = true;
         }
         
@@ -68,7 +79,7 @@
                 in:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
             >
-                <div class="flex flex-col items-center justify-center w-full h-full gap-3">
+                <form class="flex flex-col items-center justify-center w-full h-full gap-3">
                     <!-- Login card elements -->
                     <h2 class="mb-6 titleFont">Log in</h2>
                     <span class="spanStyle">
@@ -76,7 +87,7 @@
                         <label for="username" class="absolute textFont left-3">Username</label>
                     </span>
                     <span class="spanStyle">
-                        <input required id="password" type="text" bind:value={password} class="absolute inputField"/>
+                        <input required id="password" type="text" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
                     <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button">
@@ -125,7 +136,7 @@
                             sign up
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         {:else}
             <!-- Register card -->
@@ -134,7 +145,7 @@
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
             >
-                <div class="flex flex-col items-center justify-center h-full gap-3">
+                <form class="flex flex-col items-center justify-center h-full gap-3">
                     <!-- Register card elements -->
                     <h2 class="mb-12 titleFont">Register</h2>
                     <span class="spanStyle" style:transform={firstSpanAnimation ? 'translateY(-20px)' : 'none'}>
@@ -149,7 +160,7 @@
                         on:focus={() => secondOrThirdSpanActive = true}
                         on:blur={() => secondOrThirdSpanActive = false}
                     >
-                        <input required id="password" type="text" bind:value={password} class="inputField"/>
+                        <input required id="password" type="text" bind:value={passwordCheck.firstPassword} class="inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
 
@@ -160,9 +171,14 @@
                         on:focus={() => secondOrThirdSpanActive = true}
                         on:blur={() => secondOrThirdSpanActive = false}
                     >
-                        <input required id="confirmPassword" type="text" bind:value={confirmPassword} class="inputField"/>
+                        <input required id="confirmPassword" type="text" bind:value={passwordCheck.secondPassword} class="inputField"/>
                         <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
                     </span>
+                    {#if !passwordCheck.doPasswordsMatch && passwordCheck.message.length > 0}
+                        <p class="w-64 flex justify-center place-items-center text-red-500">
+                            {passwordCheck.message}
+                        </p>
+                    {/if}
                     <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button">
                         Register
                     </button>
@@ -184,7 +200,7 @@
                             sign in
                         </button>
                     </div>
-                </div>
+                </form>
             </div>
         {/if}
     </div>
