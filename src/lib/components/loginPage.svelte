@@ -14,8 +14,13 @@
     let password: string = '';
     let confirmPassword: string = '';
 
-    $: if(password || confirmPassword) {
-        console.log(checkPasswords(password, confirmPassword));
+    // First span animation condition
+    let firstSpanAnimation: boolean = false;
+    let secondOrThirdSpanActive: boolean = false;
+
+    // Function to check if password contain something
+    $: if (password || confirmPassword) {
+        swapFirstSpanAnimation();
     };
 
     // Function to toggle between login and register forms
@@ -27,6 +32,25 @@
     // Function to clear password field
     const clearPassword = () => {
         password = '';
+    };
+
+    // Function to swap first span animation boolean
+    const swapFirstSpanAnimation = (mouseEvent: string = 'none') => {
+        if (password.length > 0 && confirmPassword.length > 0) {
+            firstSpanAnimation = true;
+        } 
+
+        else if ((mouseEvent === 'confirmaor' && password.length > 0) || (mouseEvent === 'password' && confirmPassword.length > 0)) {
+            firstSpanAnimation = true;
+        }
+
+        else if (secondOrThirdSpanActive && mouseEvent === 'confirmaor') {
+            firstSpanAnimation = true;
+        }
+        
+        else {
+            firstSpanAnimation = false;
+        };
     };
 </script>
 
@@ -46,7 +70,7 @@
             >
                 <div class="h-full w-full flex flex-col items-center justify-center gap-3">
                     <!-- Login card elements -->
-                    <h2 class="mb-3 titleFont">Log in</h2>
+                    <h2 class="mb-6 titleFont">Log in</h2>
                     <span class="spanStyle">
                         <input required id="username" type="text" bind:value={username} class="inputField absolute"/>
                         <label for="username" class="textFont absolute left-3">Username</label>
@@ -112,18 +136,30 @@
             >
                 <div class="h-full flex flex-col items-center justify-center gap-3">
                     <!-- Register card elements -->
-                    <h2 class="mb-8 titleFont">Register</h2>
-                    <span class="spanStyle">
+                    <h2 class="mb-12 titleFont">Register</h2>
+                    <span class="spanStyle" style:transform={firstSpanAnimation ? 'translateY(-20px)' : 'none'}>
                         <input required id="username" type="text" bind:value={username} class="inputField"/>
                         <label for="username" class="textFont absolute left-3">Username</label>
                     </span>
 
-                    <span class="spanStyle">
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <span class="spanStyle"
+                        on:mouseenter={() => swapFirstSpanAnimation('password')}
+                        on:mouseleave={() => swapFirstSpanAnimation('none')}    
+                        on:focus={() => secondOrThirdSpanActive = true}
+                        on:blur={() => secondOrThirdSpanActive = false}
+                    >
                         <input required id="password" type="text" bind:value={password} class="inputField"/>
                         <label for="password" class="textFont absolute left-3">Password</label>
                     </span>
 
-                    <span class="spanStyle">
+                    <!-- svelte-ignore a11y_no_static_element_interactions -->
+                    <span class="spanStyle"
+                        on:mouseenter={() => swapFirstSpanAnimation('confirmaor')}
+                        on:mouseleave={() => swapFirstSpanAnimation('none')}
+                        on:focus={() => secondOrThirdSpanActive = true}
+                        on:blur={() => secondOrThirdSpanActive = false}
+                    >
                         <input required id="confirmPassword" type="text" bind:value={confirmPassword} class="inputField"/>
                         <label for="confirmPassword" class="textFont absolute left-3">Confirm password</label>
                     </span>
