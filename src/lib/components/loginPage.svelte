@@ -56,37 +56,37 @@
 
 <main class="fixed inset-0 flex items-center justify-center overflow-hidden">
     <!-- Page photo -->
-    <div class="h-full w-1/2 hidden md:block z-20 shadow-2xl">
+    <div class="z-20 hidden w-1/2 h-full shadow-2xl md:block">
         <!-- svelte-ignore a11y_img_redundant_alt -->
-        <img src="/loginPagePhoto.jpg" alt="Login page photo" class="object-cover h-full w-full"/>
+        <img src="/loginPagePhoto.jpg" alt="Login page photo" class="object-cover w-full h-full"/>
     </div>
-    <div class="h-full w-1/2 flex justify-center items-center">
+    <div class="flex items-center justify-center w-1/2 h-full">
         {#if loginVisible}
             <!-- Login card -->
             <div 
-                class="fixed w-full md:w-1/2 h-full"
+                class="fixed w-full h-full md:w-1/2"
                 in:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
             >
-                <div class="h-full w-full flex flex-col items-center justify-center gap-3">
+                <div class="flex flex-col items-center justify-center w-full h-full gap-3">
                     <!-- Login card elements -->
                     <h2 class="mb-6 titleFont">Log in</h2>
                     <span class="spanStyle">
-                        <input required id="username" type="text" bind:value={username} class="inputField absolute"/>
-                        <label for="username" class="textFont absolute left-3">Username</label>
+                        <input required id="username" type="text" bind:value={username} class="absolute inputField"/>
+                        <label for="username" class="absolute textFont left-3">Username</label>
                     </span>
                     <span class="spanStyle">
-                        <input required id="password" type="text" bind:value={password} class="inputField absolute"/>
-                        <label for="password" class="textFont absolute left-3">Password</label>
+                        <input required id="password" type="text" bind:value={password} class="absolute inputField"/>
+                        <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
-                    <button class="textFont loginButton w-64 h-14 border-2 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100 transition-all" aria-label="Login button">
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button">
                         Log in
                     </button>
                     <!-- Forgot password button -->
-                    <div class="flex-row items-center gap-1 hidden">
+                    <div class="flex-row items-center hidden gap-1">
                         <p class="textFont">Maybe you want to </p>
                         <button 
-                            class="textFont text-orange-400 cursor-pointer"
+                            class="text-orange-400 cursor-pointer textFont"
                             on:click={toggleForms}
                         >
                             sign in
@@ -97,7 +97,7 @@
                         <button class="loginButton bg-[#7289da]" aria-label="Login with OAuth - Discord">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M524.5 69.8a1.5 1.5 0 0 0 -.8-.7A485.1 485.1 0 0 0 404.1 32a1.8 1.8 0 0 0 -1.9 .9 337.5 337.5 0 0 0 -14.9 30.6 447.8 447.8 0 0 0 -134.4 0 309.5 309.5 0 0 0 -15.1-30.6 1.9 1.9 0 0 0 -1.9-.9A483.7 483.7 0 0 0 116.1 69.1a1.7 1.7 0 0 0 -.8 .7C39.1 183.7 18.2 294.7 28.4 404.4a2 2 0 0 0 .8 1.4A487.7 487.7 0 0 0 176 479.9a1.9 1.9 0 0 0 2.1-.7A348.2 348.2 0 0 0 208.1 430.4a1.9 1.9 0 0 0 -1-2.6 321.2 321.2 0 0 1 -45.9-21.9 1.9 1.9 0 0 1 -.2-3.1c3.1-2.3 6.2-4.7 9.1-7.1a1.8 1.8 0 0 1 1.9-.3c96.2 43.9 200.4 43.9 295.5 0a1.8 1.8 0 0 1 1.9 .2c2.9 2.4 6 4.9 9.1 7.2a1.9 1.9 0 0 1 -.2 3.1 301.4 301.4 0 0 1 -45.9 21.8 1.9 1.9 0 0 0 -1 2.6 391.1 391.1 0 0 0 30 48.8 1.9 1.9 0 0 0 2.1 .7A486 486 0 0 0 610.7 405.7a1.9 1.9 0 0 0 .8-1.4C623.7 277.6 590.9 167.5 524.5 69.8zM222.5 337.6c-29 0-52.8-26.6-52.8-59.2S193.1 219.1 222.5 219.1c29.7 0 53.3 26.8 52.8 59.2C275.3 311 251.9 337.6 222.5 337.6zm195.4 0c-29 0-52.8-26.6-52.8-59.2S388.4 219.1 417.9 219.1c29.7 0 53.3 26.8 52.8 59.2C470.7 311 447.5 337.6 417.9 337.6z"/></svg>
                         </button>
-                        <button class="loginButton bg-white" aria-label="Login with OAuth - Google">
+                        <button class="bg-white loginButton" aria-label="Login with OAuth - Google">
                             <svg width="800px" height="800px" viewBox="-3 0 262 262" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid"><path d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027" fill="#4285F4"/><path d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1" fill="#34A853"/><path d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782" fill="#FBBC05"/><path d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251" fill="#EB4335"/></svg>
                         </button>
                         <button class="loginButton bg-[#24292e]" aria-label="Login with OAuth - Github">
@@ -119,7 +119,7 @@
                     <div class="flex flex-row items-center gap-1">
                         <p class="textFont">Maybe you want to </p>
                         <button 
-                            class="textFont text-orange-400 cursor-pointer"
+                            class="text-orange-400 cursor-pointer textFont"
                             on:click={toggleForms}
                         >
                             sign up
@@ -130,16 +130,16 @@
         {:else}
             <!-- Register card -->
             <div 
-                class="fixed w-full md:w-1/2 h-full"
+                class="fixed w-full h-full md:w-1/2"
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
             >
-                <div class="h-full flex flex-col items-center justify-center gap-3">
+                <div class="flex flex-col items-center justify-center h-full gap-3">
                     <!-- Register card elements -->
                     <h2 class="mb-12 titleFont">Register</h2>
                     <span class="spanStyle" style:transform={firstSpanAnimation ? 'translateY(-20px)' : 'none'}>
                         <input required id="username" type="text" bind:value={username} class="inputField"/>
-                        <label for="username" class="textFont absolute left-3">Username</label>
+                        <label for="username" class="absolute textFont left-3">Username</label>
                     </span>
 
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -150,7 +150,7 @@
                         on:blur={() => secondOrThirdSpanActive = false}
                     >
                         <input required id="password" type="text" bind:value={password} class="inputField"/>
-                        <label for="password" class="textFont absolute left-3">Password</label>
+                        <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
 
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -161,9 +161,9 @@
                         on:blur={() => secondOrThirdSpanActive = false}
                     >
                         <input required id="confirmPassword" type="text" bind:value={confirmPassword} class="inputField"/>
-                        <label for="confirmPassword" class="textFont absolute left-3">Confirm password</label>
+                        <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
                     </span>
-                    <button class="textFont loginButton w-64 h-14 border-2 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100 transition-all" aria-label="Login button">
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button">
                         Register
                     </button>
                     <!-- Splitter -->
@@ -178,7 +178,7 @@
                     <div class="flex flex-row items-center gap-1">
                         <p class="textFont">Maybe you want to </p>
                         <button 
-                            class="textFont text-orange-400 cursor-pointer"
+                            class="text-orange-400 cursor-pointer textFont"
                             on:click={toggleForms}
                         >
                             sign in
