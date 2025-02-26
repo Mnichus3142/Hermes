@@ -1,10 +1,16 @@
 <!-- * Login page * -->
 
 <script lang="ts">
-    import LoginMobile from "$lib/components/loginMobile.svelte";
+    import LoginPage from "$lib/components/loginPage.svelte";
     import Loader from "$lib/components/loader.svelte";
+
+    let loadState: Boolean = false;
 </script>
 
 <main class="h-full w-full">
-    <Loader />
+    {#if loadState}
+        <Loader />
+    {:else}
+        <LoginPage />
+    {/if}
 </main>

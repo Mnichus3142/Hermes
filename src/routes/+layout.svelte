@@ -5,6 +5,6 @@
     let { children }:LayoutProps = $props();
 </script>
 
-<main class="h-screen w-screen bg-white">
+<main class="h-screen w-screen bg-main-100">
     {@render children()}
 </main>

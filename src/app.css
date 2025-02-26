@@ -1,1 +1,82 @@
 @import "tailwindcss";
+
+/* Light theme */
+:root {
+    --acme-main-100: oklch(96.44% 0.001 286.38);
+    --acme-main-200: oklch(50.37% 0.006 274.88);
+    --acme-main-300: oklch(41.33% 0.007 274.83);
+    --acme-main-400: oklch(32.12% 0.005 271.24);
+    --acme-main-500: oklch(23.09% 0.006 271.15);
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+    --acme-canvas-color: oklch(0.21 0.034 264.665);
+}
+
+/* Variables declaration */
+@theme {
+    --font-title: "Tajawal", serif;
+    --font-text: "Raleway", serif;
+}
+
+@theme inline {
+    --color-main-100: var(--acme-main-100);
+    --color-main-200: var(--acme-main-200);
+    --color-main-300: var(--acme-main-300);
+    --color-main-400: var(--acme-main-400);
+    --color-main-500: var(--acme-main-500);
+}
+
+/* Font for titles */
+.titleFont {
+    @apply text-3xl font-title font-medium;
+}
+
+/* Font for normal text */
+.textFont {
+    @apply text-lg font-text font-normal;
+}
+
+/* Style for span containing elements */
+.spanStyle {
+    @apply relative w-64 h-10 flex items-center justify-center transition-all;
+}
+
+.spanStyle:has(~ .spanStyle:hover), .spanStyle:has(+ .spanStyle .inputField:focus), .spanStyle:has(+ .spanStyle .inputField:valid) {
+    @apply -translate-y-4;
+}
+
+.spanStyle > * {
+    @apply transition-all;
+}
+
+.spanStyle > label {
+    @apply text-main-400;
+}
+
+.spanStyle:hover > label, .inputField:focus + label, .inputField:valid + label {
+    @apply -translate-y-8 text-gray-800;
+}
+
+/* Style for input field */
+.inputField {
+    @apply w-full h-10 px-2 py-1 border-2 border-main-300 rounded-md;
+}
+
+.inputField:focus, .inputField:hover, .inputField:valid {
+    @apply border-orange-300 outline-none;
+}
+
+/* Style for external login buttons */
+.loginButton {
+    @apply max-h-16 flex items-center justify-center cursor-pointer rounded-md transition-all;
+}
+
+.loginButton:hover {
+    @apply scale-110;
+}
+
+.loginButton svg {
+    @apply h-1/2 fill-main-100;
+}
