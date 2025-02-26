@@ -2,6 +2,7 @@
     import { fly } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import { checkPasswords } from '$lib/functions/checkPasswords';
+    import { clearSpaces } from '$lib/functions/clearSpaces';
     import type { checkPasswordsType } from '$lib/types/checkPasswords';
 
     // Constants
@@ -17,20 +18,36 @@
     let firstSpanAnimation: boolean = false;
     let secondOrThirdSpanActive: boolean = false;
 
+    // Second span clicked
+    let secondSpanClicked: boolean = false;
+
     // Variables for password checking
     let passwordCheck: checkPasswordsType = {
         doPasswordsMatch: false,
         firstPassword: '',
         secondPassword: '',
-        message: ''
+        message: '',
+        conditions: {
+            isAtLeast8Characters: false,
+            hasAtLeast1UppercaseLetter: false,
+            hasAtLeast1LowercaseLetter: false,
+            hasAtLeast1Number: false,
+            hasAtLeast1SpecialCharacter: false,
+            allConditionsMet: false
+     }
     };
+
+    // Clear all spaces
+    $: username = clearSpaces(username);
+    $: passwordCheck.firstPassword = clearSpaces(passwordCheck.firstPassword);
+    $: passwordCheck.secondPassword = clearSpaces(passwordCheck.secondPassword);
 
     // Function to check if password contain something
     $: if (passwordCheck.firstPassword || passwordCheck.secondPassword) {
         swapFirstSpanAnimation();
+        passwordCheck = checkPasswords(passwordCheck);
         if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
             passwordCheck = checkPasswords(passwordCheck);
-            console.log(passwordCheck.doPasswordsMatch)
         }
     };
 
@@ -164,17 +181,108 @@
                         <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
 
+                    {#if !passwordCheck.conditions.allConditionsMet}
+                        <div class="flex flex-col gap-1 w-64 text-sm transition-all" style:transform={secondSpanClicked ? 'translateY(-20px)' : 'none'}>
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 transition-all duration-300">
+                                    {#if passwordCheck.conditions.isAtLeast8Characters}
+                                        <svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9.707 14.293l-3-3c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414l3.707 3.707c.39.39 1.023.39 1.414 0l7.707-7.707c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-7 7z"/>
+                                        </svg>
+                                    {:else}
+                                        <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M6.293 6.293a1 1 0 011.414 0L12 10.586l4.293-4.293a1 1 0 111.414 1.414L13.414 12l4.293 4.293a1 1 0 01-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 12 6.293 7.707a1 1 0 010-1.414z"/>
+                                        </svg>
+                                    {/if}
+                                </div>
+                                <span class="textFont">At least 8 characters</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 transition-all duration-300">
+                                    {#if passwordCheck.conditions.hasAtLeast1UppercaseLetter}
+                                        <svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9.707 14.293l-3-3c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414l3.707 3.707c.39.39 1.023.39 1.414 0l7.707-7.707c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-7 7z"/>
+                                        </svg>
+                                    {:else}
+                                        <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M6.293 6.293a1 1 0 011.414 0L12 10.586l4.293-4.293a1 1 0 111.414 1.414L13.414 12l4.293 4.293a1 1 0 01-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 12 6.293 7.707a1 1 0 010-1.414z"/>
+                                        </svg>
+                                    {/if}
+                                </div>
+                                <span class="textFont">At least 1 uppercase letter</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 transition-all duration-300">
+                                    {#if passwordCheck.conditions.hasAtLeast1LowercaseLetter}
+                                        <svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9.707 14.293l-3-3c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414l3.707 3.707c.39.39 1.023.39 1.414 0l7.707-7.707c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-7 7z"/>
+                                        </svg>
+                                    {:else}
+                                        <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M6.293 6.293a1 1 0 011.414 0L12 10.586l4.293-4.293a1 1 0 111.414 1.414L13.414 12l4.293 4.293a1 1 0 01-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 12 6.293 7.707a1 1 0 010-1.414z"/>
+                                        </svg>
+                                    {/if}
+                                </div>
+                                <span class="textFont">At least 1 lowercase letter</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 transition-all duration-300">
+                                    {#if passwordCheck.conditions.hasAtLeast1Number}
+                                        <svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9.707 14.293l-3-3c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414l3.707 3.707c.39.39 1.023.39 1.414 0l7.707-7.707c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-7 7z"/>
+                                        </svg>
+                                    {:else}
+                                        <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M6.293 6.293a1 1 0 011.414 0L12 10.586l4.293-4.293a1 1 0 111.414 1.414L13.414 12l4.293 4.293a1 1 0 01-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 12 6.293 7.707a1 1 0 010-1.414z"/>
+                                        </svg>
+                                    {/if}
+                                </div>
+                                <span class="textFont">At least 1 number</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <div class="w-4 h-4 transition-all duration-300">
+                                    {#if passwordCheck.conditions.hasAtLeast1SpecialCharacter}
+                                        <svg class="text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M9.707 14.293l-3-3c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414l3.707 3.707c.39.39 1.023.39 1.414 0l7.707-7.707c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0l-7 7z"/>
+                                        </svg>
+                                    {:else}
+                                        <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M6.293 6.293a1 1 0 011.414 0L12 10.586l4.293-4.293a1 1 0 111.414 1.414L13.414 12l4.293 4.293a1 1 0 01-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 01-1.414-1.414L10.586 12 6.293 7.707a1 1 0 010-1.414z"/>
+                                        </svg>
+                                    {/if}
+                                </div>
+                                <span class="textFont">At least 1 special character</span>
+                            </div>
+                        </div>
+                    {/if}
+
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
                     <span class="spanStyle"
-                        on:mouseenter={() => swapFirstSpanAnimation('confirmaor')}
-                        on:mouseleave={() => swapFirstSpanAnimation('none')}
-                        on:focus={() => secondOrThirdSpanActive = true}
-                        on:blur={() => secondOrThirdSpanActive = false}
+                        on:mouseenter={() => {
+                            swapFirstSpanAnimation('confirmaor');
+                            secondSpanClicked = true;
+                        }}
+                        on:mouseleave={() => {
+                            swapFirstSpanAnimation('none')
+                            secondSpanClicked = false;
+                        }}
+                        on:focus={() => {
+                            secondOrThirdSpanActive = true;
+                            secondSpanClicked = true;
+                        }}
+                        on:blur={() => {
+                            secondOrThirdSpanActive = false
+                            secondSpanClicked = false;
+                        }}
                     >
                         <input required id="confirmPassword" type="text" bind:value={passwordCheck.secondPassword} class="inputField"/>
                         <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
                     </span>
-                    {#if !passwordCheck.doPasswordsMatch && passwordCheck.message.length > 0}
+                    {#if !passwordCheck.doPasswordsMatch && passwordCheck.message.length > 0 && passwordCheck.conditions.allConditionsMet}
                         <p class="w-64 flex justify-center place-items-center text-red-500">
                             {passwordCheck.message}
                         </p>
