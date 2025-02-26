@@ -22,6 +22,10 @@
 
 @theme inline {
     --color-main-100: var(--acme-main-100);
+    --color-main-200: var(--acme-main-200);
+    --color-main-300: var(--acme-main-300);
+    --color-main-400: var(--acme-main-400);
+    --color-main-500: var(--acme-main-500);
 }
 
 /* Font for titles */
@@ -36,7 +40,11 @@
 
 /* Style for span containing elements */
 .spanStyle {
-    @apply relative w-48 h-10 flex items-center justify-center;
+    @apply relative w-64 h-10 flex items-center justify-center transition-all;
+}
+
+.spanStyle:has(+ .spanStyle:hover), .spanStyle:has(+ .spanStyle .inputField:focus), .spanStyle:has(+ .spanStyle .inputField:valid) {
+    @apply -translate-y-4;
 }
 
 .spanStyle > * {
@@ -44,23 +52,27 @@
 }
 
 .spanStyle > label {
-    @apply text-gray-400;
+    @apply text-main-400;
 }
 
-.spanStyle:hover > label, .inputField:focus + label {
+.spanStyle:hover > label, .inputField:focus + label, .inputField:valid + label {
     @apply -translate-y-8 text-gray-800;
 }
 
 /* Style for input field */
 .inputField {
-    @apply w-full h-10 px-2 py-1 border-2 border-gray-300 rounded-md;
+    @apply w-full h-10 px-2 py-1 border-2 border-main-300 rounded-md;
 }
 
-.inputField:focus, .inputField:hover {
+.inputField:focus, .inputField:hover, .inputField:valid {
     @apply border-orange-300 outline-none;
 }
 
 /* Style for external login buttons */
 .loginButton {
-    @apply bg-red-500;
+    @apply max-h-16 flex items-center justify-center cursor-pointer rounded-md;
+}
+
+.loginButton svg {
+    @apply h-1/2 fill-main-100;
 }
