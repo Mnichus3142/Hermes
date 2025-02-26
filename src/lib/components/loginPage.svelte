@@ -11,10 +11,17 @@
     // Form fields
     let username: string = '';
     let password: string = '';
+    let confirmPassword: string = '';
 
     // Function to toggle between login and register forms
-    function toggleForms() {
+    const toggleForms = () => {
         loginVisible = !loginVisible;
+        clearPassword();
+    }
+
+    // Function to clear password field
+    const clearPassword = () => {
+        password = '';
     }
 </script>
 
@@ -43,6 +50,19 @@
                         <input required id="password" type="text" bind:value={password} class="inputField absolute"/>
                         <label for="password" class="textFont absolute left-3">Password</label>
                     </span>
+                    <button class="textFont loginButton w-64 h-14 border-2 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100 transition-all" aria-label="Login button">
+                        Log in
+                    </button>
+                    <!-- Forgot password button -->
+                    <div class="flex-row items-center gap-1 hidden">
+                        <p class="textFont">Maybe you want to </p>
+                        <button 
+                            class="textFont text-orange-400 cursor-pointer"
+                            on:click={toggleForms}
+                        >
+                            sign in
+                        </button>
+                    </div>
                     <!-- OAuth login -->
                     <div class="grid grid-cols-[repeat(auto-fit,_minmax(0,_1fr))] gap-2 w-64 h-16">
                         <button class="loginButton bg-[#7289da]" aria-label="Login with OAuth - Discord">
@@ -85,16 +105,44 @@
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
             >
-                <div class="h-full flex flex-col items-center justify-center">
+                <div class="h-full flex flex-col items-center justify-center gap-3">
                     <!-- Register card elements -->
                     <h2 class="mb-8 titleFont">Register</h2>
-                    <!-- Button to change card -->
-                    <button 
-                        class=""
-                        on:click={toggleForms}
-                    >
-                        Sign in
+                    <span class="spanStyle">
+                        <input required id="username" type="text" bind:value={username} class="inputField absolute"/>
+                        <label for="username" class="textFont absolute left-3">Username</label>
+                    </span>
+
+                    <span class="spanStyle">
+                        <input required id="password" type="text" bind:value={password} class="inputField absolute"/>
+                        <label for="password" class="textFont absolute left-3">Password</label>
+                    </span>
+
+                    <span class="spanStyle">
+                        <input required id="confirmPassword" type="text" bind:value={confirmPassword} class="inputField absolute"/>
+                        <label for="confirmPassword" class="textFont absolute left-3">Confirm password</label>
+                    </span>
+                    <button class="textFont loginButton w-64 h-14 border-2 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100 transition-all" aria-label="Login button">
+                        Register
                     </button>
+                    <!-- Splitter -->
+                    <div class="flex flex-row items-center justify-center gap-3">
+                        <div class="bg-main-200 min-w-28 h-0.5"></div>
+                        <p class="textFont">
+                            Or
+                        </p>
+                        <div class="bg-main-200 min-w-28 h-0.5"></div>
+                    </div>
+                    <!-- Button to change card -->
+                    <div class="flex flex-row items-center gap-1">
+                        <p class="textFont">Maybe you want to </p>
+                        <button 
+                            class="textFont text-orange-400 cursor-pointer"
+                            on:click={toggleForms}
+                        >
+                            sign in
+                        </button>
+                    </div>
                 </div>
             </div>
         {/if}
