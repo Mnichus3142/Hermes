@@ -46,10 +46,21 @@
     $: if (passwordCheck.firstPassword || passwordCheck.secondPassword) {
         swapFirstSpanAnimation();
         passwordCheck = checkPasswords(passwordCheck);
-        if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
-            passwordCheck = checkPasswords(passwordCheck);
+        if (passwordCheck.firstPassword.length > 0) {
+            if (passwordCheck.secondPassword.length > 0) {
+                passwordCheck = checkPasswords(passwordCheck);
+            }
         }
     };
+
+    $: if (passwordCheck.firstPassword === '') {
+        passwordCheck.conditions.allConditionsMet = false;
+        passwordCheck.conditions.hasAtLeast1LowercaseLetter = false;
+        passwordCheck.conditions.hasAtLeast1Number = false;
+        passwordCheck.conditions.hasAtLeast1SpecialCharacter = false;
+        passwordCheck.conditions.hasAtLeast1UppercaseLetter = false;
+        passwordCheck.conditions.isAtLeast8Characters = false;
+    }
 
     // Function to toggle between login and register forms
     const toggleForms = () => {
