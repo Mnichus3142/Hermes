@@ -3,6 +3,7 @@
     import { quintOut } from 'svelte/easing';
     import { checkPasswords } from '$lib/functions/checkPasswords';
     import { clearSpaces } from '$lib/functions/clearSpaces';
+    import { createNewNotification } from '$lib/logic/notificationLogic.svelte';
     import type { checkPasswordsType } from '$lib/types/checkPasswords';
 
     // Constants
@@ -20,6 +21,7 @@
 
     // Second span clicked
     let secondSpanClicked: boolean = false;
+    let secondSpanNotBlank: boolean = false;
 
     // Variables for password checking
     let passwordCheck: checkPasswordsType = {
@@ -53,6 +55,7 @@
         }
     };
 
+    // Function to disable conditions, if password field is blank
     $: if (passwordCheck.firstPassword === '') {
         passwordCheck.conditions.allConditionsMet = false;
         passwordCheck.conditions.hasAtLeast1LowercaseLetter = false;
@@ -60,6 +63,17 @@
         passwordCheck.conditions.hasAtLeast1SpecialCharacter = false;
         passwordCheck.conditions.hasAtLeast1UppercaseLetter = false;
         passwordCheck.conditions.isAtLeast8Characters = false;
+    }
+
+    // Function to move conditions div if field is not blank
+    $: if (passwordCheck.secondPassword.length != 0)
+    {
+        secondSpanNotBlank = true;
+    }
+
+    $: if (passwordCheck.secondPassword.length === 0)
+    {
+        secondSpanNotBlank = false;
     }
 
     // Function to toggle between login and register forms
@@ -71,6 +85,7 @@
     // Function to clear password field
     const clearPassword = () => {
         passwordCheck.secondPassword = '';
+        passwordCheck.firstPassword = '';
     };
 
     // Function to swap first span animation boolean
@@ -115,10 +130,10 @@
                         <label for="username" class="absolute textFont left-3">Username</label>
                     </span>
                     <span class="spanStyle">
-                        <input required id="password" type="text" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
+                        <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
-                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button">
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({message: 'kutas', type: 'info'})}>
                         Log in
                     </button>
                     <!-- Forgot password button -->
@@ -188,12 +203,12 @@
                         on:focus={() => secondOrThirdSpanActive = true}
                         on:blur={() => secondOrThirdSpanActive = false}
                     >
-                        <input required id="password" type="text" bind:value={passwordCheck.firstPassword} class="inputField"/>
+                        <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
 
                     {#if !passwordCheck.conditions.allConditionsMet}
-                        <div class="flex flex-col gap-1 w-64 text-sm transition-all" style:transform={secondSpanClicked ? 'translateY(-20px)' : 'none'}>
+                        <div class="flex flex-col gap-1 w-64 text-sm transition-all" style:transform={secondSpanClicked || secondSpanNotBlank ? 'translateY(-20px)' : 'none'}>
                             <div class="flex items-center gap-2">
                                 <div class="w-4 h-4 transition-all duration-300">
                                     {#if passwordCheck.conditions.isAtLeast8Characters}
@@ -290,7 +305,7 @@
                             secondSpanClicked = false;
                         }}
                     >
-                        <input required id="confirmPassword" type="text" bind:value={passwordCheck.secondPassword} class="inputField"/>
+                        <input required id="confirmPassword" type="password" bind:value={passwordCheck.secondPassword} class="inputField"/>
                         <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
                     </span>
                     {#if !passwordCheck.doPasswordsMatch && passwordCheck.message.length > 0 && passwordCheck.conditions.allConditionsMet}
