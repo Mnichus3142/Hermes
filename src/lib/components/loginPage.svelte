@@ -133,7 +133,7 @@
                         <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
                     </span>
-                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({message: 'kutas', type: 'info'})}>
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({title: "Test" ,message: 'Sonia małym pieskiem jest', type: 'info'})}>
                         Log in
                     </button>
                     <!-- Forgot password button -->
@@ -208,7 +208,7 @@
                     </span>
 
                     {#if !passwordCheck.conditions.allConditionsMet}
-                        <div class="flex flex-col gap-1 w-64 text-sm transition-all" style:transform={secondSpanClicked || secondSpanNotBlank ? 'translateY(-20px)' : 'none'}>
+                        <div class="flex flex-col w-64 gap-1 text-sm transition-all" style:transform={secondSpanClicked || secondSpanNotBlank ? 'translateY(-20px)' : 'none'}>
                             <div class="flex items-center gap-2">
                                 <div class="w-4 h-4 transition-all duration-300">
                                     {#if passwordCheck.conditions.isAtLeast8Characters}
@@ -309,7 +309,7 @@
                         <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
                     </span>
                     {#if !passwordCheck.doPasswordsMatch && passwordCheck.message.length > 0 && passwordCheck.conditions.allConditionsMet}
-                        <p class="w-64 flex justify-center place-items-center text-red-500">
+                        <p class="flex justify-center w-64 text-red-500 place-items-center">
                             {passwordCheck.message}
                         </p>
                     {/if}

@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 
 export type notificationPayload = {
+    title: string;
     message: string;
     type: 'info' | 'error' | 'success';
 }
@@ -11,6 +12,7 @@ export type notificationType = {
 }
 
 export class Notification {
+    private title: string;
     private message: string;
     private notificationProperties: notificationType;
 
@@ -23,12 +25,17 @@ export class Notification {
     public id: number = 0;
     
     constructor (payload: notificationPayload, id: number) {
+        this.title = payload.title;
         this.message = payload.message;
         this.notificationProperties = {
             color: this.typeData[payload.type][0],
             icon: this.typeData[payload.type][1]
         }
         this.id = id;
+    }
+
+    public getTitle() {
+        return this.title;
     }
 
     public getMessage() {
