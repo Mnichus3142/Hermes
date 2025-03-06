@@ -114,17 +114,21 @@
 
     // Function to properly animate password strength conditions
     const moveConditionsUp = () => {
-      if (clickOnThirdSpan || secondSpanClicked || passwordCheck.secondPassword.length > 0) {
-        movePasswordConditions = true;
-      }
+        if (clickOnThirdSpan || secondSpanClicked || passwordCheck.secondPassword.length > 0) {
+            movePasswordConditions = true;
+        }
 
-      else if (!clickOnThirdSpan && !secondSpanClicked) {
-        movePasswordConditions = false;
-      }
+        else if (passwordCheck.secondPassword.length === 0) {
+            movePasswordConditions = false;
+        }
 
-      else {
-        movePasswordConditions = false;
-      }
+        else if (!clickOnThirdSpan && !secondSpanClicked) {
+            movePasswordConditions = false;
+        }
+
+        else {
+            movePasswordConditions = false;
+        }
     };
 </script>
 
@@ -220,8 +224,7 @@
                     <span class="spanStyle"
                         on:mouseenter={() => swapFirstSpanAnimation('password')}
                         on:mouseleave={() => swapFirstSpanAnimation('none')}    
-                        on:focus={() => secondOrThirdSpanActive = true}
-                        on:blur={() => secondOrThirdSpanActive = false}
+                        
                     >
                         <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
@@ -311,7 +314,7 @@
                     <!-- svelte-ignore typescript-all -->
                     <!-- svelte-ignore a11y_click_events_have_key_events -->
                     <span class="spanStyle" use:clickOutside 
-                        on:clickOutside={() => {
+                        on:click_outside={() => {
                             clickOnThirdSpan = false;
                             moveConditionsUp();
                         }}
