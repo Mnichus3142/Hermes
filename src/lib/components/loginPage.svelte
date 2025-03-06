@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fly } from 'svelte/transition';
+    import { fly, draw } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import { checkPasswords } from '$lib/functions/checkPasswords';
     import { clearSpaces } from '$lib/functions/clearSpaces';
@@ -29,6 +29,11 @@
     let clickOnThirdSpan: boolean = false;
     let movePasswordConditions: boolean = false;
 
+    // Input types
+    let loginPassword = 'password';
+    let registerPassword = 'password';
+    let registerConfirmation = 'password';
+
     // Variables for password checking
     let passwordCheck: checkPasswordsType = {
         doPasswordsMatch: false,
@@ -50,6 +55,15 @@
     $: passwordCheck.firstPassword = clearSpaces(passwordCheck.firstPassword);
     $: passwordCheck.secondPassword = clearSpaces(passwordCheck.secondPassword);
 
+    $: if (passwordCheck.firstPassword.length === 0) {
+        loginPassword = 'password';
+        registerPassword = 'password';
+    }
+
+    $: if (passwordCheck.firstPassword.length === 0) {
+        registerConfirmation = 'password';
+    }
+
     // Function to check if password contain something
     $: if (passwordCheck.firstPassword || passwordCheck.secondPassword) {
         swapFirstSpanAnimation();
@@ -58,6 +72,7 @@
         passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0 && (passwordCheck = checkPasswords(passwordCheck));
     };
 
+    // Bug fixing
     $: if (passwordCheck)
     {
         fixBugsWithFirstSpan();
@@ -160,7 +175,7 @@
                 in:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
             >
-                <form class="flex flex-col items-center justify-center w-full h-full gap-3">
+                <form class="flex flex-col items-center justify-center w-full h-full gap-3" novalidate>
                     <!-- Login card elements -->
                     <h2 class="mb-6 titleFont">Log in</h2>
                     <span class="spanStyle">
@@ -168,8 +183,26 @@
                         <label for="username" class="absolute textFont left-3">Username</label>
                     </span>
                     <span class="spanStyle">
-                        <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
+                        <input required id="password" type="{loginPassword}" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
+                        {#if passwordCheck.firstPassword.length !== 0}
+                            <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" on:click|stopPropagation={() => {
+                                loginPassword === 'password' ? loginPassword = 'text' : loginPassword = 'password';
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                    {#if loginPassword === 'text'}
+                                        <path 
+                                            d="M1 1L21 21" 
+                                            class="stroke-current"
+                                            transition:draw={{ duration: 100 }}
+                                        />
+                                    {/if}
+                                </svg>
+                            </button>
+                        {/if}
                     </span>
                     <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({title: "Test" ,message: 'Sonia małym pieskiem jest', type: 'info'})}>
                         Log in
@@ -226,7 +259,7 @@
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
                 out:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
             >
-                <form class="flex flex-col items-center justify-center h-full gap-3">
+                <form class="flex flex-col items-center justify-center h-full gap-3" novalidate>
                     <!-- Register card elements -->
                     <h2 class="mb-12 titleFont">Register</h2>
                     <span 
@@ -250,8 +283,26 @@
                         on:mouseleave={() => swapFirstSpanAnimation('none')}
                         
                     >
-                        <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="inputField"/>
+                        <input required id="password" type="{registerPassword}" bind:value={passwordCheck.firstPassword} class="inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
+                        {#if passwordCheck.firstPassword.length !== 0}
+                            <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" on:click|stopPropagation={() => {
+                                registerPassword === 'password' ? registerPassword = 'text' : registerPassword = 'password';
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                    {#if registerPassword === 'text'}
+                                        <path 
+                                            d="M1 1L21 21" 
+                                            class="stroke-current"
+                                            transition:draw={{ duration: 100 }}
+                                        />
+                                    {/if}
+                                </svg>
+                            </button>
+                        {/if}
                     </span>
 
                     {#if !passwordCheck.conditions.allConditionsMet}
@@ -366,8 +417,26 @@
                             thirdSpanClicked = false;
                         }}
                     >
-                        <input required id="confirmPassword" type="password" bind:value={passwordCheck.secondPassword} class="inputField"/>
+                        <input required id="confirmPassword" type="{registerConfirmation}" bind:value={passwordCheck.secondPassword} class="inputField"/>
                         <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
+                        {#if passwordCheck.secondPassword.length !== 0}
+                            <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer pointer-events-auto" on:click|stopPropagation={() => {
+                                registerConfirmation === 'password' ? registerConfirmation = 'text' : registerConfirmation = 'password';
+                            }}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                    <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                                    <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
+                                    {#if registerConfirmation === 'text'}
+                                        <path 
+                                            d="M1 1L21 21" 
+                                            class="stroke-current"
+                                            transition:draw={{ duration: 100 }}
+                                        />
+                                    {/if}
+                                </svg>
+                            </button>
+                        {/if}
                     </span>
                     {#if !passwordCheck.doPasswordsMatch && passwordCheck.message.length > 0 && passwordCheck.conditions.allConditionsMet}
                         <p class="flex justify-center w-64 text-red-500 place-items-center">
