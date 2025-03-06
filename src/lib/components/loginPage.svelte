@@ -161,7 +161,7 @@
     }
 </script>
 
-<main class="fixed inset-0 flex items-center justify-center overflow-hidden">
+<main class="fixed inset-0 flex items-center justify-center overflow-hidden bg-main-100">
     <!-- Page photo -->
     <div class="z-20 hidden w-1/2 h-full shadow-2xl md:block">
         <!-- svelte-ignore a11y_img_redundant_alt -->
@@ -209,19 +209,9 @@
                             </button>
                         {/if}
                     </span>
-                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({title: "Test" ,message: 'Sonia małym pieskiem jest', type: 'info'})}>
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({title: "Test" ,message: 'Sonia małym pieskiem jest', type: 'error', duration: 3000})}>
                         Log in
                     </button>
-                    <!-- Forgot password button -->
-                    <div class="flex-row items-center hidden gap-1">
-                        <p class="textFont">Maybe you want to </p>
-                        <button 
-                            class="text-orange-400 cursor-pointer textFont"
-                            on:click={toggleForms}
-                        >
-                            sign in
-                        </button>
-                    </div>
                     <!-- OAuth login -->
                     <div class="grid grid-cols-[repeat(auto-fit,_minmax(0,_1fr))] gap-2 w-64 h-16">
                         <button class="loginButton bg-[#7289da]" aria-label="Login with OAuth - Discord">

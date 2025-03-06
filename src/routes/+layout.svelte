@@ -6,7 +6,7 @@
     let { children }:LayoutProps = $props();
 </script>
 
-<main class="w-screen h-screen bg-main-100">
+<main class="max-w-screen max-h-screen bg-main-100">
     <Notification></Notification>
     {@render children()}
 </main>
