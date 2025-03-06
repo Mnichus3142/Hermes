@@ -54,11 +54,8 @@
     $: if (passwordCheck.firstPassword || passwordCheck.secondPassword) {
         swapFirstSpanAnimation();
         passwordCheck = checkPasswords(passwordCheck);
-        if (passwordCheck.firstPassword.length > 0) {
-            if (passwordCheck.secondPassword.length > 0) {
-                passwordCheck = checkPasswords(passwordCheck);
-            }
-        }
+
+        passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0 && (passwordCheck = checkPasswords(passwordCheck));
     };
 
     $: if (passwordCheck)
@@ -234,7 +231,7 @@
                     <h2 class="mb-12 titleFont">Register</h2>
                     <span 
                         class="spanStyle" 
-                        style:transform={firstSpanAnimation || isSecondSpanBlankButClicked ? 'translateY(-20px)' : 'none'}
+                        style:transform={firstSpanAnimation || isSecondSpanBlankButClicked || (clickOnThirdSpan && passwordCheck.conditions.allConditionsMet) ? 'translateY(-20px)' : 'none'}
                     >
                         <input required id="username" type="text" bind:value={username} class="inputField"/>
                         <label for="username" class="absolute textFont left-3">Username</label>
