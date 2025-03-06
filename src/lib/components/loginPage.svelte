@@ -4,6 +4,7 @@
     import { checkPasswords } from '$lib/functions/checkPasswords';
     import { clearSpaces } from '$lib/functions/clearSpaces';
     import { createNewNotification } from '$lib/logic/notificationLogic.svelte';
+    import { clickOutside } from '$lib/functions/clickOutside';
     import type { checkPasswordsType } from '$lib/types/checkPasswords';
 
     // Constants
@@ -22,6 +23,10 @@
     // Second span clicked
     let secondSpanClicked: boolean = false;
     let secondSpanNotBlank: boolean = false;
+
+    // Variables to properly animate password strenght conditions
+    let clickOnThirdSpan: boolean = false;
+    let movePasswordConditions: boolean = false;
 
     // Variables for password checking
     let passwordCheck: checkPasswordsType = {
@@ -105,6 +110,21 @@
         else {
             firstSpanAnimation = false;
         };
+    };
+
+    // Function to properly animate password strength conditions
+    const moveConditionsUp = () => {
+      if (clickOnThirdSpan || secondSpanClicked || passwordCheck.secondPassword.length > 0) {
+        movePasswordConditions = true;
+      }
+
+      else if (!clickOnThirdSpan && !secondSpanClicked) {
+        movePasswordConditions = false;
+      }
+
+      else {
+        movePasswordConditions = false;
+      }
     };
 </script>
 
@@ -208,7 +228,7 @@
                     </span>
 
                     {#if !passwordCheck.conditions.allConditionsMet}
-                        <div class="flex flex-col w-64 gap-1 text-sm transition-all" style:transform={secondSpanClicked || secondSpanNotBlank ? 'translateY(-20px)' : 'none'}>
+                        <div class="flex flex-col w-64 gap-1 text-sm transition-all" class:-translate-y-5={movePasswordConditions}>
                             <div class="flex items-center gap-2">
                                 <div class="w-4 h-4 transition-all duration-300">
                                     {#if passwordCheck.conditions.isAtLeast8Characters}
@@ -286,15 +306,28 @@
                         </div>
                     {/if}
 
-                    <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <span class="spanStyle"
+                    <!-- svelte-ignore a11y-click-events-key-events -->
+                    <!-- svelte-ignore a11y-no-static-element-interactions -->
+                    <!-- svelte-ignore typescript-all -->
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
+                    <span class="spanStyle" use:clickOutside 
+                        on:clickOutside={() => {
+                            clickOnThirdSpan = false;
+                            moveConditionsUp();
+                        }}
+                        on:click={() => {
+                            clickOnThirdSpan = true;
+                            moveConditionsUp();
+                        }}
                         on:mouseenter={() => {
                             swapFirstSpanAnimation('confirmaor');
                             secondSpanClicked = true;
+                            moveConditionsUp();
                         }}
                         on:mouseleave={() => {
-                            swapFirstSpanAnimation('none')
+                            swapFirstSpanAnimation('none');
                             secondSpanClicked = false;
+                            moveConditionsUp();
                         }}
                         on:focus={() => {
                             secondOrThirdSpanActive = true;
