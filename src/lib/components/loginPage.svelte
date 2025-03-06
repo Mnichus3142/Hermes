@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fly, draw } from 'svelte/transition';
+    import { fly, draw, fade } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
     import { checkPasswords } from '$lib/functions/checkPasswords';
     import { clearSpaces } from '$lib/functions/clearSpaces';
@@ -186,9 +186,14 @@
                         <input required id="password" type="{loginPassword}" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
                         {#if passwordCheck.firstPassword.length !== 0}
-                            <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" on:click|stopPropagation={() => {
-                                loginPassword === 'password' ? loginPassword = 'text' : loginPassword = 'password';
-                            }}>
+                            <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" 
+                                on:click|stopPropagation={() => {
+                                    loginPassword === 'password' ? loginPassword = 'text' : loginPassword = 'password';
+                                }}
+                                transition:fade={{
+                                    duration: 200
+                                }}
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                     <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
@@ -288,7 +293,11 @@
                         {#if passwordCheck.firstPassword.length !== 0}
                             <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" on:click|stopPropagation={() => {
                                 registerPassword === 'password' ? registerPassword = 'text' : registerPassword = 'password';
-                            }}>
+                            }}
+                            transition:fade={{
+                                duration: 200
+                            }}
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                     <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
@@ -422,7 +431,11 @@
                         {#if passwordCheck.secondPassword.length !== 0}
                             <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer pointer-events-auto" on:click|stopPropagation={() => {
                                 registerConfirmation === 'password' ? registerConfirmation = 'text' : registerConfirmation = 'password';
-                            }}>
+                            }}
+                            transition:fade={{
+                                duration: 200
+                            }}
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-eye">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
                                     <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
