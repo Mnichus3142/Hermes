@@ -21,10 +21,11 @@
     let secondOrThirdSpanActive: boolean = false;
 
     // Second span clicked
-    let secondSpanClicked: boolean = false;
-    let secondSpanNotBlank: boolean = false;
+    let isSecondSpanBlankButClicked: boolean = false;
+    let clickOnSecondSpan: boolean = false;
 
     // Variables to properly animate password strenght conditions
+    let thirdSpanClicked: boolean = false;
     let clickOnThirdSpan: boolean = false;
     let movePasswordConditions: boolean = false;
 
@@ -60,6 +61,11 @@
         }
     };
 
+    $: if (passwordCheck)
+    {
+        fixBugsWithFirstSpan();
+    }
+
     // Function to disable conditions, if password field is blank
     $: if (passwordCheck.firstPassword === '') {
         passwordCheck.conditions.allConditionsMet = false;
@@ -68,17 +74,6 @@
         passwordCheck.conditions.hasAtLeast1SpecialCharacter = false;
         passwordCheck.conditions.hasAtLeast1UppercaseLetter = false;
         passwordCheck.conditions.isAtLeast8Characters = false;
-    }
-
-    // Function to move conditions div if field is not blank
-    $: if (passwordCheck.secondPassword.length != 0)
-    {
-        secondSpanNotBlank = true;
-    }
-
-    $: if (passwordCheck.secondPassword.length === 0)
-    {
-        secondSpanNotBlank = false;
     }
 
     // Function to toggle between login and register forms
@@ -92,17 +87,17 @@
         passwordCheck.secondPassword = '';
         passwordCheck.firstPassword = '';
     };
-
+    
     // Function to swap first span animation boolean
     const swapFirstSpanAnimation = (mouseEvent: string = 'none') => {
         if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
             firstSpanAnimation = true;
-        } 
-
+        }
+        
         else if ((mouseEvent === 'confirmaor' && passwordCheck.firstPassword.length > 0) || (mouseEvent === 'password' && passwordCheck.secondPassword.length > 0)) {
             firstSpanAnimation = true;
         }
-
+        
         else if (secondOrThirdSpanActive && (mouseEvent === 'confirmaor' || mouseEvent === 'password')) {
             firstSpanAnimation = true;
         }
@@ -111,10 +106,10 @@
             firstSpanAnimation = false;
         };
     };
-
+    
     // Function to properly animate password strength conditions
     const moveConditionsUp = () => {
-        if (clickOnThirdSpan || secondSpanClicked || passwordCheck.secondPassword.length > 0) {
+        if (clickOnThirdSpan || thirdSpanClicked || passwordCheck.secondPassword.length > 0) {
             movePasswordConditions = true;
         }
 
@@ -122,14 +117,36 @@
             movePasswordConditions = false;
         }
 
-        else if (!clickOnThirdSpan && !secondSpanClicked) {
-            movePasswordConditions = false;
-        }
-
         else {
             movePasswordConditions = false;
         }
     };
+
+    // Function to handle both second and third span actions, which have impact on first span position
+    const fixBugsWithFirstSpan = () => {
+        if (passwordCheck.firstPassword.length !== 0 && clickOnThirdSpan)
+        {
+            isSecondSpanBlankButClicked = true;
+        }
+
+        if (passwordCheck.secondPassword.length !== 0 && clickOnSecondSpan)
+        {
+            isSecondSpanBlankButClicked = true;
+        }      
+    }
+
+    // Function to reset first span position 
+    const resetFirstSpan = () => {
+        if (passwordCheck.firstPassword.length !== 0 && passwordCheck.secondPassword.length === 0)
+        {
+            isSecondSpanBlankButClicked = false;
+        }
+
+        if (passwordCheck.firstPassword.length === 0 && passwordCheck.secondPassword.length !== 0)
+        {
+            isSecondSpanBlankButClicked = false;
+        }
+    }
 </script>
 
 <main class="fixed inset-0 flex items-center justify-center overflow-hidden">
@@ -215,15 +232,25 @@
                 <form class="flex flex-col items-center justify-center h-full gap-3">
                     <!-- Register card elements -->
                     <h2 class="mb-12 titleFont">Register</h2>
-                    <span class="spanStyle" style:transform={firstSpanAnimation ? 'translateY(-20px)' : 'none'}>
+                    <span 
+                        class="spanStyle" 
+                        style:transform={firstSpanAnimation || isSecondSpanBlankButClicked ? 'translateY(-20px)' : 'none'}
+                    >
                         <input required id="username" type="text" bind:value={username} class="inputField"/>
                         <label for="username" class="absolute textFont left-3">Username</label>
                     </span>
 
                     <!-- svelte-ignore a11y_no_static_element_interactions -->
-                    <span class="spanStyle"
+                    <!-- svelte-ignore a11y_click_events_have_key_events -->
+                    <span class="spanStyle" use:clickOutside 
+                        on:click_outside={() => {
+                            clickOnSecondSpan = false;
+                        }}
+                        on:click={() => {
+                            clickOnSecondSpan = true;
+                        }}
                         on:mouseenter={() => swapFirstSpanAnimation('password')}
-                        on:mouseleave={() => swapFirstSpanAnimation('none')}    
+                        on:mouseleave={() => swapFirstSpanAnimation('none')}
                         
                     >
                         <input required id="password" type="password" bind:value={passwordCheck.firstPassword} class="inputField"/>
@@ -317,6 +344,7 @@
                         on:click_outside={() => {
                             clickOnThirdSpan = false;
                             moveConditionsUp();
+                            resetFirstSpan();
                         }}
                         on:click={() => {
                             clickOnThirdSpan = true;
@@ -324,21 +352,21 @@
                         }}
                         on:mouseenter={() => {
                             swapFirstSpanAnimation('confirmaor');
-                            secondSpanClicked = true;
+                            thirdSpanClicked = true;
                             moveConditionsUp();
                         }}
                         on:mouseleave={() => {
                             swapFirstSpanAnimation('none');
-                            secondSpanClicked = false;
+                            thirdSpanClicked = false;
                             moveConditionsUp();
                         }}
                         on:focus={() => {
                             secondOrThirdSpanActive = true;
-                            secondSpanClicked = true;
+                            thirdSpanClicked = true;
                         }}
                         on:blur={() => {
                             secondOrThirdSpanActive = false
-                            secondSpanClicked = false;
+                            thirdSpanClicked = false;
                         }}
                     >
                         <input required id="confirmPassword" type="password" bind:value={passwordCheck.secondPassword} class="inputField"/>
