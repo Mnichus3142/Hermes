@@ -160,6 +160,48 @@
             isSecondSpanBlankButClicked = false;
         }
     }
+
+    // Function to handle internal login
+    const handleInternalLogin = async (e: Event) => {
+        e.preventDefault();
+        if (passwordCheck.firstPassword === '' || username === '') {
+            createNewNotification({
+                title: 'Could not log in',
+                message: 'Password and username cannot be empty',
+                type: 'error',
+                duration: 3000
+            });
+        }
+    };
+
+    // Function to handle third party login
+    const handleThirdPartyLogin = async (e: Event) => {
+        e.preventDefault();
+        console.log('Login with third party');
+    };
+
+    // Function to handle internal registration
+    const handleInternalRegistration = async (e: Event) => {
+        e.preventDefault();
+
+        if (passwordCheck.firstPassword === '' || username === '' || passwordCheck.secondPassword === '') {
+            createNewNotification({
+                title: 'Could not register',
+                message: 'Password and username cannot be empty',
+                type: 'error',
+                duration: 3000
+            })
+        }
+
+        else if (passwordCheck.firstPassword !== passwordCheck.secondPassword) {
+            createNewNotification({
+                title: 'Could not register',
+                message: 'Passwords do not match',
+                type: 'error',
+                duration: 3000
+            })
+        }
+    };
 </script>
 
 <main class="fixed inset-0 flex items-center justify-center overflow-hidden bg-main-100">
@@ -210,7 +252,7 @@
                             </button>
                         {/if}
                     </span>
-                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={() => createNewNotification({title: "Test" ,message: 'Sonia małym pieskiem jest', type: 'error', duration: 3000})}>
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={handleInternalLogin}>
                         Log in
                     </button>
                     <!-- OAuth login -->
@@ -447,7 +489,7 @@
                             {passwordCheck.message}
                         </p>
                     {/if}
-                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button">
+                    <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Login button" on:click={handleInternalRegistration}>
                         Register
                     </button>
                     <!-- Splitter -->
