@@ -164,6 +164,8 @@
     // Function to handle internal login
     const handleInternalLogin = async (e: Event) => {
         e.preventDefault();
+
+        
         if (passwordCheck.firstPassword === '' || username === '') {
             createNewNotification({
                 title: 'Could not log in',
@@ -184,23 +186,65 @@
     const handleInternalRegistration = async (e: Event) => {
         e.preventDefault();
 
-        if (passwordCheck.firstPassword === '' || username === '' || passwordCheck.secondPassword === '') {
-            createNewNotification({
-                title: 'Could not register',
-                message: 'Password and username cannot be empty',
-                type: 'error',
-                duration: 3000
-            })
-        }
+        // if (passwordCheck.firstPassword === '' || username === '' || passwordCheck.secondPassword === '') {
+        //     console.error('Password and username cannot be empty');
+        //     createNewNotification({
+        //         title: 'Could not register',
+        //         message: 'Password and username cannot be empty',
+        //         type: 'error',
+        //         duration: 3000
+        //     })
 
-        else if (passwordCheck.firstPassword !== passwordCheck.secondPassword) {
+        //     return;
+        // }
+
+        // else if (passwordCheck.firstPassword !== passwordCheck.secondPassword) {
+        //     console.error('Passwords do not match');
+        //     createNewNotification({
+        //         title: 'Could not register',
+        //         message: 'Passwords do not match',
+        //         type: 'error',
+        //         duration: 3000
+        //     })
+
+        //     return;
+        // }
+
+        fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: passwordCheck.firstPassword,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message);
+            }
+
             createNewNotification({
-                title: 'Could not register',
-                message: 'Passwords do not match',
+                title: 'Registration completed',
+                message: data.message,
+                type: 'success',
+                duration: 3000
+            });
+
+            loginVisible = true;
+            clearPassword();
+        })
+        .catch(error => {
+            console.error('Error during registration:', error);
+            createNewNotification({
+                title: 'Error during registration',
+                message: error.message || 'There was an unknown error during registration',
                 type: 'error',
                 duration: 3000
-            })
-        }
+            });
+        });
     };
 </script>
 
