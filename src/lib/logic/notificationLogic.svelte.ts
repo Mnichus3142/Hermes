@@ -17,6 +17,8 @@ export class Notification {
     private message: string;
     private notificationProperties: notificationType;
     private duration: number;
+    private createdAt: number;
+    private remainingTime: number;
 
     private typeData = {
         'info' : ['bg-blue-500', ''],
@@ -35,6 +37,8 @@ export class Notification {
         }
         this.id = id;
         this.duration = payload.duration;
+        this.createdAt = Date.now();
+        this.remainingTime = payload.duration;
     }
 
     public getTitle() {
@@ -59,6 +63,12 @@ export class Notification {
 
     public closeNotification() {
         removeNotification(this.id);
+    }
+
+    public getRemainingTime(): number {
+        if (this.duration === 0) return 0;
+        const elapsed = Date.now() - this.createdAt;
+        return Math.max(0, this.duration - elapsed);
     }
 }
 
