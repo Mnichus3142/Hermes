@@ -6,8 +6,7 @@
 
     const animationDuration = 300;
     
-    // Aktualizacja co sekundę
-    const updateInterval = 100;
+    const updateInterval = 10;
     let mounted = true;
 
     onMount(() => {
