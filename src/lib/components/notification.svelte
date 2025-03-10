@@ -60,7 +60,7 @@
                 <!-- Close button with timer -->
                 <div class="absolute top-2 right-2">
                     {#if notification.getDuration() > 0}
-                        <svg class="absolute -top-0.5 -right-0.5" width="28" height="28" viewBox="0 0 28 28">
+                        <svg class="absolute -top-0.5 -right-0.5 scale-90" width="28" height="28" viewBox="0 0 28 28">
                             <circle
                                 cx="14"
                                 cy="14"
