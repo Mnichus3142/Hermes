@@ -55,6 +55,7 @@
     $: passwordCheck.firstPassword = clearSpaces(passwordCheck.firstPassword);
     $: passwordCheck.secondPassword = clearSpaces(passwordCheck.secondPassword);
 
+    // Disable visibility of passwords
     $: if (passwordCheck.firstPassword.length === 0) {
         loginPassword = 'password';
         registerPassword = 'password';
