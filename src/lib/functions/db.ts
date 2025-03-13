@@ -5,7 +5,7 @@ const sql = postgres({
   host: env.HOST,
   port: Number(env.PORT),
   database: env.DATABASE,
-  user: env.USERNAME,
+  user: env.DATABASE_USER,
   password: env.PASSWORD,
   ssl: env.SSL_ENABLED === "true" 
     ? { rejectUnauthorized: false }

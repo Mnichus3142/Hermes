@@ -80,13 +80,13 @@ const getNotExistingTables = (sqlFiles: String[], tables: String[]) => {
     return sqlFiles.filter(file => !tables.includes(file));
 }
 
-const standarizeQuery = (query: String) => {
+const standardizeQuery = (query: String) => {
     return query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 export const createTables = async (tables: String[]) => {
     for (const table of tables) {
-        const query = standarizeQuery(fs.readFileSync(`${__dirname}/${table}.sql`, 'utf8'));
+        const query = standardizeQuery(fs.readFileSync(`${__dirname}/${table}.sql`, 'utf8'));
         try {
             await sql.unsafe(query);
         } catch (error) {
