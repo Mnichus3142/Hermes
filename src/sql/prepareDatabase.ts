@@ -3,7 +3,6 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
 import sql from '$lib/functions/db';
-const readline = require('node:readline');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -28,15 +27,48 @@ export const verifyTables = async () => {
         
         const sqlFiles = files.filter(file => file.endsWith('.sql')).map(file => file.replace('.sql', ''));
 
-        const query = await sql`SELECT table_name
-                                    FROM information_schema.tables
-                                    WHERE table_schema='public'
-                                    AND table_type='BASE TABLE';`;
+        const queryTableNames = await sql`SELECT table_name
+                                            FROM information_schema.tables
+                                            WHERE table_schema='public'
+                                            AND table_type='BASE TABLE';`;
 
-        const tables = query.map(table => table.table_name);
+        const tables = queryTableNames.map(table => table.table_name);
                     
-        if (!sqlFiles.every(file => tables.includes(file))) return createTables(getNotExistingTables(sqlFiles, tables));
+        if (!sqlFiles.every(file => tables.includes(file))) createTables(getNotExistingTables(sqlFiles, tables));
 
+        for (const table of tables) {
+            const queryTableColumns = await sql`SELECT column_name, data_type, is_nullable, column_default
+                                              FROM information_schema.columns
+                                              WHERE table_name = ${table};`;
+
+            const file = fs.readFileSync(`${__dirname}/${table}.sql`, 'utf8')
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line !== '' && !line.startsWith('CREATE TABLE') && line !== ');')
+            .reduce((acc, line) => {
+                const [key, ...rest] = line.split(' ');
+                acc[key] = rest.join(' ').replace(',', '');
+                return acc;
+            }, {} as Record<string, string>);
+            console.log("This is the file")
+            console.table(file)
+
+            for (const column of queryTableColumns) {
+                const conditions = {
+                    column_name: column.column_name,
+                    data_type: column.data_type,
+                    is_nullable: column.is_nullable,
+                    column_default: column.column_default
+                }
+
+                console.log("This is a column")
+                console.table(conditions)
+
+                let needToBeChanged: String;
+
+                console.log(file.hasOwnProperty(column.column_name));
+            }
+        }
         return true;
     } catch (error) {
         console.error('There was an error during reading files in SQL catalog or when getting tables from database', error);
