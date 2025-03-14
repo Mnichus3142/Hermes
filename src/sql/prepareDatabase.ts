@@ -37,7 +37,7 @@ export const verifyTables = async () => {
         if (!sqlFiles.every(file => tables.includes(file))) createTables(getNotExistingTables(sqlFiles, tables));
 
         for (const table of tables) {
-            const queryTableColumns = await sql`SELECT column_name, data_type, is_nullable, column_default
+            const queryTableColumns = await sql`SELECT column_name, data_type, is_nullable, column_default, character_maximum_length
                                               FROM information_schema.columns
                                               WHERE table_name = ${table};`;
 
@@ -50,23 +50,42 @@ export const verifyTables = async () => {
                 acc[key] = rest.join(' ').replace(',', '');
                 return acc;
             }, {} as Record<string, string>);
+
             console.log("This is the file")
             console.table(file)
+
+            let columnsInDatabase: { [key: string]: any } = {};
 
             for (const column of queryTableColumns) {
                 const conditions = {
                     column_name: column.column_name,
                     data_type: column.data_type,
                     is_nullable: column.is_nullable,
-                    column_default: column.column_default
+                    column_default: column.column_default,
+                    character_maximum_length: column.character_maximum_length
                 }
 
-                console.log("This is a column")
-                console.table(conditions)
+                columnsInDatabase[column.column_name] = conditions;
+            }
 
-                let needToBeChanged: String;
+            console.log("Those are the columns in the database");
+            console.table(columnsInDatabase)
 
-                console.log(file.hasOwnProperty(column.column_name));
+            for (const column in file) {
+                if (column in columnsInDatabase) {
+                    // console.log(file[column].split(' '))
+                    for (const word of file[column].split(' ')) {
+                        // console.log(word)
+                    }
+                    // console.log(columnsInDatabase[column])
+                }
+
+                // console.log('\n')
+
+                else {
+                    const query = `ALTER TABLE ${table} ADD COLUMN ${column} ${file[column]}`;
+                    await sql.unsafe(query);
+                }
             }
         }
         return true;
