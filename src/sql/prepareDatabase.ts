@@ -51,9 +51,6 @@ export const verifyTables = async () => {
                 return acc;
             }, {} as Record<string, string>);
 
-            console.log("This is the file")
-            console.table(file)
-
             let columnsInDatabase: { [key: string]: any } = {};
 
             for (const column of queryTableColumns) {
@@ -68,20 +65,23 @@ export const verifyTables = async () => {
                 columnsInDatabase[column.column_name] = conditions;
             }
 
-            console.log("Those are the columns in the database");
-            console.table(columnsInDatabase)
-
             for (const column in file) {
                 if (column in columnsInDatabase) {
-                    // console.log(file[column].split(' '))
                     for (const word of file[column].split(' ')) {
-                        // console.log(word)
+                        if (word === 'SERIAL' && (columnsInDatabase[column].data_type !== 'integer' || columnsInDatabase[column].column_default !== 'nextval(\'${table}_${column}_seq\'::regclass)'))
+                        {
+                            const query = `ALTER TABLE ${table} DROP COLUMN ${column}; ALTER TABLE ${table} ADD COLUMN ${column} SERIAL PRIMARY KEY;`;
+                            await sql.unsafe(query);
+                        }
+
+                        else if (word === 'VARCHAR(255)' && (column === 'password' || column === 'username') && (columnsInDatabase[column].character_maximum_length !== 255 || columnsInDatabase[column].data_type !== 'character varying' || columnsInDatabase[column].is_nullable !== 'NO'))
+                        {
+                            const query = `ALTER TABLE ${table} ALTER COLUMN ${column} SET NOT NULL; ALTER TABLE ${table} ALTER COLUMN ${column} SET DATA TYPE VARCHAR(255);`;
+                            await sql.unsafe(query);
+                        }
                     }
-                    // console.log(columnsInDatabase[column])
                 }
-
-                // console.log('\n')
-
+                
                 else {
                     const query = `ALTER TABLE ${table} ADD COLUMN ${column} ${file[column]}`;
                     await sql.unsafe(query);
