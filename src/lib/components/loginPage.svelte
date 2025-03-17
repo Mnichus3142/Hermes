@@ -239,6 +239,14 @@
                 duration: 3000
             });
 
+            firstSpanAnimation = false;
+            secondOrThirdSpanActive = false;
+            isSecondSpanBlankButClicked = false;
+            clickOnSecondSpan = false;
+            thirdSpanClicked = false;
+            clickOnThirdSpan = false;
+            movePasswordConditions = false;
+
             loginVisible = true;
             clearPassword();
         })
