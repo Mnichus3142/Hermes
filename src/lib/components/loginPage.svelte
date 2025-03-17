@@ -362,7 +362,7 @@
                     <h2 class="mb-12 titleFont">Register</h2>
                     <span 
                         class="spanStyle" 
-                        style:transform={firstSpanAnimation || isSecondSpanBlankButClicked || (clickOnThirdSpan && passwordCheck.conditions.allConditionsMet) ? 'translateY(-20px)' : 'none'}
+                        style:transform={firstSpanAnimation || isSecondSpanBlankButClicked || (clickOnThirdSpan && passwordCheck.conditions.allConditionsMet) || (passwordCheck.firstPassword.length !== 0 && thirdSpanClicked) ? 'translateY(-20px)' : 'none'}
                     >
                         <input required id="username" type="text" bind:value={username} class="inputField"/>
                         <label for="username" class="absolute textFont left-3">Username</label>
@@ -379,7 +379,6 @@
                         }}
                         on:mouseenter={() => swapFirstSpanAnimation('password')}
                         on:mouseleave={() => swapFirstSpanAnimation('none')}
-                        
                     >
                         <input required id="password" type="{registerPassword}" bind:value={passwordCheck.firstPassword} class="inputField"/>
                         <label for="password" class="absolute textFont left-3">Password</label>
@@ -408,7 +407,7 @@
                     </span>
 
                     {#if !passwordCheck.conditions.allConditionsMet}
-                        <div class="flex flex-col w-64 gap-1 text-sm transition-all" class:-translate-y-5={movePasswordConditions}>
+                        <div class="flex flex-col w-64 gap-1 text-sm transition-all" class:-translate-y-5={movePasswordConditions || (passwordCheck.firstPassword.length !== 0 && thirdSpanClicked)}>
                             <div class="flex items-center gap-2">
                                 <div class="w-4 h-4 transition-all duration-300">
                                     {#if passwordCheck.conditions.isAtLeast8Characters}
@@ -513,6 +512,14 @@
                         on:focus={() => {
                             secondOrThirdSpanActive = true;
                             thirdSpanClicked = true;
+                        }}
+                        on:focusin={() => {
+                            secondOrThirdSpanActive = true;
+                            thirdSpanClicked = true;
+                        }}
+                        on:focusout={() => {
+                            secondOrThirdSpanActive = false
+                            thirdSpanClicked = false;
                         }}
                         on:blur={() => {
                             secondOrThirdSpanActive = false
