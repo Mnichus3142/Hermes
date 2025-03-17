@@ -186,29 +186,29 @@
     const handleInternalRegistration = async (e: Event) => {
         e.preventDefault();
 
-        // if (passwordCheck.firstPassword === '' || username === '' || passwordCheck.secondPassword === '') {
-        //     console.error('Password and username cannot be empty');
-        //     createNewNotification({
-        //         title: 'Could not register',
-        //         message: 'Password and username cannot be empty',
-        //         type: 'error',
-        //         duration: 3000
-        //     })
+        if (passwordCheck.firstPassword === '' || username === '' || passwordCheck.secondPassword === '') {
+            console.error('Password and username cannot be empty');
+            createNewNotification({
+                title: 'Could not register',
+                message: 'Password and username cannot be empty',
+                type: 'error',
+                duration: 3000
+            })
 
-        //     return;
-        // }
+            return;
+        }
 
-        // else if (passwordCheck.firstPassword !== passwordCheck.secondPassword) {
-        //     console.error('Passwords do not match');
-        //     createNewNotification({
-        //         title: 'Could not register',
-        //         message: 'Passwords do not match',
-        //         type: 'error',
-        //         duration: 3000
-        //     })
+        else if (passwordCheck.firstPassword !== passwordCheck.secondPassword) {
+            console.error('Passwords do not match');
+            createNewNotification({
+                title: 'Could not register',
+                message: 'Passwords do not match',
+                type: 'error',
+                duration: 3000
+            })
 
-        //     return;
-        // }
+            return;
+        }
 
         fetch('/api/auth/register', {
             method: 'POST',
@@ -223,11 +223,17 @@
         .then(response => response.json())
         .then(data => {
             if (!data.success) {
-                throw new Error(data.message);
+                createNewNotification({
+                    title: data.title,
+                    message: data.message,
+                    type: 'error',
+                    duration: 3000
+                })
+                throw new Error('409');
             }
 
             createNewNotification({
-                title: 'Registration completed',
+                title: data.title,
                 message: data.message,
                 type: 'success',
                 duration: 3000
@@ -237,13 +243,15 @@
             clearPassword();
         })
         .catch(error => {
-            console.error('Error during registration:', error);
-            createNewNotification({
-                title: 'Error during registration',
-                message: error.message || 'There was an unknown error during registration',
-                type: 'error',
-                duration: 3000
-            });
+            if (error.message !== '409') {
+                console.error('Error during registration:', error);
+                createNewNotification({
+                    title: 'Error during registration',
+                    message: error.message || 'There was an unknown error during registration',
+                    type: 'error',
+                    duration: 3000
+                });
+            }
         });
     };
 </script>
