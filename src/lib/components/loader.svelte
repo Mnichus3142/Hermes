@@ -31,7 +31,7 @@
     </div>
     <!-- First white ring -->
     <div 
-        class="absolute z-20 h-[calc(4/12*100%-30px)] aspect-square rounded-full bg-background"
+        class="absolute z-20 h-[calc(4/12*100%-30px)] aspect-square rounded-full bg-main-100"
     >
     </div>
     <!-- Second ring -->
@@ -42,7 +42,7 @@
     </div>
     <!-- Second white ring -->
     <div 
-        class="absolute z-30 h-[calc(4/12*100%-50px)] aspect-square rounded-full bg-background"
+        class="absolute z-30 h-[calc(4/12*100%-50px)] aspect-square rounded-full bg-main-100"
     >
     </div>
     <!-- Third ring -->
@@ -53,7 +53,7 @@
     </div>
     <!-- Third white ring -->
     <div 
-        class="absolute z-40 h-[calc(4/12*100%-70px)] aspect-square rounded-full bg-background"
+        class="absolute z-40 h-[calc(4/12*100%-70px)] aspect-square rounded-full bg-main-100"
     >
     </div>
 </main>
