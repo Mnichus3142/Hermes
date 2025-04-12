@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.0.8",
+		"erronaut": "^1.0.2",
 		"postgres": "^3.4.5"
 	}
 }

@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import 'erronaut';
 import type { OAuthButtons } from '$lib/types/OAuthButtons';
 
 export async function GET() {

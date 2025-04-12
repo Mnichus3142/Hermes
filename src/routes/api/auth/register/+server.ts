@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import sql from '$lib/functions/db';
 import crypto from 'crypto';
+import 'erronaut';
 import type { RequestEvent } from './$types';
 
 export async function POST(event: RequestEvent) {
