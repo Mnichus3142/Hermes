@@ -11,7 +11,11 @@ declare global {
 
 	declare namespace svelteHTML {
         interface HTMLAttributes<T> {
-            'on:click_outside'?: CompositionEventHandler<T>;
+            // Removed old declaration for on:click_outside
+            // 'on:click_outside'?: CompositionEventHandler<T>;
+            
+            // Added new declaration for onclick_outside compatible with Svelte 5 syntax
+            onclick_outside?: (event: CustomEvent<{originalEvent: MouseEvent}>) => void;
         }
     }
 }
