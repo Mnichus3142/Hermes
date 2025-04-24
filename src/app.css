@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./lib/styles/loginPage.css";
 
 /* Light theme */
 :root {
@@ -38,47 +39,4 @@
 /* Font for normal text */
 .textFont {
     @apply text-lg font-normal font-text;
-}
-
-/* Style for span containing elements */
-.spanStyle {
-    @apply relative flex items-center justify-center w-64 h-10 transition-all;
-}
-
-.spanStyle:has(~ .spanStyle:hover), .spanStyle:has(~ .spanStyle .inputField:focus), .spanStyle:has(~ .spanStyle .inputField:valid) {
-    @apply -translate-y-4;
-}
-
-.spanStyle > * {
-    @apply transition-all;
-}
-
-.spanStyle > label {
-    @apply text-main-400;
-}
-
-.spanStyle:hover > label, .inputField:focus + label, .inputField:valid + label {
-    @apply text-gray-800 -translate-y-8;
-}
-
-/* Style for input field */
-.inputField {
-    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-main-300;
-}
-
-.inputField:focus, .inputField:hover, .inputField:valid {
-    @apply border-orange-300 outline-none;
-}
-
-/* Style for external login buttons */
-.loginButton {
-    @apply flex items-center justify-center transition-all rounded-md cursor-pointer max-h-16;
-}
-
-.loginButton:hover {
-    @apply scale-110;
-}
-
-.loginButton svg {
-    @apply h-1/2 fill-main-100;
 }
