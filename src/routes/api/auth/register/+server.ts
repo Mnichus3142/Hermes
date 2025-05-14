@@ -1,17 +1,19 @@
 import { json } from '@sveltejs/kit';
-import sql from '$lib/functions/db';
+import prisma from '$lib/functions/prisma';
 import crypto from 'crypto';
 import 'erronaut';
 import type { RequestEvent } from './$types';
 
 export async function POST(event: RequestEvent) {
     try {
-        // Get the username and password from user
         const { username, password } = await event.request.json();
+        const userExists = await prisma.users.findUnique({
+            where: {
+                username: username
+            }
+        });
 
-        // Check if the user already exists in database
-        const userExists = await sql`SELECT * FROM users WHERE username = ${username}`;
-        if (userExists.length !== 0) {
+        if (userExists) {
             return json(
                 {
                     success: false,
@@ -22,11 +24,14 @@ export async function POST(event: RequestEvent) {
             );
         }
 
-        // Encrypt password
         const encryptedPassword = await crypto.createHash('sha256').update(password).digest('hex');
 
-        // Insert the user into the database
-        await sql`INSERT INTO users (username, password) VALUES (${username}, ${encryptedPassword})`;
+        await prisma.users.create({
+            data: {
+                username: username,
+                password: encryptedPassword
+            }
+        });
 
         return json(
             {
@@ -48,5 +53,9 @@ export async function POST(event: RequestEvent) {
             },
             { status: 500 }
         );
+    }
+
+    finally {
+        await prisma.$disconnect();
     }
 }
