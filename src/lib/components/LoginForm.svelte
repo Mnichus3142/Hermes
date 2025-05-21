@@ -29,7 +29,7 @@
         }
     });
 
-    function handleInternalLogin(e: Event) {
+    async function handleInternalLogin(e: Event) {
         e.preventDefault();
 
         if (passwordCheck.firstPassword === '' || username === '') {
@@ -39,6 +39,44 @@
                 type: 'error',
                 duration: 3000
             });
+
+            return 0;
+        }
+
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: passwordCheck.firstPassword,
+                })
+            });
+
+            const data = await response.json();
+            if (!data.success) {
+                createNewNotification({
+                    title: data.title,
+                    message: data.message,
+                    type: 'error',
+                    duration: 3000
+                });
+                throw new Error('409');
+            }
+        }
+
+        catch (error: any) {
+            if (error.message !== '409') {
+                console.error('Error during logging in:', error);
+                createNewNotification({
+                    title: 'Error during logging in',
+                    message: error.message || 'There was an unknown error during logging in',
+                    type: 'error',
+                    duration: 3000
+                });
+            }
         }
     }
 

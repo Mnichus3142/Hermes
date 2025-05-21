@@ -9,11 +9,11 @@ export type notificationPayload = {
 
 export type notificationType = {
     color: string;
-    icon: string;
 }
 
 export class Notification {
     private title: string;
+    private type: string;
     private message: string;
     private notificationProperties: notificationType;
     private duration: number;
@@ -21,19 +21,19 @@ export class Notification {
     private remainingTime: number;
 
     private typeData = {
-        'info' : ['bg-blue-500', ''],
-        'error' : ['bg-red-500' , ''],
-        'success': ['bg-green-500', '']
+        'info' : 'bg-blue-500',
+        'error' : 'bg-red-500',
+        'success': 'bg-green-500'
     };
 
     public id: number = 0;
     
     constructor (payload: notificationPayload, id: number) {
         this.title = payload.title;
+        this.type = payload.type;
         this.message = payload.message;
         this.notificationProperties = {
-            color: this.typeData[payload.type][0],
-            icon: this.typeData[payload.type][1]
+            color: this.typeData[payload.type],
         }
         this.id = id;
         this.duration = payload.duration;
@@ -58,7 +58,7 @@ export class Notification {
     }
 
     public getNotificationProperties() {
-        return this.notificationProperties;
+        return [this.type, this.notificationProperties];
     }
 
     public closeNotification() {
@@ -81,7 +81,7 @@ export const removeNotification = (id: number) => {
         const filteredNotifications = current.filter(notif => notif.id !== id);
         
         return filteredNotifications.map((notif, index) => {
-            notif.id = index + 1;
+            notif.id = index;
             return notif;
         });
     });

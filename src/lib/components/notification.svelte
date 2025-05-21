@@ -35,16 +35,19 @@
     }
 </script>
 
-<main class='max-h-svh max-w-svw'>
-    <div class="fixed bottom-0 right-0 z-30 flex flex-col justify-start p-4 h-fit">
+<main class='max-h-svh max-w-svw flex place-items-center justify-center'>
+    <div class="fixed bottom-0 z-30 flex flex-col justify-center p-4 h-fit">
         {#each $notifications as notification, index (notification)}
             <!-- Main container -->
             <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded min-w-80 max-w-80 overflow-hidden"
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintInOut }}
                 out:fly={{ x: 1000, duration: animationDuration, easing: quintInOut }}
             >
-                <!-- Colored line -->
-                <div class="{notification.getNotificationProperties().color} w-1"></div>
+                <!--Message icon-->
+                <div class="flex justify-center place-items-center w-20">
+                    <img src="{notification.getNotificationProperties()[0]}.svg" alt="Notification icon">
+                </div>
+
                 <!-- Content container -->
                 <div class="p-2 flex-1 grid">
                     <!-- Title -->
@@ -58,31 +61,29 @@
                 </div>
                 <!-- Close button with timer -->
                 <div class="absolute top-2 right-2">
-                    {#if notification.getDuration() > 0}
-                        <svg class="absolute -top-0.5 -right-0.5 scale-90" width="28" height="28" viewBox="0 0 28 28">
-                            <circle
-                                cx="14"
-                                cy="14"
-                                r="13"
-                                fill="none"
-                                stroke="#e2e8f0"
-                                stroke-width="2"
-                            />
-                            <circle
-                                cx="14"
-                                cy="14"
-                                r="13"
-                                fill="none"
-                                stroke="#94a3b8"
-                                stroke-width="2"
-                                stroke-dasharray={`${2 * Math.PI * 13}`}
-                                stroke-dashoffset={`${2 * Math.PI * 13 * (1 - calculateProgress(notification) / 100)}`}
-                                transform="rotate(-90 14 14)"
-                                style="transition: stroke-dashoffset 0.1s linear;"
-                            />
-                        </svg>
-                    {/if}
-                    <button 
+                    <svg class="absolute -top-0.5 -right-0.5 scale-90" width="28" height="28" viewBox="0 0 28 28">
+                        <circle
+                            cx="14"
+                            cy="14"
+                            r="13"
+                            fill="none"
+                            stroke="#e2e8f0"
+                            stroke-width="2"
+                        />
+                        <circle
+                            cx="14"
+                            cy="14"
+                            r="13"
+                            fill="none"
+                            stroke="#94a3b8"
+                            stroke-width="2"
+                            stroke-dasharray={`${2 * Math.PI * 13}`}
+                            stroke-dashoffset={`${2 * Math.PI * 13 * (1 - calculateProgress(notification) / 100)}`}
+                            transform="rotate(-90 14 14)"
+                            style="transition: stroke-dashoffset 0.1s linear;"
+                        />
+                    </svg>
+                    <button
                         class="cursor-pointer hover:scale-125 transition-all relative z-10 " 
                         aria-label="Close notification" 
                         on:click={() => {notification.closeNotification()}}

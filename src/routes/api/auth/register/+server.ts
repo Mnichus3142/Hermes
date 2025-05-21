@@ -43,8 +43,6 @@ export async function POST(event: RequestEvent) {
         );
     }
     catch (error) {
-        console.error('There was an error in POST /api/auth/register:', error);
-        
         return json(
             {
                 success: false,
