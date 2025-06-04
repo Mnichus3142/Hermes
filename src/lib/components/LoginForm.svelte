@@ -41,9 +41,7 @@
             });
 
             return 0;
-        }
-
-        try {
+        }        try {
             const response = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: {
@@ -56,6 +54,8 @@
             });
 
             const data = await response.json();
+
+            console.log(data)
             if (!data.success) {
                 createNewNotification({
                     title: data.title,
@@ -63,7 +63,30 @@
                     type: 'error',
                     duration: 3000
                 });
-                throw new Error('409');
+                throw new Error('409');            } else {
+                // Pomyślne logowanie - przekieruj do dashboard lub zapisanej strony
+                createNewNotification({
+                    title: data.title,
+                    message: data.message,
+                    type: 'success',
+                    duration: 3000
+                });
+                
+                // Sprawdź czy jest zapisana ścieżka do przekierowania
+                const redirectPath = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('redirectAfterLogin='))
+                    ?.split('=')[1];
+                
+                // Usuń cookie z przekierowaniem
+                if (redirectPath) {
+                    document.cookie = 'redirectAfterLogin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+                }
+                
+                // Przekierowanie po krótkim opóźnieniu
+                setTimeout(() => {
+                    window.location.href = redirectPath ? decodeURIComponent(redirectPath) : '/dashboard';
+                }, 1500);
             }
         }
 

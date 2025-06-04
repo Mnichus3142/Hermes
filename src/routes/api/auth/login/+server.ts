@@ -1,13 +1,14 @@
 import {json} from "@sveltejs/kit";
 import prisma from '$lib/functions/prisma';
-import crypto from 'crypto';
-import 'erronaut';
+// import 'erronaut';
 import bcrypt from 'bcrypt';
 import type { RequestEvent } from './$types';
-import {webcrypto} from "node:crypto";
+import jwt from 'jsonwebtoken';
+import { env } from '$env/dynamic/private';
 
 export async function POST(event: RequestEvent) {
     try {
+        const { cookies } = event;
         const { username, password } = await event.request.json();
 
         const userExists = await prisma.users.findUnique({
@@ -16,17 +17,66 @@ export async function POST(event: RequestEvent) {
             }
         })
 
+        if (!userExists) {
+            return json(
+                {
+                    success: false,
+                    title: 'Invalid username and/or password',
+                    message: 'Invalid username and/or password',
+                },
+                { status: 401 }
+            );
+        }
+
         const match = await bcrypt.compare(password, userExists.password)
 
         if (!match) {
             return json(
                 {
                     success: false,
-                    title: 'Invalid password',
-                    message: 'That is not a valid password',
+                    title: 'Invalid username and/or password',
+                    message: 'Invalid username and/or password',
                 },
                 { status: 401 }
             );
+        }
+
+        const accessToken = jwt.sign({ id: userExists.id }, env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+        const refreshToken = jwt.sign({ id: userExists.id }, env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 7);
+
+        const updateDatabase = await prisma.refreshTokens.create({
+            data: {
+                userId: Number(userExists.id),
+                token: String(refreshToken),
+                expiresAt
+            }
+        });
+
+        if (updateDatabase) {
+            cookies.set(
+                'accessToken',
+                accessToken,
+                {
+                    path: '/',
+                    httpOnly: true,
+                    secure: false,
+                    maxAge: 60 * 15,
+                }
+            )
+
+            cookies.set(
+                'refreshToken',
+                refreshToken,
+                {
+                    path: '/',
+                    httpOnly: true,
+                    secure: false,
+                    maxAge: 60 * 60 * 24 * 7,
+                }
+            )
         }
 
         return json(

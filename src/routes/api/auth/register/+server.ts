@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/functions/prisma';
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 import 'erronaut';
 import type { RequestEvent } from './$types';
 
@@ -24,7 +24,7 @@ export async function POST(event: RequestEvent) {
             );
         }
 
-        const encryptedPassword = await crypto.createHash('sha256').update(password).digest('hex');
+        const encryptedPassword = await bcrypt.hash(password, 10);
 
         await prisma.users.create({
             data: {
