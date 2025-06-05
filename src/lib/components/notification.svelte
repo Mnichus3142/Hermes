@@ -3,6 +3,7 @@
     import { fly } from "svelte/transition";
     import { quintInOut } from "svelte/easing";
     import { onMount } from "svelte";
+    import TypeWriter from "./typeWriter.svelte";
 
     const animationDuration = 300;
     
@@ -22,11 +23,6 @@
         };
     });
 
-    function formatTime(ms: number): string {
-        if (ms === 0) return '';
-        return `${(ms / 1000).toFixed(1)}s`;
-    }
-
     function calculateProgress(notification: Notification): number {
         if (notification.getDuration() === 0) return 0;
         const remaining = notification.getRemainingTime();
@@ -39,7 +35,7 @@
     <div class="fixed bottom-0 z-30 flex flex-col justify-center p-4 h-fit">
         {#each $notifications as notification, index (notification)}
             <!-- Main container -->
-            <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded min-w-80 max-w-80 overflow-hidden"
+            <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded min-w-80 max-w-80 overflow-hidden min-h-24"
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintInOut }}
                 out:fly={{ x: 1000, duration: animationDuration, easing: quintInOut }}
             >
@@ -52,24 +48,32 @@
                 <div class="p-2 flex-1 grid">
                     <!-- Title -->
                     <p class="row-start-1 font-medium text-lg">
-                        {notification.getTitle()}
+                        <TypeWriter typeWriterPayload={{
+                            text: notification.getTitle(),
+                            delay: 1000,
+                            speed: 50,
+                            cursor: "|",
+                            cursorSpeed: 300,
+                            cursorBlink: true,
+                            cursorBlinkAtTheEnd: true
+                        }}></TypeWriter>
                     </p>
                     <!-- Content -->
                     <p class="row-start-2">
-                        {notification.getMessage()}
+                        <TypeWriter typeWriterPayload={{
+                            text: notification.getMessage(),
+                            delay: 1000,
+                            speed: 50,
+                            cursor: "|",
+                            cursorSpeed: 300,
+                            cursorBlink: true,
+                            cursorBlinkAtTheEnd: true
+                        }}></TypeWriter>
                     </p>
                 </div>
                 <!-- Close button with timer -->
                 <div class="absolute top-2 right-2">
                     <svg class="absolute -top-0.5 -right-0.5 scale-90" width="28" height="28" viewBox="0 0 28 28">
-                        <circle
-                            cx="14"
-                            cy="14"
-                            r="13"
-                            fill="none"
-                            stroke="#e2e8f0"
-                            stroke-width="2"
-                        />
                         <circle
                             cx="14"
                             cy="14"
