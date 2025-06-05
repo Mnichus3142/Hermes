@@ -34,7 +34,6 @@
 	"dependencies": {
 		"@tailwindcss/vite": "^4.0.8",
 		"bcrypt": "^6.0.0",
-		"bcryptjs": "^3.0.2",
 		"erronaut": "^1.0.2",
 		"jsonwebtoken": "^9.0.2",
 		"postgres": "^3.4.5"
