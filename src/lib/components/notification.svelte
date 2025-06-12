@@ -5,13 +5,8 @@
     import { onMount } from "svelte";
     import TypeWriter from "./typeWriter.svelte";
     import { showCloseButton } from "$lib/logic/notificationLogic.svelte";
+    import { notificationConfig } from "$lib/config/notificationConfig";
 
-    const animationDuration = 300;
-
-    const { typeWriterDelay, typeWriterSpeed } = { typeWriterDelay: 500, typeWriterSpeed: 40 };
-    const closeButtonDelay = 1500;
-    
-    const updateInterval = 10;
     let mounted = true;
 
     onMount(() => {
@@ -19,7 +14,7 @@
             if (mounted) {
                 notifications.update(n => n);
             }
-        }, updateInterval);
+        }, notificationConfig.updateInterval);
 
         return () => {
             mounted = false;
@@ -39,8 +34,8 @@
     <div class="fixed bottom-0 z-30 p-4 h-fit flex flex-col justify-center place-items-center">
         {#each $notifications as notification, index (notification)}
             <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded max-w-80 overflow-hidden min-h-24 w-fit"
-                in:fly={{ y: 1000, duration: animationDuration, easing: quintInOut }}
-                out:fly={{ x: 1000, duration: animationDuration, easing: quintInOut }}
+                in:fly={{ y: 1000, duration: notificationConfig.animationDuration, easing: quintInOut }}
+                out:fly={{ x: 1000, duration: notificationConfig.animationDuration, easing: quintInOut }}
             >
                 <div class="flex justify-center place-items-center w-10 ml-8 mr-6">
                     <img src="{notification.getNotificationProperties()[0]}.svg" alt="Notification icon">
@@ -50,8 +45,8 @@
                     <p class="row-start-1 font-medium text-lg">
                         <TypeWriter typeWriterPayload={{
                             text: notification.getTitle(),
-                            delay: typeWriterDelay,
-                            speed: typeWriterSpeed,
+                            delay: notificationConfig.typeWriterDelay,
+                            speed: notificationConfig.typeWriterSpeed,
                             cursor: "|",
                             cursorSpeed: 300,
                             cursorBlink: true,
@@ -61,8 +56,8 @@
                     <p class="row-start-2">
                         <TypeWriter typeWriterPayload={{
                             text: notification.getMessage(),
-                            delay: typeWriterDelay,
-                            speed: typeWriterSpeed,
+                            delay: notificationConfig.typeWriterDelay,
+                            speed: notificationConfig.typeWriterSpeed,
                             cursor: "|",
                             cursorSpeed: 300,
                             cursorBlink: true,
@@ -71,7 +66,7 @@
                     </p>
                 </div>
 
-                {#await showCloseButton(closeButtonDelay) then state}
+                {#await showCloseButton(notificationConfig.closeButtonDelay) then state}
                     {#if state}
                         <div class="absolute top-2 right-2">
                             <svg class="absolute -top-0.5 -right-0.5 scale-90" width="28" height="28" viewBox="0 0 28 28">
