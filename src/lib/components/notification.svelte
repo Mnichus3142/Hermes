@@ -7,6 +7,9 @@
     import { showCloseButton } from "$lib/logic/notificationLogic.svelte";
 
     const animationDuration = 300;
+
+    const { typeWriterDelay, typeWriterSpeed } = { typeWriterDelay: 500, typeWriterSpeed: 40 };
+    const closeButtonDelay = 1500;
     
     const updateInterval = 10;
     let mounted = true;
@@ -33,9 +36,9 @@
 </script>
 
 <main class='max-h-svh max-w-svw flex justify-center'>
-    <div class="fixed bottom-0 z-30 p-4 h-fit">
+    <div class="fixed bottom-0 z-30 p-4 h-fit flex flex-col justify-center place-items-center">
         {#each $notifications as notification, index (notification)}
-            <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded max-w-80 overflow-hidden min-h-24"
+            <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded max-w-80 overflow-hidden min-h-24 w-fit"
                 in:fly={{ y: 1000, duration: animationDuration, easing: quintInOut }}
                 out:fly={{ x: 1000, duration: animationDuration, easing: quintInOut }}
             >
@@ -47,8 +50,8 @@
                     <p class="row-start-1 font-medium text-lg">
                         <TypeWriter typeWriterPayload={{
                             text: notification.getTitle(),
-                            delay: 1000,
-                            speed: 40,
+                            delay: typeWriterDelay,
+                            speed: typeWriterSpeed,
                             cursor: "|",
                             cursorSpeed: 300,
                             cursorBlink: true,
@@ -58,8 +61,8 @@
                     <p class="row-start-2">
                         <TypeWriter typeWriterPayload={{
                             text: notification.getMessage(),
-                            delay: 1000,
-                            speed: 40,
+                            delay: typeWriterDelay,
+                            speed: typeWriterSpeed,
                             cursor: "|",
                             cursorSpeed: 300,
                             cursorBlink: true,
@@ -68,7 +71,7 @@
                     </p>
                 </div>
 
-                {#await showCloseButton(2500) then state}
+                {#await showCloseButton(closeButtonDelay) then state}
                     {#if state}
                         <div class="absolute top-2 right-2">
                             <svg class="absolute -top-0.5 -right-0.5 scale-90" width="28" height="28" viewBox="0 0 28 28">
@@ -80,7 +83,7 @@
                                     stroke="#94a3b8"
                                     stroke-width="2"
                                     stroke-dasharray={`${2 * Math.PI * 13}`}
-                                    stroke-dashoffset={`${2 * Math.PI * 13 * (1 - calculateProgress(notification) / 100)}`}
+                                    stroke-dashoffset={`${2 * Math.PI * 13 * (((1 - calculateProgress(notification) / 100) / 0.7) - 0.41)}`}
                                     transform="rotate(-90 14 14)"
                                     style="transition: stroke-dashoffset 0.1s linear;"
                                 />
