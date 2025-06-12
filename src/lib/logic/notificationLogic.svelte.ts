@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 export type notificationPayload = {
     title: string;
     message: string;
-    type: 'info' | 'error' | 'success';
+    type: 'info' | 'error' | 'success' | 'warn';
     duration: number;
 }
 
@@ -23,7 +23,8 @@ export class Notification {
     private typeData = {
         'info' : 'bg-blue-500',
         'error' : 'bg-red-500',
-        'success': 'bg-green-500'
+        'success': 'bg-green-500',
+        'warn': 'bg-yellow-500'
     };
 
     public id: number = 0;
@@ -107,3 +108,15 @@ export const createNewNotification = (payload: notificationPayload) => {
         return updatedNotifications;
     });
 };
+
+const returnTrue = () => {
+    return true;
+}
+
+export const showCloseButton = async (delay: number) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(returnTrue());
+        }, delay);
+    });
+}
