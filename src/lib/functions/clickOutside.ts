@@ -6,17 +6,15 @@
  */
 export function clickOutside(node: HTMLElement, options: { enabled?: boolean } = {}) {
     let { enabled = true } = options;
-    
-    const handleClick = (event: MouseEvent) => {
+      const handleClick = (event: MouseEvent) => {
         if (!enabled) return;
         
         if (!event.defaultPrevented && 
             node && 
             !node.contains(event.target as Node)) {
-            
-            // Changed event name to "onclick_outside" instead of "click_outside"
-            node.dispatchEvent(new CustomEvent('onclick_outside', {
-                detail: { originalEvent: event }
+                // Changed event name to "onclick_outside" instead of "click_outside"
+                node.dispatchEvent(new CustomEvent('onclick_outside', {
+                    detail: { originalEvent: event }
             }));
         }
     };

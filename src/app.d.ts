@@ -11,9 +11,7 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
-	}
-
-	declare namespace svelteHTML {
+	}	declare namespace svelteHTML {
         interface HTMLAttributes<T> {
             // Removed old declaration for on:click_outside
             // 'on:click_outside'?: CompositionEventHandler<T>;

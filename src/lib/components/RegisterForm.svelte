@@ -26,11 +26,11 @@
     // Variables for second span
     let isSecondSpanBlankButClicked = $state(false);
     let clickOnSecondSpan = $state(false);
-    
-    // Variables for password conditions and animation
+      // Variables for password conditions and animation
     let thirdSpanClicked = $state(false);
     let clickOnThirdSpan = $state(false);
     let movePasswordConditions = $state(false);
+    let thirdSpanRef: HTMLSpanElement;
     
     // Password checking object
     let passwordCheck = $state<checkPasswordsType>({
@@ -90,7 +90,7 @@
     $effect(() => {
         fixBugsWithFirstSpan();
     });
-    
+      
     // Effect for deactivating conditions if password field is empty
     $effect(() => {
         if (passwordCheck.firstPassword === '') {
@@ -101,6 +101,23 @@
             passwordCheck.conditions.hasAtLeast1UppercaseLetter = false;
             passwordCheck.conditions.isAtLeast8Characters = false;
         }
+    });    
+    
+    // Effect for handling click outside third span
+    $effect(() => {
+        if (thirdSpanRef) {
+            const handleClickOutside = (event: CustomEvent) => {
+                clickOnThirdSpan = false;
+                moveConditionsUp();
+                resetFirstSpan();
+            };
+            
+            thirdSpanRef.addEventListener('onclick_outside', handleClickOutside as EventListener);
+            
+            return () => {
+                thirdSpanRef.removeEventListener('onclick_outside', handleClickOutside as EventListener);
+            };
+        }
     });
     
     // Function to change first span animation
@@ -109,11 +126,11 @@
             firstSpanAnimation = true;
         }
         
-        else if ((mouseEvent === 'confirmaor' && passwordCheck.firstPassword.length > 0) || (mouseEvent === 'password' && passwordCheck.secondPassword.length > 0)) {
+        else if ((mouseEvent === 'confirmator' && passwordCheck.firstPassword.length > 0) || (mouseEvent === 'password' && passwordCheck.secondPassword.length > 0)) {
             firstSpanAnimation = true;
         }
         
-        else if (secondOrThirdSpanActive && (mouseEvent === 'confirmaor' || mouseEvent === 'password')) {
+        else if (secondOrThirdSpanActive && (mouseEvent === 'confirmator' || mouseEvent === 'password')) {
             firstSpanAnimation = true;
         }
         
@@ -303,22 +320,15 @@
             {/if}
         </span>
 
-        <PasswordStrengthIndicator {passwordCheck} {movePasswordConditions} {thirdSpanClicked} />
-
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <PasswordStrengthIndicator {passwordCheck} {movePasswordConditions} {thirdSpanClicked} />        <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <span class="spanStyle" use:clickOutside 
-            onclick_outside={() => {
-                clickOnThirdSpan = false;
-                moveConditionsUp();
-                resetFirstSpan();
-            }}
+        <span class="spanStyle" use:clickOutside bind:this={thirdSpanRef}
             onclick={() => {
                 clickOnThirdSpan = true;
                 moveConditionsUp();
             }}
             onmouseenter={() => {
-                swapFirstSpanAnimation('confirmaor');
+                swapFirstSpanAnimation('confirmator');
                 thirdSpanClicked = true;
                 moveConditionsUp();
             }}
@@ -344,7 +354,7 @@
                 thirdSpanClicked = false;
             }}
         >
-            <input required id="confirmPassword" type="{registerConfirmation}" bind:value={passwordCheck.secondPassword} class="inputField"/>
+            <input required id="confirmPassword" type="{registerConfirmation}" bind:value={passwordCheck.secondPassword} class="inputField" />
             <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
             {#if passwordCheck.secondPassword.length !== 0}
                 <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer pointer-events-auto" 
