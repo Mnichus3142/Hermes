@@ -29,6 +29,8 @@
         }
     });
 
+    const notificationTimeout = 5000;
+
     async function handleInternalLogin(e: Event) {
         e.preventDefault();
 
@@ -37,7 +39,7 @@
                 title: 'Could not log in',
                 message: 'Password and username cannot be empty',
                 type: 'error',
-                duration: 3000
+                duration: notificationTimeout
             });
 
             return 0;
@@ -55,35 +57,32 @@
 
             const data = await response.json();
 
-            console.log(data)
             if (!data.success) {
                 createNewNotification({
                     title: data.title,
                     message: data.message,
                     type: 'error',
-                    duration: 3000
+                    duration: notificationTimeout
                 });
-                throw new Error('409');            } else {
-                // Pomyślne logowanie - przekieruj do dashboard lub zapisanej strony
+                throw new Error('409');
+            } 
+            else {
                 createNewNotification({
                     title: data.title,
                     message: data.message,
                     type: 'success',
-                    duration: 3000
+                    duration: notificationTimeout
                 });
                 
-                // Sprawdź czy jest zapisana ścieżka do przekierowania
                 const redirectPath = document.cookie
                     .split('; ')
                     .find(row => row.startsWith('redirectAfterLogin='))
                     ?.split('=')[1];
                 
-                // Usuń cookie z przekierowaniem
                 if (redirectPath) {
                     document.cookie = 'redirectAfterLogin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
                 }
                 
-                // Przekierowanie po krótkim opóźnieniu
                 setTimeout(() => {
                     window.location.href = redirectPath ? decodeURIComponent(redirectPath) : '/dashboard';
                 }, 1500);
@@ -97,7 +96,7 @@
                     title: 'Error during logging in',
                     message: error.message || 'There was an unknown error during logging in',
                     type: 'error',
-                    duration: 3000
+                    duration: notificationTimeout
                 });
             }
         }

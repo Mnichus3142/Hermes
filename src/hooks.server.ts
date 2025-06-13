@@ -8,7 +8,6 @@ export const handle: Handle = async ({ event, resolve }) => {
     
     console.log('🔍 Hook wywołany dla:', url.pathname);
 
-    // Ścieżki, które nie wymagają autentyfikacji
     const publicPaths = [
         '/',
         '/api/auth/login',
@@ -18,7 +17,6 @@ export const handle: Handle = async ({ event, resolve }) => {
         '/api/info/OAuth'
     ];
     
-    // Sprawdź czy to ścieżka publiczna
     const isPublicPath = publicPaths.some(path => url.pathname === path || url.pathname.startsWith(path));
     
     console.log('📍 Ścieżka publiczna?', isPublicPath, 'dla', url.pathname);
@@ -26,14 +24,12 @@ export const handle: Handle = async ({ event, resolve }) => {
         return resolve(event);
     }
     
-    // Pobierz access token z cookies
     const accessToken = cookies.get('accessToken');
     
     console.log('🔑 Access token:', accessToken ? 'ISTNIEJE' : 'BRAK');
     
     if (!accessToken) {
         console.log('❌ Brak tokenu - przekierowuję na stronę logowania');
-        // Brak tokenu - przekieruj do strony logowania z notyfikacją
         cookies.set('authNotification', JSON.stringify({
             title: 'Wymagane logowanie',
             message: 'Musisz się zalogować, aby uzyskać dostęp do tej strony',
@@ -45,7 +41,6 @@ export const handle: Handle = async ({ event, resolve }) => {
             maxAge: 60
         });
         
-        // Zapisz oryginalną ścieżkę do przekierowania po zalogowaniu
         if (url.pathname !== '/') {
             cookies.set('redirectAfterLogin', url.pathname + url.search, {
                 path: '/',
@@ -57,13 +52,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
     
     try {
-        // Weryfikuj access token
         console.log('🔐 Weryfikuję access token...');
         const payload = jwt.verify(accessToken, env.JWT_ACCESS_SECRET) as { id: number };
         
         console.log('✅ Token prawidłowy dla użytkownika ID:', payload.id);
         
-        // Dodaj informacje o użytkowniku do event.locals
         event.locals.user = {
             id: payload.id
         };
@@ -71,16 +64,14 @@ export const handle: Handle = async ({ event, resolve }) => {
         return resolve(event);
     } catch (error) {
         console.log('❌ Token nieprawidłowy:', error);
-        // Token jest nieważny - usuń tokeny i przekieruj bez próby odświeżania
         cookies.delete('accessToken', { path: '/' });
         cookies.delete('refreshToken', { path: '/' });
         
-        // Zapisz oryginalną ścieżkę do przekierowania po zalogowaniu
         if (url.pathname !== '/') {
             cookies.set('redirectAfterLogin', url.pathname + url.search, {
                 path: '/',
                 httpOnly: false,
-                maxAge: 300 // 5 minut
+                maxAge: 300
             });
         }
         

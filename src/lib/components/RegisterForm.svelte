@@ -165,7 +165,7 @@
             createNewNotification({
                 title: 'Could not register',
                 message: 'Password and username cannot be empty',
-                type: 'error',
+                type: 'warn',
                 duration: 3000
             });
             return;
@@ -175,7 +175,7 @@
             createNewNotification({
                 title: 'Could not register',
                 message: 'Passwords do not match',
-                type: 'error',
+                type: 'warn',
                 duration: 3000
             });
             return;
