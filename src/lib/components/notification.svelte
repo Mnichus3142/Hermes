@@ -33,7 +33,7 @@
 <main class='max-h-svh max-w-svw flex justify-center'>
     <div class="fixed bottom-0 z-30 p-4 h-fit flex flex-col justify-center place-items-center">
         {#each $notifications as notification, index (notification)}
-            <div class="relative flex p-0 m-1 transition-all bg-main-50 shadow-sm rounded max-w-80 overflow-hidden min-h-24 w-fit"
+            <div class="relative flex p-0 m-1 transition-all bg-mainWhite shadow-sm rounded max-w-80 overflow-hidden min-h-24 w-fit"
                 in:fly={{ y: 1000, duration: notificationConfig.animationDuration, easing: quintInOut }}
                 out:fly={{ x: 1000, duration: notificationConfig.animationDuration, easing: quintInOut }}
             >
@@ -75,7 +75,7 @@
                                     cy="14"
                                     r="13"
                                     fill="none"
-                                    stroke="#94a3b8"
+                                    stroke="#2F2F2F"
                                     stroke-width="2"
                                     stroke-dasharray={`${2 * Math.PI * 13}`}
                                     stroke-dashoffset={`${2 * Math.PI * 13 * (((1 - calculateProgress(notification) / 100) / 0.7) - 0.41)}`}

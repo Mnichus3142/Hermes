@@ -3,12 +3,10 @@
 
 /* Light theme */
 :root {
-    --acme-main-50: oklch(98.11% 0.009 286.23);
-    --acme-main-100: oklch(96.44% 0.001 286.38);
-    --acme-main-200: oklch(50.37% 0.006 274.88);
-    --acme-main-300: oklch(41.33% 0.007 274.83);
-    --acme-main-400: oklch(32.12% 0.005 271.24);
-    --acme-main-500: oklch(23.09% 0.006 271.15);
+    --mainBlack: #111111;
+    --mainGrey: #2F2F2F;
+    --mainWhite: #F6F6F6;
+    --mainGold: #FFCB74
 }
 
 /* Dark theme */
@@ -23,19 +21,17 @@
 }
 
 @theme inline {
-    --color-main-50: var(--acme-main-50);
-    --color-main-100: var(--acme-main-100);
-    --color-main-200: var(--acme-main-200);
-    --color-main-300: var(--acme-main-300);
-    --color-main-400: var(--acme-main-400);
-    --color-main-500: var(--acme-main-500);
+    --color-mainBlack: var(--mainBlack);
+    --color-mainGrey: var(--mainGrey);
+    --color-mainWhite: var(--mainWhite);
+    --color-mainGold: var(--mainGold);
 }
 
 /* Font for titles */
 .titleFont {
     @apply text-3xl font-medium font-title;
 }
-
+    
 /* Font for normal text */
 .textFont {
     @apply text-lg font-normal font-text;

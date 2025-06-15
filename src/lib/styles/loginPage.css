@@ -1,4 +1,5 @@
 @import "tailwindcss";
+/* @import "../../app.css"; */
 
 /* Style for span containing elements */
 .spanStyle {
@@ -14,23 +15,21 @@
 }
 
 .spanStyle > label {
-    @apply text-main-400;
+    @apply text-mainGrey;
 }
 
 .spanStyle:hover > label, .inputField:focus + label, .inputField:valid + label {
-    @apply text-gray-800 -translate-y-8;
+    @apply text-mainGrey -translate-y-8;
 }
 
-/* Style for input field */
 .inputField {
-    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-main-300;
+    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainGrey;
 }
 
 .inputField:focus, .inputField:hover, .inputField:valid {
-    @apply border-orange-300 outline-none;
+    @apply border-mainGold outline-none;
 }
 
-/* Style for external login buttons */
 .loginButton {
     @apply flex items-center justify-center transition-all rounded-md cursor-pointer max-h-16;
 }
@@ -40,5 +39,5 @@
 }
 
 .loginButton svg {
-    @apply h-1/2 fill-main-100;
+    @apply h-1/2 fill-mainGrey;
 }

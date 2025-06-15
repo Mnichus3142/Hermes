@@ -388,24 +388,24 @@
             </p>
         {/if}
         
-        <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-orange-300 hover:bg-orange-300 hover:text-main-100" aria-label="Register button" onclick={handleInternalRegistration}>
+        <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-mainGold hover:bg-mainGold hover:text-main-100" aria-label="Register button" onclick={handleInternalRegistration}>
             Register
         </button>
         
         <!-- Splitter -->
         <div class="flex flex-row items-center justify-center gap-3">
-            <div class="bg-main-200 min-w-28 h-0.5"></div>
+            <div class="bg-mainGrey min-w-28 h-0.5"></div>
             <p class="textFont">
                 Or
             </p>
-            <div class="bg-main-200 min-w-28 h-0.5"></div>
+            <div class="bg-mainGrey min-w-28 h-0.5"></div>
         </div>
         
         <!-- Button to change card -->
         <div class="flex flex-row items-center gap-1">
             <p class="textFont">Maybe you want to </p>
             <button 
-                class="text-orange-400 cursor-pointer textFont"
+                class="text-mainGold cursor-pointer textFont"
                 onclick={toggleForms}
             >
                 sign in

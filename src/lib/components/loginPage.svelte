@@ -62,7 +62,7 @@
 {#if !pageReady}
     <Loader/>
 {:else}
-    <main class="fixed inset-0 flex items-center justify-center overflow-hidden bg-main-100">
+    <main class="fixed inset-0 flex items-center justify-center overflow-hidden bg-mainWhite">
         <div class="z-20 hidden w-1/2 h-full shadow-2xl md:block">
             <!-- svelte-ignore a11y_img_redundant_alt -->
             <img src="/loginPagePhoto.jpg" alt="Login page photo" class="object-cover w-full h-full"/>

@@ -72,8 +72,19 @@ export async function POST(event: RequestEvent) {
                 }
             )
         }
-
+        
         const accessToken = jwt.sign({ id: tokenExists.userId }, env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+
+        cookies.set(
+            'accessToken',
+            accessToken,
+            {
+                path: '/',
+                httpOnly: true,
+                secure: false,
+                maxAge: 60 * 15,
+            }
+        );
 
         return json({
             success: true,
