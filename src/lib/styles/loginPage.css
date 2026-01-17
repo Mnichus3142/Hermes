@@ -3,30 +3,33 @@
 
 /* Style for span containing elements */
 .spanStyle {
-    @apply relative flex items-center justify-center w-64 h-10 transition-all;
+    @apply relative flex items-center justify-center w-64 h-10 transition-all duration-300;
 }
 
-.spanStyle:has(~ .spanStyle:hover), .spanStyle:has(~ .spanStyle .inputField:focus), .spanStyle:has(~ .spanStyle .inputField:valid) {
-    @apply -translate-y-4;
-}
+/* Klasa pomocnicza do przesuwania w górę (sterowana przez Svelte) */
+/* Usunąłem sztywną klasę .move-up, używamy inline styles dla precyzji */
+
 
 .spanStyle > * {
-    @apply transition-all;
+    @apply transition-all duration-200;
 }
 
 .spanStyle > label {
-    @apply text-mainGrey;
+    @apply text-mainGrey pointer-events-none;
 }
 
-.spanStyle:hover > label, .inputField:focus + label, .inputField:valid + label {
-    @apply text-mainGrey -translate-y-8;
+/* Logika floating label (etykieta w górę) */
+.inputField:focus + label,
+.spanStyle:hover > label,
+.spanStyle.has-value > label {
+    @apply text-mainGrey -translate-y-8 text-sm;
 }
 
 .inputField {
-    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainGrey;
+    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainGrey bg-transparent;
 }
 
-.inputField:focus, .inputField:hover, .inputField:valid {
+.inputField:focus, .inputField:hover, .spanStyle.has-value .inputField {
     @apply border-mainGold outline-none;
 }
 

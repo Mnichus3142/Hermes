@@ -14,6 +14,9 @@
     
     let username = $state('');
     let loginPassword = $state('password');
+    let focusedField = $state<string | null>(null);
+    let hoveredField = $state<string | null>(null);
+
     let passwordCheck: checkPasswordsType = $state({
         doPasswordsMatch: false,
         firstPassword: '',
@@ -28,6 +31,13 @@
             allConditionsMet: false
         }
     });
+
+    // Username translation Y
+    let usernameY = $derived(
+        (focusedField === 'password' || hoveredField === 'password' || passwordCheck.firstPassword.length > 0) 
+            ? -24 
+            : 0
+    );
 
     const notificationTimeout = 5000;
 
@@ -113,15 +123,53 @@
     in:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
     out:fly={{ y: -1000, duration: animationDuration, easing: quintOut }}
 >
-    <form class="flex flex-col items-center justify-center w-full h-full gap-3" novalidate>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <form 
+        class="flex flex-col items-center justify-center w-full h-full gap-3" 
+        novalidate
+        onclick={() => focusedField = null}
+    >
         <!-- Login card elements -->
         <h2 class="mb-6 titleFont">Log in</h2>
-        <span class="spanStyle">
-            <input required id="username" type="text" bind:value={username} class="absolute inputField"/>
+        <!-- Username Field -->
+        <span 
+            class="spanStyle" 
+            class:has-value={username.length > 0} 
+            style:transform="translateY({usernameY}px)"
+            onclick={(e) => e.stopPropagation()}
+            onmouseenter={() => hoveredField = 'username'}
+            onmouseleave={() => hoveredField = null}
+        >
+            <input 
+                required 
+                id="username" 
+                type="text" 
+                bind:value={username} 
+                class="inputField"
+                onfocus={() => focusedField = 'username'}
+                onblur={() => focusedField = null}
+            />
             <label for="username" class="absolute textFont left-3">Username</label>
         </span>
-        <span class="spanStyle">
-            <input required id="password" type="{loginPassword}" bind:value={passwordCheck.firstPassword} class="absolute inputField"/>
+
+        <!-- Password Field -->
+        <span 
+            class="spanStyle" 
+            class:has-value={passwordCheck.firstPassword.length > 0}
+            onclick={(e) => e.stopPropagation()}
+            onmouseenter={() => hoveredField = 'password'}
+            onmouseleave={() => hoveredField = null}
+        >
+            <input 
+                required 
+                id="password" 
+                type="{loginPassword}" 
+                bind:value={passwordCheck.firstPassword} 
+                class="inputField"
+                onfocus={() => focusedField = 'password'}
+                onblur={() => focusedField = null}
+            />
             <label for="password" class="absolute textFont left-3">Password</label>
             {#if passwordCheck.firstPassword.length !== 0}
                 <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" 

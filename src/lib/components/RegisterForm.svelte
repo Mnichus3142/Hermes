@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { fly, draw, fade } from 'svelte/transition';
+    import { fly, fade, slide, draw } from 'svelte/transition';
     import { checkPasswords } from '$lib/functions/checkPasswords';
     import { quintOut } from 'svelte/easing';
     import { clearSpaces } from '$lib/functions/clearSpaces';
@@ -17,20 +17,8 @@
     let username = $state('');
     let registerPassword = $state('password');
     let registerConfirmation = $state('password');
-    
-    // Variables for first span animation
-    let firstSpanAnimation = $state(false);
-    let secondOrThirdSpanActive = $state(false);
-    let secondSpanHovered = $state(false);
-    
-    // Variables for second span
-    let isSecondSpanBlankButClicked = $state(false);
-    let clickOnSecondSpan = $state(false);
-      // Variables for password conditions and animation
-    let thirdSpanClicked = $state(false);
-    let clickOnThirdSpan = $state(false);
-    let movePasswordConditions = $state(false);
-    let thirdSpanRef: HTMLSpanElement;
+    let focusedField = $state<string | null>(null);
+    let hoveredField = $state<string | null>(null);
     
     // Password checking object
     let passwordCheck = $state<checkPasswordsType>({
@@ -47,6 +35,39 @@
             allConditionsMet: false
         }
     });
+
+    // Derived states for animation
+    // Password span translation Y
+    let passwordY = $derived(
+         (focusedField === 'confirm' || hoveredField === 'confirm' || passwordCheck.secondPassword.length > 0) ? -24 : 0
+    );
+
+    // Username span translation Y
+    // Sum of password's shift PLUS extra shift if password field needs headroom for label
+    let usernameY = $derived(
+        passwordY + 
+        ((focusedField === 'password' || hoveredField === 'password' || passwordCheck.firstPassword.length > 0) ? -24 : 0)
+    );
+    
+    // Title moves together with username to maintain spacing
+    let titleY = $derived(usernameY);
+
+    // Logic for PasswordStrengthIndicator
+    // It moves up (compacts) when we interact with Confirm Password
+    let movePasswordConditions = $derived(
+        focusedField === 'confirm' ||
+        hoveredField === 'confirm' || 
+        passwordCheck.secondPassword.length > 0
+    );
+
+    let thirdSpanClicked = $derived(
+        focusedField === 'confirm' ||
+        hoveredField === 'confirm'
+    );
+    
+    let showPasswordStrength = $derived(
+        passwordCheck.firstPassword.length > 0 && !passwordCheck.conditions.allConditionsMet
+    );
 
     // Reactive effects
     $effect(() => {
@@ -76,19 +97,9 @@
     
     // Effect for checking password conditions
     $effect(() => {
-        if (passwordCheck.firstPassword || passwordCheck.secondPassword) {
-            swapFirstSpanAnimation();
+        if (passwordCheck.firstPassword.length > 0 || passwordCheck.secondPassword.length > 0) {
             passwordCheck = checkPasswords(passwordCheck);
         }
-        
-        if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
-            passwordCheck = checkPasswords(passwordCheck);
-        }
-    });
-    
-    // Effect for fixing bugs with first span
-    $effect(() => {
-        fixBugsWithFirstSpan();
     });
       
     // Effect for deactivating conditions if password field is empty
@@ -102,77 +113,6 @@
             passwordCheck.conditions.isAtLeast8Characters = false;
         }
     });    
-    
-    // Effect for handling click outside third span
-    $effect(() => {
-        if (thirdSpanRef) {
-            const handleClickOutside = (event: CustomEvent) => {
-                clickOnThirdSpan = false;
-                moveConditionsUp();
-                resetFirstSpan();
-            };
-            
-            thirdSpanRef.addEventListener('onclick_outside', handleClickOutside as EventListener);
-            
-            return () => {
-                thirdSpanRef.removeEventListener('onclick_outside', handleClickOutside as EventListener);
-            };
-        }
-    });
-    
-    // Function to change first span animation
-    function swapFirstSpanAnimation(mouseEvent: string = 'none') {
-        if (passwordCheck.firstPassword.length > 0 && passwordCheck.secondPassword.length > 0) {
-            firstSpanAnimation = true;
-        }
-        
-        else if ((mouseEvent === 'confirmator' && passwordCheck.firstPassword.length > 0) || (mouseEvent === 'password' && passwordCheck.secondPassword.length > 0)) {
-            firstSpanAnimation = true;
-        }
-        
-        else if (secondOrThirdSpanActive && (mouseEvent === 'confirmator' || mouseEvent === 'password')) {
-            firstSpanAnimation = true;
-        }
-        
-        else {
-            firstSpanAnimation = false;
-        }
-    }
-    
-    // Function to properly animate password strength conditions
-    function moveConditionsUp() {
-        if (clickOnThirdSpan || thirdSpanClicked || passwordCheck.secondPassword.length > 0) {
-            movePasswordConditions = true;
-        }
-        else if (passwordCheck.secondPassword.length === 0) {
-            movePasswordConditions = false;
-        }
-        else {
-            movePasswordConditions = false;
-        }
-    }
-    
-    // Function to handle second and third span, which affect first span position
-    function fixBugsWithFirstSpan() {
-        if (passwordCheck.firstPassword.length !== 0 && clickOnThirdSpan) {
-            isSecondSpanBlankButClicked = true;
-        }
-
-        if (passwordCheck.secondPassword.length !== 0 && clickOnSecondSpan) {
-            isSecondSpanBlankButClicked = true;
-        }
-    }
-    
-    // Function to reset first span position
-    function resetFirstSpan() {
-        if (passwordCheck.firstPassword.length !== 0 && passwordCheck.secondPassword.length === 0) {
-            isSecondSpanBlankButClicked = false;
-        }
-
-        if (passwordCheck.firstPassword.length === 0 && passwordCheck.secondPassword.length !== 0) {
-            isSecondSpanBlankButClicked = false;
-        }
-    }
     
     // Function handling registration
     async function handleInternalRegistration(e: Event) {
@@ -229,15 +169,6 @@
                 duration: 3000
             });
 
-            // Reset all states
-            firstSpanAnimation = false;
-            secondOrThirdSpanActive = false;
-            isSecondSpanBlankButClicked = false;
-            clickOnSecondSpan = false;
-            thirdSpanClicked = false;
-            clickOnThirdSpan = false;
-            movePasswordConditions = false;
-
             // Switch to login form
             toggleForms();
             
@@ -263,36 +194,60 @@
     in:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
     out:fly={{ y: 1000, duration: animationDuration, easing: quintOut }}
 >
-    <form class="flex flex-col items-center justify-center h-full gap-3" novalidate>
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+    <form 
+        class="flex flex-col items-center justify-center h-full gap-3" 
+        novalidate
+        onclick={() => focusedField = null}
+    >
         <!-- Register card elements -->
-        <h2 class="mb-12 titleFont">Register</h2>
+        <h2 
+            class="mb-12 titleFont transition-all duration-300"
+            style:transform="translateY({titleY}px)"
+        >
+            Register
+        </h2>
+        
+        <!-- Username Field -->
         <span 
             class="spanStyle" 
-            style:transform={firstSpanAnimation || isSecondSpanBlankButClicked || (clickOnThirdSpan && passwordCheck.conditions.allConditionsMet) || (passwordCheck.firstPassword.length !== 0 && thirdSpanClicked) || (thirdSpanClicked && secondSpanHovered) ? 'translateY(-20px)' : 'none'}
+            class:has-value={username.length > 0}
+            style:transform="translateY({usernameY}px)"
+            onclick={(e) => e.stopPropagation()}
+            onmouseenter={() => hoveredField = 'username'}
+            onmouseleave={() => hoveredField = null}
         >
-            <input required id="username" type="text" bind:value={username} class="inputField"/>
+            <input 
+                required 
+                id="username" 
+                type="text" 
+                bind:value={username} 
+                class="inputField"
+                onfocus={() => focusedField = 'username'}
+                onblur={() => focusedField = null}
+            />
             <label for="username" class="absolute textFont left-3">Username</label>
         </span>
 
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <span class="spanStyle" use:clickOutside 
-            onclick_outside={() => {
-                clickOnSecondSpan = false;
-            }}
-            onclick={() => {
-                clickOnSecondSpan = true;
-            }}
-            onmouseenter={() => {
-                swapFirstSpanAnimation('password');
-                secondSpanHovered = true;
-            }}
-            onmouseleave={() => {
-                swapFirstSpanAnimation('none');
-                secondSpanHovered = false;
-            }}
+        <!-- Password Field -->
+        <span 
+            class="spanStyle" 
+            class:has-value={passwordCheck.firstPassword.length > 0}
+            style:transform="translateY({passwordY}px)"
+            onclick={(e) => e.stopPropagation()}
+            onmouseenter={() => hoveredField = 'password'}
+            onmouseleave={() => hoveredField = null}
         >
-            <input required id="password" type="{registerPassword}" bind:value={passwordCheck.firstPassword} class="inputField"/>
+            <input 
+                required 
+                id="password" 
+                type="{registerPassword}" 
+                bind:value={passwordCheck.firstPassword} 
+                class="inputField"
+                onfocus={() => focusedField = 'password'}
+                onblur={() => focusedField = null}
+            />
             <label for="password" class="absolute textFont left-3">Password</label>
             {#if passwordCheck.firstPassword.length !== 0}
                 <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer" 
@@ -320,41 +275,29 @@
             {/if}
         </span>
 
-        <PasswordStrengthIndicator {passwordCheck} {movePasswordConditions} {thirdSpanClicked} />        <!-- svelte-ignore a11y_click_events_have_key_events -->
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <span class="spanStyle" use:clickOutside bind:this={thirdSpanRef}
-            onclick={() => {
-                clickOnThirdSpan = true;
-                moveConditionsUp();
-            }}
-            onmouseenter={() => {
-                swapFirstSpanAnimation('confirmator');
-                thirdSpanClicked = true;
-                moveConditionsUp();
-            }}
-            onmouseleave={() => {
-                swapFirstSpanAnimation('none');
-                thirdSpanClicked = false;
-                moveConditionsUp();
-            }}
-            onfocus={() => {
-                secondOrThirdSpanActive = true;
-                thirdSpanClicked = true;
-            }}
-            onfocusin={() => {
-                secondOrThirdSpanActive = true;
-                thirdSpanClicked = true;
-            }}
-            onfocusout={() => {
-                secondOrThirdSpanActive = false;
-                thirdSpanClicked = false;
-            }}
-            onblur={() => {
-                secondOrThirdSpanActive = false;
-                thirdSpanClicked = false;
-            }}
+        {#if showPasswordStrength}
+            <div transition:slide={{ duration: 300 }}>
+                <PasswordStrengthIndicator {passwordCheck} {movePasswordConditions} {thirdSpanClicked} />        
+            </div>
+        {/if}
+        
+        <!-- Confirm Password Field -->
+        <span 
+            class="spanStyle" 
+            class:has-value={passwordCheck.secondPassword.length > 0}
+            onclick={(e) => e.stopPropagation()}
+            onmouseenter={() => hoveredField = 'confirm'}
+            onmouseleave={() => hoveredField = null}
         >
-            <input required id="confirmPassword" type="{registerConfirmation}" bind:value={passwordCheck.secondPassword} class="inputField" />
+            <input 
+                required 
+                id="confirmPassword" 
+                type="{registerConfirmation}" 
+                bind:value={passwordCheck.secondPassword} 
+                class="inputField" 
+                onfocus={() => focusedField = 'confirm'}
+                onblur={() => focusedField = null}
+            />
             <label for="confirmPassword" class="absolute textFont left-3">Confirm password</label>
             {#if passwordCheck.secondPassword.length !== 0}
                 <button aria-label="Show password" class="absolute right-3 hover:scale-125 transition-all cursor-pointer pointer-events-auto" 
