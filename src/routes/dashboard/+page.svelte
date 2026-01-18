@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import AddNewCarForm from '$lib/components/addNewCarForm.svelte';
+    import { carStore } from '$lib/logic/carStore.svelte';
 
     let showAddCarForm = $state(false);
 
@@ -48,13 +49,13 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             
             <!-- Auto add cars -->
-            <!-- {#each cars as car}
+            {#each carStore.cars as car}
                 <div class="bg-mainBackground p-6 rounded-xl border border-mainBorder shadow-lg hover:border-mainAccent transition-all group">
-                    <div class="text-mainAccent font-bold text-xl mb-2">{car.make}</div>
-                    <div class="text-mainTextColor opacity-80">{car.model}</div>
-                    <div class="mt-4 text-xs text-mainTextColor/50 font-mono tracking-widest">{car.vin || 'NO VIN'}</div>
+                    <div class="text-mainAccent font-bold text-xl mb-2">{car.getCarInfo().car.manufacturer}</div>
+                    <div class="text-mainTextColor opacity-80">{car.getCarInfo().car.model}</div>
+                    <div class="mt-4 text-xs text-mainTextColor/50 font-mono tracking-widest">{car.getCarInfo().car.VIN || 'NO VIN'}</div>
                 </div>
-            {/each} -->
+            {/each}
 
             <!-- Add Card -->
             <!-- svelte-ignore event_directive_deprecated -->

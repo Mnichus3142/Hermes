@@ -28,7 +28,16 @@ model refreshTokens {
   user Users @relation(fields: [userId], references: [id])
 }
 
-model manufacturers {
-  id Int @id @default(autoincrement())
-  name String @unique @db.VarChar(255)
+model Car {
+  VIN String @id @db.VarChar(17)
+  type String @db.VarChar(50)
+  manufacturer String @db.VarChar(100)
+  model String @db.VarChar(100)
+  year Int
+  mileage Int
+  licensePlate String @db.VarChar(20)
+  insuranceValidUntil DateTime @db.Date
+  technicalInspectionValidUntil DateTime @db.Date
+  insuranceValid Boolean?
+  technicalInspectionValid Boolean?
 }

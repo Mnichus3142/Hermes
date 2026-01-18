@@ -1,5 +1,8 @@
-export type Car = {
-    type: string;
+import { CarEnum } from "$lib/enums/carEnum";
+
+export type CarType = {
+    VIN: string;
+    type: CarEnum;
     manufacturer: string;
     model: string;
     year: number;

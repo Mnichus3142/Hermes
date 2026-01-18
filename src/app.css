@@ -9,6 +9,7 @@
 
 @import "./lib/styles/loginPage.css";
 @import "./lib/styles/dashboard.css";
+@import "./lib/styles/addNewCarForm.css";
 
 /* Light theme */
 :root {
