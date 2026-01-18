@@ -6,31 +6,27 @@
     @apply relative flex items-center justify-center w-64 h-10 transition-all duration-300;
 }
 
-/* Klasa pomocnicza do przesuwania w górę (sterowana przez Svelte) */
-/* Usunąłem sztywną klasę .move-up, używamy inline styles dla precyzji */
-
-
 .spanStyle > * {
     @apply transition-all duration-200;
 }
 
 .spanStyle > label {
-    @apply text-mainGrey pointer-events-none;
+    @apply text-mainBorder pointer-events-none;
 }
 
 /* Logika floating label (etykieta w górę) */
 .inputField:focus + label,
 .spanStyle:hover > label,
 .spanStyle.has-value > label {
-    @apply text-mainGrey -translate-y-8 text-sm;
+    @apply text-mainTextColor -translate-y-8 text-sm;
 }
 
 .inputField {
-    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainGrey bg-transparent;
+    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainBorder bg-transparent text-mainTextColor;
 }
 
 .inputField:focus, .inputField:hover, .spanStyle.has-value .inputField {
-    @apply border-mainGold outline-none;
+    @apply border-mainTextColor outline-none;
 }
 
 .loginButton {
@@ -42,5 +38,9 @@
 }
 
 .loginButton svg {
-    @apply h-1/2 fill-mainGrey;
+    @apply h-1/2 fill-mainBorder;
+}
+
+button svg {
+    @apply text-mainTextColor;
 }

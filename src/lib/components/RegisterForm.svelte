@@ -1,4 +1,4 @@
-<script lang="ts">
+ <script lang="ts">
     import { fly, fade, slide, draw } from 'svelte/transition';
     import { checkPasswords } from '$lib/functions/checkPasswords';
     import { quintOut } from 'svelte/easing';
@@ -203,13 +203,14 @@
     >
         <!-- Register card elements -->
         <h2 
-            class="mb-12 titleFont transition-all duration-300"
+            class="mb-12 titleFont transition-all duration-300 text-mainTextColor"
             style:transform="translateY({titleY}px)"
         >
             Register
         </h2>
         
         <!-- Username Field -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <span 
             class="spanStyle" 
             class:has-value={username.length > 0}
@@ -231,6 +232,7 @@
         </span>
 
         <!-- Password Field -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <span 
             class="spanStyle" 
             class:has-value={passwordCheck.firstPassword.length > 0}
@@ -282,6 +284,7 @@
         {/if}
         
         <!-- Confirm Password Field -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
         <span 
             class="spanStyle" 
             class:has-value={passwordCheck.secondPassword.length > 0}
@@ -331,24 +334,24 @@
             </p>
         {/if}
         
-        <button class="w-64 transition-all border-2 textFont loginButton h-14 border-main-200 hover:border-mainGold hover:bg-mainGold hover:text-main-100" aria-label="Register button" onclick={handleInternalRegistration}>
+        <button class="w-64 transition-all border-2 textFont loginButton h-14 border-mainBorder text-mainBorder hover:border-mainBorder hover:bg-mainBorder hover:text-mainTextColor" aria-label="Register button" onclick={handleInternalRegistration}>
             Register
         </button>
         
         <!-- Splitter -->
         <div class="flex flex-row items-center justify-center gap-3">
-            <div class="bg-mainGrey min-w-28 h-0.5"></div>
-            <p class="textFont">
+            <div class="bg-mainBorder min-w-28 h-0.5"></div>
+            <p class="textFont text-mainBorder">
                 Or
             </p>
-            <div class="bg-mainGrey min-w-28 h-0.5"></div>
+            <div class="bg-mainBorder min-w-28 h-0.5"></div>
         </div>
         
         <!-- Button to change card -->
         <div class="flex flex-row items-center gap-1">
-            <p class="textFont">Maybe you want to </p>
+            <p class="textFont text-mainBorder">Maybe you want to </p>
             <button 
-                class="text-mainGold cursor-pointer textFont"
+                class="text-mainAccent cursor-pointer textFont"
                 onclick={toggleForms}
             >
                 sign in

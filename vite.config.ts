@@ -7,4 +7,8 @@ export default defineConfig({
     tailwindcss(),
     sveltekit(),
   ],
+  test: {
+      globals: true,
+      environment: 'node',
+  },
 });

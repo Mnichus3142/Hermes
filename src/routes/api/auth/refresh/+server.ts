@@ -1,6 +1,5 @@
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/functions/prisma';
-import 'erronaut';
 import type { RequestEvent } from './$types';
 import jwt from 'jsonwebtoken';
 import { env } from '$env/dynamic/private';

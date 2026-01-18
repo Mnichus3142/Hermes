@@ -5,7 +5,7 @@
     export let handleThirdPartyLogin: (e: Event) => void;
 </script>
 
-<div class="grid grid-cols-[repeat(auto-fit,_minmax(0,_1fr))] gap-2 w-64 h-16">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-2 w-64 h-16">
     {#if buttons.discord}
         <button 
             class="loginButton bg-[#7289da]" 

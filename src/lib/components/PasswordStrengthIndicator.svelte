@@ -20,7 +20,7 @@
                     </svg>
                 {/if}
             </div>
-            <span class="textFont">At least 8 characters</span>
+            <span class="textFont text-mainBorder">At least 8 characters</span>
         </div>
         
         <div class="flex items-center gap-2">
@@ -35,7 +35,7 @@
                     </svg>
                 {/if}
             </div>
-            <span class="textFont">At least 1 uppercase letter</span>
+            <span class="textFont text-mainBorder">At least 1 uppercase letter</span>
         </div>
 
         <div class="flex items-center gap-2">
@@ -50,7 +50,7 @@
                     </svg>
                 {/if}
             </div>
-            <span class="textFont">At least 1 lowercase letter</span>
+            <span class="textFont text-mainBorder">At least 1 lowercase letter</span>
         </div>
 
         <div class="flex items-center gap-2">
@@ -65,7 +65,7 @@
                     </svg>
                 {/if}
             </div>
-            <span class="textFont">At least 1 number</span>
+            <span class="textFont text-mainBorder">At least 1 number</span>
         </div>
 
         <div class="flex items-center gap-2">
@@ -80,7 +80,7 @@
                     </svg>
                 {/if}
             </div>
-            <span class="textFont">At least 1 special character</span>
+            <span class="textFont text-mainBorder">At least 1 special character</span>
         </div>
     </div>
 {/if}

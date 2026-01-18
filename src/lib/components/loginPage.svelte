@@ -62,10 +62,11 @@
 {#if !pageReady}
     <Loader/>
 {:else}
-    <main class="fixed inset-0 flex items-center justify-center overflow-hidden bg-mainWhite">
-        <div class="z-20 hidden w-1/2 h-full shadow-2xl md:block">
+    <main class="fixed inset-0 flex items-center justify-center overflow-hidden bg-mainBackground">
+        <div class="z-20 hidden w-1/2 h-full md:flex md:justify-center md:items-center">
             <!-- svelte-ignore a11y_img_redundant_alt -->
-            <img src="/loginPagePhoto.jpg" alt="Login page photo" class="object-cover w-full h-full"/>
+            <!-- <img src="/loginPagePhoto.jpg" alt="Login page photo" class="object-cover w-full h-full"/> -->
+            <img src="/logo.svg" alt="Login page photo" class=""/>
         </div>
         <div class="flex items-center justify-center w-1/2 h-full">
             {#if loginVisible}
