@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+.main {
+    @apply bg-dashboardBackground min-h-screen flex items-center justify-center p-4;
+}

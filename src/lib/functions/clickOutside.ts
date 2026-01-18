@@ -12,8 +12,7 @@ export function clickOutside(node: HTMLElement, options: { enabled?: boolean } =
         if (!event.defaultPrevented && 
             node && 
             !node.contains(event.target as Node)) {
-                // Changed event name to "onclick_outside" instead of "click_outside"
-                node.dispatchEvent(new CustomEvent('onclick_outside', {
+                node.dispatchEvent(new CustomEvent('click_outside', {
                     detail: { originalEvent: event }
             }));
         }

@@ -1,9 +1,19 @@
 @import "tailwindcss";
+
+/* Variables declaration */
+@theme {
+    --font-title: "Tajawal", serif;
+    --font-text: "Raleway", serif;
+    --font-playwrite: "Playwrite US Trad", serif;
+}
+
 @import "./lib/styles/loginPage.css";
+@import "./lib/styles/dashboard.css";
 
 /* Light theme */
 :root {
-    --mainBackground: #2b2d42;
+    --mainBackground: #1e2035;
+    --dashboardBackground: #2b2d42;
     --mainBorder: #4e5c78;
     --mainTextColor: #edf2f4;
     --mainAccent: #ffa8a9;
@@ -14,14 +24,9 @@
     --acme-canvas-color: oklch(0.21 0.034 264.665);
 }
 
-/* Variables declaration */
-@theme {
-    --font-title: "Tajawal", serif;
-    --font-text: "Raleway", serif;
-}
-
 @theme inline {
     --color-mainBackground: var(--mainBackground);
+    --color-dashboardBackground: var(--dashboardBackground);
     --color-mainBorder: var(--mainBorder);
     --color-mainTextColor: var(--mainTextColor);
     --color-mainAccent: var(--mainAccent);

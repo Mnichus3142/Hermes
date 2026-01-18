@@ -1,15 +1,6 @@
 import { writable } from 'svelte/store';
-
-export type notificationPayload = {
-    title: string;
-    message: string;
-    type: 'info' | 'error' | 'success' | 'warn';
-    duration: number;
-}
-
-export type notificationType = {
-    color: string;
-}
+import type { notificationPayload } from '../types/notificationPayload';
+import type { notificationType } from '../types/notificationType';
 
 export class Notification {
     private title: string;

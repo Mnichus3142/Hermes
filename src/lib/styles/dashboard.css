@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+.dashboardTitle {
+    @apply text-2xl font-bold font-playwrite text-mainAccent;
+}
+
+.buttonPrimary {
+    @apply w-full bg-mainAccent text-mainBackground font-title font-semibold py-2 px-4 rounded cursor-pointer hover:bg-mainAccent/90 hover:scale-105 transition-all duration-300;
+}
+
+.logoutButton {
+    @apply px-4 py-2 bg-mainBorder text-mainTextColor text-sm font-title font-medium rounded-md hover:bg-mainAccent hover:scale-110 transition-all duration-200 cursor-pointer;
+}
+
+.addVehicleCard {
+    @apply border-2 border-dashed border-mainBorder rounded-xl p-6 flex flex-col items-center justify-center min-h-80 hover:border-mainAccent hover:bg-mainAccent/5 cursor-pointer transition-all duration-200;
+}
+
+.plus {
+    @apply text-4xl text-mainBorder transition-colors mb-2 transition-all duration-200;
+}
+
+.addVehicleText {
+    @apply text-mainBorder font-medium transition-all duration-200;
+}
+
+.addVehicleCard:hover .plus, .addVehicleCard:hover .addVehicleText {
+    @apply text-mainAccent;
+}
