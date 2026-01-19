@@ -42,10 +42,29 @@
         showConfirm = false;
     }
 
-    const handleSubmit = (e: SubmitEvent) => {
+    const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault();
         
         const newCar: CarType = { ...formData }
+
+        const response = await fetch('/api/carInfo/saveToDatabase', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newCar)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            createNewNotification({
+                title: 'Error',
+                message: `Cannot add vehicle: ${errorData.message}`,
+                type: 'error',
+                duration: 10000
+            });
+            return;
+        }
 
         const validation = checkCar(newCar);
         if (!validation.valid) {

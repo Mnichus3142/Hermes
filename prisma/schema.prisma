@@ -37,8 +37,8 @@ model Car {
   year Int
   mileage Int
   licensePlate String @db.VarChar(20)
-  insuranceValidUntil DateTime @db.Date
-  technicalInspectionValidUntil DateTime @db.Date
+  insuranceValidUntil DateTime? @db.Date
+  technicalInspectionValidUntil DateTime? @db.Date
   insuranceValid Boolean?
   technicalInspectionValid Boolean?
   userId  Int
