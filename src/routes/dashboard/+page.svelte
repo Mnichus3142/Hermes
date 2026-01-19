@@ -2,8 +2,17 @@
     import { page } from '$app/stores';
     import AddNewCarForm from '$lib/components/addNewCarForm.svelte';
     import { carStore } from '$lib/logic/carStore.svelte';
-
+    import { onMount } from 'svelte';
+    
     let showAddCarForm = $state(false);
+
+    let { data } = $props();
+
+    onMount(() => {
+        if (data.initialCars) {
+            carStore.setCars(data.initialCars);
+        }
+    });
 
     const toggleAddCarForm = () => {
         showAddCarForm = !showAddCarForm;

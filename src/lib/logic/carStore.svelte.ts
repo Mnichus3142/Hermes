@@ -4,9 +4,13 @@ import { Car } from "./car";
 class CarStore {
     private _cars: Car[] = $state([]);
 
+    setCars(carsData: CarType[]) {
+        this._cars = carsData.map(carData => new Car(carData));
+    }
+
     addCar(carData: CarType) {
         const newCar = new Car(carData);
-        this.cars.push(newCar);
+        this._cars.push(newCar);
     }
 
     get cars() {

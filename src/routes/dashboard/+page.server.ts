@@ -2,15 +2,15 @@ import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import prisma from '$lib/functions/prisma';
 
-export const load: PageServerLoad = async ({ locals, cookies }) => {
+export const load: PageServerLoad = async ({ locals, cookies, fetch }) => {
     if (!locals.user) {
         throw redirect(303, '/');
     }
     
     const user = await prisma.users.findUnique({
-        where: { id: locals.user?.id },
+        where: { id: locals.user.id },
         select: { id: true, username: true }
-    })
+    });
 
     if (!user) {
         cookies.delete('accessToken', { path: '/' });
@@ -18,7 +18,14 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
         throw redirect(303, '/');
     }
 
+    const response = await fetch('/api/carInfo/getFromDatabase', {
+        method: 'POST'
+    });
+
+    const data = await response.json();
+
     return { 
-        user
+        user,
+        initialCars: data.cars || []
     };
 };
