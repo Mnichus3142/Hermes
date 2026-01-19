@@ -29,7 +29,8 @@ export async function POST(event: RequestEvent) {
                 amount: Number(expenseData.amount),
                 category: expenseData.category,
                 mileage: expenseData.mileage ? Number(expenseData.mileage) : null,
-                liters: expenseData.liters ? Number(expenseData.liters) : null
+                liters: expenseData.liters ? Number(expenseData.liters) : null,
+                subCategory: expenseData.subCategory || null
             }
         });
 

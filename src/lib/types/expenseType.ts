@@ -5,6 +5,7 @@ export type ExpenseType = {
     description: string;
     amount: number;
     category: 'FUEL' | 'REPAIR' | 'INSURANCE' | 'MAINTENANCE' | 'OTHER';
+    subCategory?: string;
     mileage?: number;
     liters?: number;
 };

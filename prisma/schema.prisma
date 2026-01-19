@@ -36,6 +36,7 @@ model Expense {
   description String   @db.VarChar(255)
   amount      Float 
   category    String   @db.VarChar(50)
+  subCategory String?  @db.VarChar(50)
   mileage     Int?
   liters      Float?
   car         Car      @relation(fields: [carVin], references: [VIN], onDelete: Cascade)

@@ -4,13 +4,15 @@ export class repairExpense {
     private _description: string;
     private _cost: number;
     private _mileage?: number;
+    private _subCategory?: string;
 
-    constructor(date: Date, description: string, cost: number, mileage?: number, id?: number) {
+    constructor(date: Date, description: string, cost: number, mileage?: number, id?: number, subCategory?: string) {
         this._id = id;
         this._date = date;
         this._description = description;
         this._cost = cost;
         this._mileage = mileage;
+        this._subCategory = subCategory;
     }
 
     get id(): number | undefined { return this._id; }
@@ -18,4 +20,5 @@ export class repairExpense {
     get description(): string { return this._description; }
     get cost(): number { return this._cost; }
     get mileage(): number | undefined { return this._mileage; }
+    get subCategory(): string | undefined { return this._subCategory; }
 }

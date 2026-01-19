@@ -41,7 +41,8 @@ export class ExpenseTracker {
                             e.description, 
                             e.amount, 
                             e.mileage, 
-                            e.id
+                            e.id,
+                            e.subCategory
                         );
                     });
                 this._repairExpenses.sort((a, b) => b.date.getTime() - a.date.getTime());
@@ -152,8 +153,8 @@ export class ExpenseTracker {
 
     // --- REPAIR METHODS ---
 
-    async addRepairExpense(vin: string, date: Date, description: string, cost: number, mileage?: number): Promise<boolean> {
-        const repair = new repairExpense(date, description, cost, mileage);
+    async addRepairExpense(vin: string, date: Date, description: string, cost: number, mileage?: number, subCategory?: string): Promise<boolean> {
+        const repair = new repairExpense(date, description, cost, mileage, undefined, subCategory);
 
         try {
             const response = await fetch('/api/expenses/add', {
@@ -165,7 +166,8 @@ export class ExpenseTracker {
                     description: description,
                     amount: cost,
                     category: 'REPAIR',
-                    mileage: mileage
+                    mileage: mileage,
+                    subCategory: subCategory
                 })
             });
 
@@ -173,7 +175,7 @@ export class ExpenseTracker {
 
             if (result.success) {
                  if (result.expense && result.expense.id) {
-                     this._repairExpenses.push(new repairExpense(date, description, cost, mileage, result.expense.id));
+                     this._repairExpenses.push(new repairExpense(date, description, cost, mileage, result.expense.id, subCategory));
                 } else {
                      this._repairExpenses.push(repair);
                 }
@@ -208,8 +210,8 @@ export class ExpenseTracker {
         }
     }
 
-    async updateRepairExpense(vin: string, id: number, date: Date, description: string, cost: number, mileage?: number): Promise<boolean> {
-         const repair = new repairExpense(date, description, cost, mileage, id);
+    async updateRepairExpense(vin: string, id: number, date: Date, description: string, cost: number, mileage?: number, subCategory?: string): Promise<boolean> {
+         const repair = new repairExpense(date, description, cost, mileage, id, subCategory);
 
         try {
             const response = await fetch('/api/expenses/update', {
@@ -222,7 +224,8 @@ export class ExpenseTracker {
                     description: description,
                     amount: cost,
                     category: 'REPAIR',
-                    mileage: mileage
+                    mileage: mileage,
+                    subCategory: subCategory
                 })
             });
 

@@ -15,6 +15,12 @@
     let showEditForm = $state(false);
     let showDeleteConfirm = $state(false);
 
+    // Categories
+    const repairCategories = [
+        'ENGINE', 'SUSPENSION', 'BRAKES', 'TIRES', 'BODY', 
+        'ELECTRONICS', 'INTERIOR', 'GLASS', 'FLUIDS', 'EXHAUST', 'OTHER'
+    ];
+
     // Fuel Consumption Logic
     let expenseTracker = new ExpenseTracker();
     let fuelExpenses = $state<fuelExpense[]>([]);
@@ -41,7 +47,8 @@
         date: new Date().toISOString().split('T')[0],
         description: '',
         cost: 0,
-        mileage: undefined as number | undefined
+        mileage: undefined as number | undefined,
+        subCategory: 'OTHER'
     });
     let loadingRepairs = $state(false);
 
@@ -147,7 +154,8 @@
             date: new Date().toISOString().split('T')[0],
             description: '',
             cost: 0,
-            mileage: undefined
+            mileage: undefined,
+            subCategory: 'OTHER'
         };
         editingRepairId = null;
     }
@@ -159,7 +167,8 @@
             date: repair.date.toISOString().split('T')[0],
             description: repair.description,
             cost: repair.cost,
-            mileage: repair.mileage
+            mileage: repair.mileage,
+            subCategory: repair.subCategory || 'OTHER'
         };
     }
 
@@ -193,7 +202,8 @@
                 new Date(repairForm.date),
                 repairForm.description,
                 Number(repairForm.cost),
-                repairForm.mileage ? Number(repairForm.mileage) : undefined
+                repairForm.mileage ? Number(repairForm.mileage) : undefined,
+                repairForm.subCategory
             );
         } else {
             success = await expenseTracker.addRepairExpense(
@@ -201,7 +211,8 @@
                 new Date(repairForm.date),
                 repairForm.description,
                 Number(repairForm.cost),
-                repairForm.mileage ? Number(repairForm.mileage) : undefined
+                repairForm.mileage ? Number(repairForm.mileage) : undefined,
+                repairForm.subCategory
             );
         }
         
@@ -375,34 +386,47 @@
 
             {:else if activeTab === 'consumption'}
                 <div class="h-full grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6" in:fade={{ duration: 200 }}>
-                    <div class="bg-mainBackground p-6 rounded-lg border border-mainBorder shadow-sm h-fit">
-                        <h3 class="text-lg font-bold text-mainAccent mb-4">{editingExpenseId ? 'Edit Fueling' : 'Add Fueling'}</h3>
-                        <form onsubmit={handleFormSubmit} class="space-y-4">
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Date</label>
-                                <input type="date" bind:value={fuelForm.date} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" required />
-                            </div>
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Price per Liter</label>
-                                <input type="number" step="0.01" bind:value={fuelForm.price} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" required />
-                            </div>
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Volume (L)</label>
-                                <input type="number" step="0.01" bind:value={fuelForm.liters} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" required />
-                            </div>
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Current Mileage (km)</label>
-                                <input type="number" bind:value={fuelForm.mileage} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" 
-                                    placeholder={editingExpenseId ? "Leave empty to keep unchanged" : ""}
-                                />
+                    <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg h-fit">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-full bg-mainAccent/10 flex items-center justify-center text-mainAccent text-xl">⛽</div>
+                            <h3 class="text-xl font-bold text-mainAccent">{editingExpenseId ? 'Edit Fueling' : 'Add Fueling'}</h3>
+                        </div>
+                        
+                        <form onsubmit={handleFormSubmit} class="space-y-5">
+                            <div class="bg-black/20 p-4 rounded-lg border border-white/5 space-y-4">
+                                <div>
+                                    <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Date</label>
+                                    <input type="date" bind:value={fuelForm.date} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors" required />
+                                </div>
+                                
+                                <div class="grid grid-cols-2 gap-4">
+                                     <div>
+                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Volume (L)</label>
+                                        <input type="number" step="0.01" bind:value={fuelForm.liters} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" required />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Price / L</label>
+                                        <input type="number" step="0.01" bind:value={fuelForm.price} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" required />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Current Mileage</label>
+                                    <div class="relative">
+                                        <input type="number" bind:value={fuelForm.mileage} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono pl-6" 
+                                            placeholder={editingExpenseId ? "Unchanged" : ""}
+                                        />
+                                        <div class="absolute left-0 top-2 opacity-50 text-sm">#</div>
+                                    </div>
+                                </div>
                             </div>
                             
-                            <div class="flex gap-2">
-                                <button type="submit" disabled={loadingFuel} class="flex-1 bg-mainAccent text-white font-bold py-2 rounded hover:brightness-110 active:scale-95 transition-all disabled:opacity-50">
-                                    {loadingFuel ? 'Saving...' : (editingExpenseId ? 'Update' : 'Add Entry')}
+                            <div class="flex gap-3 pt-2">
+                                <button type="submit" disabled={loadingFuel} class="flex-1 bg-gradient-to-r from-mainAccent to-blue-600 text-white font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50">
+                                    {loadingFuel ? 'Saving...' : (editingExpenseId ? 'Update Record' : 'Save Entry')}
                                 </button>
                                 {#if editingExpenseId}
-                                    <button type="button" onclick={resetFuelForm} disabled={loadingFuel} class="px-4 py-2 border border-mainBorder text-mainTextColor rounded hover:bg-white/5 active:scale-95 transition-all">
+                                    <button type="button" onclick={resetFuelForm} disabled={loadingFuel} class="px-5 py-3 border border-mainBorder text-mainTextColor rounded-lg hover:bg-white/5 active:scale-95 transition-all font-semibold">
                                         Cancel
                                     </button>
                                 {/if}
@@ -410,10 +434,13 @@
                         </form>
                     </div>
 
-                     <div class="bg-mainBackground p-6 rounded-lg border border-mainBorder shadow-sm overflow-auto max-h-[600px]">
-                        <h3 class="text-lg font-bold text-mainAccent mb-4 flex justify-between">
-                            <span>History</span>
-                            <span class="text-sm font-normal text-white">Total Spent: {expenseTracker.calculateTotalFuelExpenses().toFixed(2)}</span>
+                     <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg overflow-auto max-h-[600px]">
+                        <h3 class="text-lg font-bold text-mainAccent mb-6 flex justify-between items-center border-b border-white/5 pb-4">
+                            <span>Filling History</span>
+                            <div class="flex flex-col items-end">
+                                <span class="text-xs text-mainTextColor opacity-50 uppercase">Total Cost</span>
+                                <span class="text-xl font-mono text-white">{expenseTracker.calculateTotalFuelExpenses().toFixed(2)}</span>
+                            </div>
                         </h3>
                         
                         {#if loadingFuel && fuelExpenses.length === 0}
@@ -451,32 +478,52 @@
             {:else if activeTab === 'faults'}
                 <div class="h-full grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6" in:fade={{ duration: 200 }}>
                     <!-- ADD/EDIT FORM -->
-                    <div class="bg-mainBackground p-6 rounded-lg border border-mainBorder shadow-sm h-fit">
-                        <h3 class="text-lg font-bold text-mainAccent mb-4">{editingRepairId ? 'Edit Record' : 'Add Maintenance/Repair'}</h3>
-                        <form onsubmit={handleRepairFormSubmit} class="space-y-4">
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Date</label>
-                                <input type="date" bind:value={repairForm.date} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" required />
-                            </div>
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Description</label>
-                                <textarea rows="3" bind:value={repairForm.description} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" required></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Cost</label>
-                                <input type="number" step="0.01" bind:value={repairForm.cost} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" required />
-                            </div>
-                             <div>
-                                <label class="block text-sm text-mainTextColor opacity-70 mb-1">Mileage (km)</label>
-                                <input type="number" bind:value={repairForm.mileage} class="w-full bg-mainBackground border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none" placeholder={editingRepairId ? "Leave empty to keep unchanged" : ""} />
+                    <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg h-fit">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-full bg-mainAccent/10 flex items-center justify-center text-mainAccent text-xl">🔧</div>
+                             <h3 class="text-xl font-bold text-mainAccent">{editingRepairId ? 'Edit Repair' : 'Log Maintenance'}</h3>
+                        </div>
+
+                        <form onsubmit={handleRepairFormSubmit} class="space-y-5">
+                            <div class="bg-black/20 p-4 rounded-lg border border-white/5 space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Date</label>
+                                        <input type="date" bind:value={repairForm.date} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors" required />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Category</label>
+                                        <select bind:value={repairForm.subCategory} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors appearance-none cursor-pointer">
+                                            {#each repairCategories as cat}
+                                                <option value={cat} class="bg-gray-800">{cat}</option>
+                                            {/each}
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Description</label>
+                                    <textarea rows="3" bind:value={repairForm.description} class="w-full bg-transparent border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors text-sm" placeholder="What was fixed?" required></textarea>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Cost</label>
+                                        <input type="number" step="0.01" bind:value={repairForm.cost} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" required />
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Mileage</label>
+                                        <input type="number" bind:value={repairForm.mileage} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" placeholder={editingRepairId ? "Unchanged" : "Current km"} />
+                                    </div>
+                                </div>
                             </div>
 
-                             <div class="flex gap-2">
-                                <button type="submit" disabled={loadingRepairs} class="flex-1 bg-mainAccent text-white font-bold py-2 rounded hover:brightness-110 active:scale-95 transition-all disabled:opacity-50">
-                                    {loadingRepairs ? 'Saving...' : (editingRepairId ? 'Update' : 'Add Record')}
+                             <div class="flex gap-3 pt-2">
+                                <button type="submit" disabled={loadingRepairs} class="flex-1 bg-gradient-to-r from-mainAccent to-blue-600 text-white font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50">
+                                    {loadingRepairs ? 'Saving...' : (editingRepairId ? 'Update Record' : 'Save Record')}
                                 </button>
                                 {#if editingRepairId}
-                                    <button type="button" onclick={resetRepairForm} disabled={loadingRepairs} class="px-4 py-2 border border-mainBorder text-mainTextColor rounded hover:bg-white/5 active:scale-95 transition-all">
+                                    <button type="button" onclick={resetRepairForm} disabled={loadingRepairs} class="px-5 py-3 border border-mainBorder text-mainTextColor rounded-lg hover:bg-white/5 active:scale-95 transition-all font-semibold">
                                         Cancel
                                     </button>
                                 {/if}
@@ -485,10 +532,13 @@
                     </div>
 
                     <!-- REPAIR LIST -->
-                    <div class="bg-mainBackground p-6 rounded-lg border border-mainBorder shadow-sm overflow-auto max-h-[600px]">
-                        <h3 class="text-lg font-bold text-mainAccent mb-4 flex justify-between">
-                            <span>History</span>
-                            <span class="text-sm font-normal text-white">Total Spent: {expenseTracker.calculateTotalRepairExpenses().toFixed(2)}</span>
+                    <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg overflow-auto max-h-[600px]">
+                        <h3 class="text-lg font-bold text-mainAccent mb-6 flex justify-between items-center border-b border-white/5 pb-4">
+                            <span>Service History</span>
+                            <div class="flex flex-col items-end">
+                                <span class="text-xs text-mainTextColor opacity-50 uppercase">Total Spent</span>
+                                <span class="text-xl font-mono text-white">{expenseTracker.calculateTotalRepairExpenses().toFixed(2)}</span>
+                            </div>
                         </h3>
 
                         {#if loadingRepairs && repairExpenses.length === 0}
@@ -575,65 +625,64 @@
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div 
-        class="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        class="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-8"
         transition:fade={{ duration: 150 }}
         onclick={() => selectedRepair = null}
         role="dialog"
         tabindex="-1"
     >
         <div 
-            class="bg-mainBackground border border-mainBorder rounded-xl shadow-2xl w-[90%] max-w-2xl p-8 relative cursor-auto" 
+            class="bg-mainBackground border border-mainBorder rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden relative" 
             onclick={(e) => e.stopPropagation()} 
             in:scale={{ start: 0.95, duration: 200 }}
             role="document" 
             tabindex="0"
         >
-            <button class="absolute top-4 right-4 text-mainTextColor/50 hover:text-mainTextColor p-2" onclick={() => selectedRepair = null}>✖</button>
-            
-            <h2 class="text-2xl font-bold text-mainAccent mb-6 flex items-center gap-2">
-                 <span>🔧</span> Repair Details
-            </h2>
-
-            <div class="space-y-6">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white/5 p-3 rounded">
-                        <div class="text-xs opacity-50 mb-1">Date</div>
-                        <div class="font-bold">{new Date(selectedRepair.date).toLocaleDateString()}</div>
-                    </div>
-                    <div class="bg-white/5 p-3 rounded">
-                        <div class="text-xs opacity-50 mb-1">Mileage</div>
-                        <div class="font-bold">{selectedRepair.mileage ? `${selectedRepair.mileage} km` : 'N/A'}</div>
-                    </div>
-                    <div class="bg-white/5 p-3 rounded">
-                        <div class="text-xs opacity-50 mb-1">Cost</div>
-                        <div class="font-bold text-mainAccent">{selectedRepair.cost.toFixed(2)}</div>
-                    </div>
-                </div>
-
+             <!-- Header -->
+             <div class="px-8 py-6 border-b border-white/5 flex justify-between items-center bg-black/20">
                 <div>
-                    <div class="text-sm font-bold opacity-70 mb-2">Description</div>
-                    <div class="bg-white/5 p-4 rounded text-sm leading-relaxed whitespace-pre-wrap max-h-[300px] overflow-auto">
+                     <div class="text-sm font-bold opacity-50 mb-1 uppercase tracking-widest text-mainAccent">Repair Details</div>
+                     <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                        <span>{selectedRepair.subCategory || 'Reapir'}</span>
+                        <span class="text-lg opacity-50 font-normal">| {new Date(selectedRepair.date).toLocaleDateString()}</span>
+                     </h2>
+                </div>
+                <button class="bg-white/5 hover:bg-white/10 w-10 h-10 rounded-full flex items-center justify-center transition-colors" onclick={() => selectedRepair = null}>✖</button>
+             </div>
+
+            <div class="p-8 bg-mainBackground space-y-8">
+                    <!-- Cost Card -->
+                    <div class="bg-gradient-to-br from-mainAccent/20 to-blue-900/20 p-6 rounded-2xl border border-mainAccent/20 flex justify-between items-center">
+                        <div>
+                            <div class="text-xs font-bold text-mainAccent opacity-80 uppercase tracking-widest mb-1">Total Cost</div>
+                            <div class="text-4xl font-mono text-white font-bold">{selectedRepair.cost.toFixed(2)}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs opacity-50 mb-1 uppercase tracking-wide">Mileage</div>
+                            <div class="font-bold text-lg font-mono">{selectedRepair.mileage ? `${selectedRepair.mileage} km` : 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                    <div class="text-sm font-bold opacity-50 uppercase tracking-widest mb-3">Technician Notes</div>
+                    <div class="bg-white/5 p-6 rounded-xl border border-white/5 text-sm leading-7 text-gray-300 whitespace-pre-wrap font-mono">
                         {selectedRepair.description}
                     </div>
-                </div>
+                    </div>
 
-                <div class="flex justify-end gap-2 pt-4 border-t border-mainBorder">
+                    <!-- Actions -->
+                    <div class="flex gap-3 pt-4 cursor-default border-t border-white/5">
                     <button 
-                        class="px-4 py-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded transition-colors text-sm font-semibold"
+                        class="flex-1 py-3 bg-blue-600/10 text-blue-400 hover:bg-blue-600/20 border border-blue-600/20 rounded-xl transition-all font-semibold flex items-center justify-center gap-2 group"
                         onclick={() => { 
                             if (selectedRepair) handleStartEditRepair(selectedRepair); 
                             selectedRepair = null; 
                         }}
                     >
-                        Edit
+                        <span>Edit Record</span>
                     </button>
-                    <button 
-                        class="px-4 py-2 bg-mainAccent text-white hover:brightness-110 rounded transition-colors text-sm font-semibold"
-                        onclick={() => selectedRepair = null}
-                    >
-                        Close
-                    </button>
-                </div>
+                    </div>
             </div>
         </div>
     </div>
