@@ -4,7 +4,7 @@ import prisma from '$lib/functions/prisma';
 import { checkCar } from '$lib/functions/checkCarCreationConditions';
 import { json } from '@sveltejs/kit';
 
-export async function POST (event: RequestEvent) {
+export async function PUT (event: RequestEvent) {
     const carData: CarType = await event.request.json();
     const userId = event.locals.user?.id;
 
@@ -30,7 +30,7 @@ export async function POST (event: RequestEvent) {
             }, { status: 401 });
         }
 
-        // Date fields validation
+        // Date fields validation - though checkCar might handle some
         if (!carData.insuranceValidUntil) {
             return json({
                 success: false,
@@ -47,39 +47,57 @@ export async function POST (event: RequestEvent) {
             }, { status: 400 });
         }
 
-        // Save car data to the database
-        await prisma.car.create({
+        // Verify car belongs to user
+        const existingCar = await prisma.car.findUnique({
+            where: {
+                VIN: carData.VIN
+            }
+        });
+
+        if (!existingCar || existingCar.userId !== userId) {
+             return json({
+                success: false,
+                title: 'Operation Error',
+                message: 'Car not found or you are not authorized to edit it'
+            }, { status: 403 });
+        }
+
+        // Update car data in the database
+        await prisma.car.update({
+            where: {
+                VIN: carData.VIN
+            },
             data: {
-                VIN: carData.VIN,
                 type: carData.type,
                 manufacturer: carData.manufacturer,
                 model: carData.model,
                 year: Number(carData.year),
                 mileage: Number(carData.mileage),
                 licensePlate: carData.licensePlate,
-                insuranceValidUntil: carData.insuranceValidUntil ? new Date(carData.insuranceValidUntil) : null,
-                technicalInspectionValidUntil: carData.technicalInspectionValidUntil ? new Date(carData.technicalInspectionValidUntil) : null,
+                insuranceValidUntil: new Date(carData.insuranceValidUntil),
+                technicalInspectionValidUntil: new Date(carData.technicalInspectionValidUntil),
                 engineCapacity: carData.engineCapacity ? Number(carData.engineCapacity) : null,
                 fuelType: carData.fuelType || null,
                 power: carData.power ? Number(carData.power) : null,
                 torque: carData.torque ? Number(carData.torque) : null,
                 transmissionType: carData.transmissionType || null,
                 gears: carData.gears ? Number(carData.gears) : null,
-                userId: userId
             }
         });
+
         return json({
             success: true,
-            title: 'Car Added',
-            message: 'Vehicle added to the database successfully'
+            title: 'Car Updated',
+            message: 'Vehicle information updated successfully'
         },
-        { status: 201 }
+        { status: 200 }
     );
     } catch (error) {
+        console.error(error);
             return json({
                 success: false,
                 title: 'Database Error',
-                message: 'Failed to save car data to the database',
+                message: 'Failed to update car data in the database',
                 error: error instanceof Error ? error.message : 'Unknown error'
             },
             { status: 500 }

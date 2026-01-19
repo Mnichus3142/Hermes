@@ -10,9 +10,10 @@
 
     interface Props {
         onClose: () => void;
+        carToEdit?: CarType | null;
     }
 
-    let { onClose }: Props = $props();
+    let { onClose, carToEdit = null }: Props = $props();
     let showConfirm = $state(false);
 
     let formData: CarType = $state({
@@ -26,7 +27,39 @@
         insuranceValidUntil: null,
         technicalInspectionValidUntil: null,
         insuranceValid: null,
-        technicalInspectionValid: null
+        technicalInspectionValid: null,
+        engineCapacity: undefined,
+        fuelType: undefined,
+        power: undefined,
+        torque: undefined,
+        transmissionType: undefined,
+        gears: undefined
+    });
+
+    $effect(() => {
+        if (carToEdit) {
+            formData.VIN = carToEdit.VIN;
+            formData.type = carToEdit.type;
+            formData.manufacturer = carToEdit.manufacturer;
+            formData.model = carToEdit.model;
+            formData.year = carToEdit.year;
+            formData.mileage = carToEdit.mileage;
+            formData.licensePlate = carToEdit.licensePlate;
+            formData.insuranceValidUntil = carToEdit.insuranceValidUntil 
+                ? new Date(carToEdit.insuranceValidUntil).toISOString().split('T')[0] as unknown as Date 
+                : null;
+            formData.technicalInspectionValidUntil = carToEdit.technicalInspectionValidUntil 
+                ? new Date(carToEdit.technicalInspectionValidUntil).toISOString().split('T')[0] as unknown as Date 
+                : null;
+            formData.insuranceValid = carToEdit.insuranceValid;
+            formData.technicalInspectionValid = carToEdit.technicalInspectionValid;
+            formData.engineCapacity = carToEdit.engineCapacity;
+            formData.fuelType = carToEdit.fuelType;
+            formData.power = carToEdit.power;
+            formData.torque = carToEdit.torque;
+            formData.transmissionType = carToEdit.transmissionType;
+            formData.gears = carToEdit.gears;
+        }
     });
 
     const handleCloseAttempt = () => {
@@ -45,10 +78,12 @@
     const handleSubmit = async (e: SubmitEvent) => {
         e.preventDefault();
         
-        const newCar: CarType = { ...formData }
+        const newCar: CarType = { ...formData };
+        const url = carToEdit ? '/api/carInfo/updateInDatabase' : '/api/carInfo/saveToDatabase';
+        const method = carToEdit ? 'PUT' : 'POST';
 
-        const response = await fetch('/api/carInfo/saveToDatabase', {
-            method: 'POST',
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -59,7 +94,7 @@
             const errorData = await response.json();
             createNewNotification({
                 title: 'Error',
-                message: `Cannot add vehicle: ${errorData.message}`,
+                message: `Cannot ${carToEdit ? 'update' : 'add'} vehicle: ${errorData.message}`,
                 type: 'error',
                 duration: 10000
             });
@@ -70,16 +105,20 @@
         if (!validation.valid) {
             createNewNotification({
                 title: 'Error',
-                message: `Cannot add vehicle: ${validation.errors[0]}`,
+                message: `Cannot ${carToEdit ? 'update' : 'add'} vehicle: ${validation.errors[0]}`,
                 type: 'error',
                 duration: 10000
             });
             return;
         }
 
-        carStore.addCar(newCar);
-
-        console.log('New car added:', newCar);
+        if (carToEdit) {
+            carStore.updateCar(newCar);
+            console.log('Car updated:', newCar);
+        } else {
+            carStore.addCar(newCar);
+            console.log('New car added:', newCar);
+        }
 
         onClose();
     }
@@ -94,12 +133,12 @@
     >
         <!-- Header -->
         <div class="p-6 border-b border-mainBorder flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-mainAccent font-title">Add New Vehicle</h2>
+            <h2 class="text-2xl font-bold text-mainAccent font-title">{carToEdit ? 'Edit Vehicle' : 'Add New Vehicle'}</h2>
             <button 
                 onclick={handleCloseAttempt}
-                class="text-mainTextColor/50 hover:text-mainAccent transition-colors text-2xl cursor-pointer"
+                class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-500/20 hover:text-red-500 transition-colors text-mainTextColor text-xl font-bold cursor-pointer"
             >
-                &times;
+                ✕
             </button>
         </div>
 
@@ -170,6 +209,8 @@
                             bind:value={formData.VIN}
                             maxlength="17"
                             placeholder="e.g., 1HGCM82633A123456"
+                            disabled={!!carToEdit}
+                            class={carToEdit ? 'opacity-50 cursor-not-allowed' : ''}
                         />
                     </div>
                     <!-- License Plate -->
@@ -182,6 +223,72 @@
                             placeholder="e.g., ABC-1234"
                         />
                     </div>
+                    <!-- New Fields -->
+                    <!-- Engine Capacity -->
+                    <div class="formInput">
+                        <label for="engineCapacity">Engine Capacity (cm³)</label>
+                        <input 
+                            type="number" 
+                            id="engineCapacity" 
+                            bind:value={formData.engineCapacity}
+                            placeholder="e.g., 1998"
+                            min="0"
+                        />
+                    </div>
+                    <!-- Fuel Type -->
+                    <div class="formInput">
+                        <label for="fuelType">Fuel Type</label>
+                        <input 
+                            type="text" 
+                            id="fuelType" 
+                            bind:value={formData.fuelType}
+                            placeholder="e.g., Petrol, Diesel, Electric"
+                        />
+                    </div>
+                    <!-- Power -->
+                    <div class="formInput">
+                        <label for="power">Power (HP)</label>
+                        <input 
+                            type="number" 
+                            id="power" 
+                            bind:value={formData.power}
+                            placeholder="e.g., 150"
+                            min="0"
+                        />
+                    </div>
+                    <!-- Torque -->
+                    <div class="formInput">
+                        <label for="torque">Torque (Nm)</label>
+                        <input 
+                            type="number" 
+                            id="torque" 
+                            bind:value={formData.torque}
+                            placeholder="e.g., 350"
+                            min="0"
+                        />
+                    </div>
+                    <!-- Transmission Type -->
+                    <div class="formInput">
+                        <label for="transmissionType">Transmission Type</label>
+                        <input 
+                            type="text" 
+                            id="transmissionType" 
+                            bind:value={formData.transmissionType}
+                            placeholder="e.g., Automatic, Manual"
+                        />
+                    </div>
+                    <!-- Gears -->
+                    <div class="formInput">
+                        <label for="gears">Number of Gears</label>
+                        <input 
+                            type="number" 
+                            id="gears" 
+                            bind:value={formData.gears}
+                            placeholder="e.g., 6"
+                            min="0"
+                        />
+                    </div>
+                    
                     <!-- Insurance Valid Until -->
                     <div class="formInput">
                         <label for="insuranceValidUntil">Insurance Valid Until</label>

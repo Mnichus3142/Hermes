@@ -12,4 +12,10 @@ export type CarType = {
     technicalInspectionValidUntil: Date | null;
     insuranceValid?: boolean | null;
     technicalInspectionValid?: boolean | null;
+    engineCapacity?: number;
+    fuelType?: string;
+    power?: number;
+    torque?: number;
+    transmissionType?: string;
+    gears?: number;
 };

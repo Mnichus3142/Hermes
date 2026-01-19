@@ -29,6 +29,18 @@ model refreshTokens {
   user Users @relation(fields: [userId], references: [id])
 }
 
+model Expense {
+  id          Int      @id @default(autoincrement())
+  carVin      String   @db.VarChar(17)
+  date        DateTime @db.Date
+  description String   @db.VarChar(255)
+  amount      Float 
+  category    String   @db.VarChar(50)
+  mileage     Int?
+  liters      Float?
+  car         Car      @relation(fields: [carVin], references: [VIN], onDelete: Cascade)
+}
+
 model Car {
   VIN String @id @db.VarChar(17)
   type String @db.VarChar(50)
@@ -41,6 +53,13 @@ model Car {
   technicalInspectionValidUntil DateTime? @db.Date
   insuranceValid Boolean?
   technicalInspectionValid Boolean?
+  engineCapacity Int?
+  fuelType String? @db.VarChar(50)
+  power Int?
+  torque Int?
+  transmissionType String? @db.VarChar(50)
+  gears Int?
   userId  Int
   user Users @relation(fields: [userId], references: [id])
+  expenses Expense[]
 }
