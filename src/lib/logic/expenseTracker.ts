@@ -1,5 +1,6 @@
 import { fuelExpense } from "./fuelExpense";
 import { repairExpense } from "./repairExpense";
+import { ExpenseCategoryEnum } from "../enums/expenseCategoryEnum";
 
 export class ExpenseTracker {
     private _fuelExpenses: fuelExpense[] = [];
@@ -24,7 +25,7 @@ export class ExpenseTracker {
             if (data.success) {
                 // Parse Fuel
                 this._fuelExpenses = data.expenses
-                    .filter((e: any) => e.category === 'FUEL')
+                    .filter((e: any) => e.category === ExpenseCategoryEnum.FUEL)
                     .map((e: any) => {
                          const liters = e.liters || 0;
                          const pricePerLiter = liters > 0 ? (e.amount / liters) : 0;
@@ -34,7 +35,7 @@ export class ExpenseTracker {
 
                 // Parse Repairs
                 this._repairExpenses = data.expenses
-                    .filter((e: any) => e.category === 'REPAIR')
+                    .filter((e: any) => e.category === ExpenseCategoryEnum.REPAIR)
                     .map((e: any) => {
                         return new repairExpense(
                             new Date(e.date), 
@@ -65,7 +66,7 @@ export class ExpenseTracker {
                     date: date.toISOString(),
                     description: 'Refueling',
                     amount: expense.totalCost,
-                    category: 'FUEL',
+                    category: ExpenseCategoryEnum.FUEL,
                     mileage: mileage,
                     liters: liters
                 })
@@ -124,7 +125,7 @@ export class ExpenseTracker {
                     date: date.toISOString(),
                     description: 'Refueling',
                     amount: expense.totalCost,
-                    category: 'FUEL',
+                    category: ExpenseCategoryEnum.FUEL,
                     mileage: mileage,
                     liters: liters
                 })
@@ -165,7 +166,7 @@ export class ExpenseTracker {
                     date: date.toISOString(),
                     description: description,
                     amount: cost,
-                    category: 'REPAIR',
+                    category: ExpenseCategoryEnum.REPAIR,
                     mileage: mileage,
                     subCategory: subCategory
                 })
@@ -223,7 +224,7 @@ export class ExpenseTracker {
                     date: date.toISOString(),
                     description: description,
                     amount: cost,
-                    category: 'REPAIR',
+                    category: ExpenseCategoryEnum.REPAIR,
                     mileage: mileage,
                     subCategory: subCategory
                 })

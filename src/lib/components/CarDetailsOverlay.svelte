@@ -6,7 +6,8 @@
     import ConfirmationDialog from './ConfirmationDialog.svelte';
     import { ExpenseTracker } from '$lib/logic/expenseTracker';
     import { fuelExpense } from '$lib/logic/fuelExpense';
-    import { repairExpense } from '$lib/logic/repairExpense';
+    import { RepairCategories } from '$lib/enums/repairEnum';
+  import type { repairExpense } from '$lib/logic/repairExpense';
 
     let { car, onClose, activeTab } = $props();
     
@@ -16,12 +17,10 @@
     let showDeleteConfirm = $state(false);
 
     // Categories
-    const repairCategories = [
-        'ENGINE', 'SUSPENSION', 'BRAKES', 'TIRES', 'BODY', 
-        'ELECTRONICS', 'INTERIOR', 'GLASS', 'FLUIDS', 'EXHAUST', 'OTHER'
-    ];
+    const repairCategories = RepairCategories;
 
     // Fuel Consumption Logic
+
     let expenseTracker = new ExpenseTracker();
     let fuelExpenses = $state<fuelExpense[]>([]);
     let editingExpenseId = $state<number|null>(null);
@@ -643,7 +642,7 @@
                 <div>
                      <div class="text-sm font-bold opacity-50 mb-1 uppercase tracking-widest text-mainAccent">Repair Details</div>
                      <h2 class="text-3xl font-bold text-white flex items-center gap-3">
-                        <span>{selectedRepair.subCategory || 'Reapir'}</span>
+                        <span>{selectedRepair.subCategory || 'Repair'}</span>
                         <span class="text-lg opacity-50 font-normal">| {new Date(selectedRepair.date).toLocaleDateString()}</span>
                      </h2>
                 </div>
