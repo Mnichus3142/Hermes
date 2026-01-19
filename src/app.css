@@ -5,6 +5,7 @@
     --font-title: "Tajawal", serif;
     --font-text: "Raleway", serif;
     --font-playwrite: "Playwrite US Trad", serif;
+    --font-google-sans: "Google Sans Code", monospace;
 }
 
 @import "./lib/styles/loginPage.css";

@@ -47,9 +47,6 @@ export async function POST (event: RequestEvent) {
             }, { status: 400 });
         }
 
-        console.log('Otrzymane dane:', carData);
-        console.log('ID użytkownika z locals:', userId);
-
         // Save car data to the database
         await prisma.car.create({
             data: {

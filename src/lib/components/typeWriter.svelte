@@ -63,8 +63,8 @@
     });
   </script>
   
-  <p>
+  <span>
     {#if visible}
         {actualText} {showCursor ? typeWriterPayload.cursor : ""}
     {/if}
-  </p>
+  </span>

@@ -27,3 +27,11 @@
 .addVehicleCard:hover .plus, .addVehicleCard:hover .addVehicleText {
     @apply text-mainAccent;
 }
+
+.carInfo {
+    @apply text-mainTextColor/60 font-google-sans mt-2 text-xs tracking-widest;
+}
+
+.carSVG {
+    @apply w-1/2 h-auto mb-4 ml-auto mr-auto;
+}

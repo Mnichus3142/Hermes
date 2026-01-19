@@ -1,15 +1,15 @@
 <script lang="ts">
     import { fly, draw, fade } from 'svelte/transition';
     import { quintOut } from 'svelte/easing';
-    import type { OAuthButtons } from '$lib/types/OAuthButtons';
-    import OAuthButtonsComponent from './OAuthButtons.svelte';
+    import type { OAuthButtons as OAuthButtonsType } from '$lib/types/OAuthButtons';
+    import OAuthButtons from './OAuthButtons.svelte';
     import type { checkPasswordsType } from '$lib/types/checkPasswords';
     import { createNewNotification } from '$lib/logic/notificationLogic.svelte';
     
     const { toggleForms, animationDuration, buttons } = $props<{
         toggleForms: () => void;
         animationDuration: number;
-        buttons: OAuthButtons;
+        buttons: OAuthButtonsType;
     }>();
     
     let username = $state('');
@@ -203,7 +203,7 @@
         </button>
         {#if buttons.discord || buttons.github || buttons.gitlab || buttons.google} 
             <!-- OAuth login -->
-            <OAuthButtonsComponent {buttons} {handleThirdPartyLogin} />
+            <OAuthButtons {buttons} {handleThirdPartyLogin} />
         {/if}
         <!-- Splitter -->
         <div class="flex flex-row items-center justify-center gap-3">
