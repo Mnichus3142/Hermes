@@ -8,8 +8,8 @@ export type CarType = {
     year: number;
     mileage: number;
     licensePlate: string;
-    insuranceValidUntil: Date;
-    technicalInspectionValidUntil: Date;
+    insuranceValidUntil: Date | null;
+    technicalInspectionValidUntil: Date | null;
     insuranceValid: boolean | null;
     technicalInspectionValid: boolean | null;
 };

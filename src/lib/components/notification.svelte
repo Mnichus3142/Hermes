@@ -31,7 +31,7 @@
 </script>
 
 <main class='max-h-svh max-w-svw flex justify-center'>
-    <div class="fixed bottom-0 z-30 p-4 h-fit flex flex-col justify-center place-items-center">
+    <div class="fixed bottom-0 z-9999 p-4 h-fit flex flex-col justify-center place-items-center">
         {#each $notifications as notification, index (notification)}
             <div class="relative flex p-0 m-1 transition-all bg-mainTextColor shadow-sm rounded max-w-80 overflow-hidden min-h-24 w-fit"
                 in:fly={{ y: 1000, duration: notificationConfig.animationDuration, easing: quintInOut }}

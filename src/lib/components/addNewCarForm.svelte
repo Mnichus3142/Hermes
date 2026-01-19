@@ -5,6 +5,8 @@
     import { CarEnum } from '$lib/enums/carEnum';
     import type { CarType } from '$lib/types/carType';
     import { carStore } from '$lib/logic/carStore.svelte';
+    import { checkCar } from '$lib/functions/checkCarCreationConditions';
+    import { createNewNotification } from '$lib/logic/notificationLogic.svelte';
 
     interface Props {
         onClose: () => void;
@@ -21,8 +23,8 @@
         year: new Date().getFullYear(),
         mileage: 0,
         licensePlate: '',
-        insuranceValidUntil: new Date(),
-        technicalInspectionValidUntil: new Date(),
+        insuranceValidUntil: null,
+        technicalInspectionValidUntil: null,
         insuranceValid: null,
         technicalInspectionValid: null
     });
@@ -45,7 +47,20 @@
         
         const newCar: CarType = { ...formData }
 
+        const validation = checkCar(newCar);
+        if (!validation.valid) {
+            createNewNotification({
+                title: 'Error',
+                message: `Cannot add vehicle: ${validation.errors[0]}`,
+                type: 'error',
+                duration: 10000
+            });
+            return;
+        }
+
         carStore.addCar(newCar);
+
+        console.log('New car added:', newCar);
 
         onClose();
     }

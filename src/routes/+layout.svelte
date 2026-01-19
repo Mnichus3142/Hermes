@@ -7,6 +7,6 @@
 </script>
 
 <main class="max-w-screen max-h-screen bg-blk">
-    <Notification></Notification>
     {@render children()}
+    <Notification></Notification>
 </main>
