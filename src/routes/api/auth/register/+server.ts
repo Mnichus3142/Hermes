@@ -6,6 +6,30 @@ import type { RequestEvent } from './$types';
 export async function POST(event: RequestEvent) {
     try {
         const { username, password } = await event.request.json();
+
+        // --- Validation ---
+        if (!username || typeof username !== 'string' || username.trim().length < 3) {
+            return json(
+                {
+                    success: false,
+                    title: 'Registration failed',
+                    message: 'Username must be at least 3 characters long'
+                },
+                { status: 400 }
+            );
+        }
+
+        if (!password || typeof password !== 'string' || password.length < 8) {
+            return json(
+                {
+                    success: false,
+                    title: 'Registration failed',
+                    message: 'Password must be at least 8 characters long'
+                },
+                { status: 400 }
+            );
+        }
+
         const userExists = await prisma.users.findUnique({
             where: {
                 username: username

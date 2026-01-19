@@ -11,6 +11,18 @@ export async function POST(event: RequestEvent) {
         const { cookies } = event;
         const { username, password } = await event.request.json();
 
+        // --- Validation ---
+        if (!username || !password) {
+            return json(
+                {
+                    success: false,
+                    title: 'Login failed',
+                    message: 'Username and password are required',
+                },
+                { status: 400 }
+            );
+        }
+
         const userExists = await prisma.users.findUnique({
             where: {
                 username : username,

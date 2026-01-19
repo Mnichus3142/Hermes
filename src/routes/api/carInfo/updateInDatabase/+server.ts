@@ -30,20 +30,23 @@ export async function PUT (event: RequestEvent) {
             }, { status: 401 });
         }
 
-        // Date fields validation - though checkCar might handle some
-        if (!carData.insuranceValidUntil) {
+        // --- Date Validation ---
+        const insuranceDate = carData.insuranceValidUntil ? new Date(carData.insuranceValidUntil) : null;
+        const inspectionDate = carData.technicalInspectionValidUntil ? new Date(carData.technicalInspectionValidUntil) : null;
+
+        if (!insuranceDate || isNaN(insuranceDate.getTime())) {
             return json({
                 success: false,
                 title: 'Validation Error',
-                message: 'Insurance valid until date is required'
+                message: 'A valid insurance expiration date is required'
             }, { status: 400 });
         }
         
-        if (!carData.technicalInspectionValidUntil) {
+        if (!inspectionDate || isNaN(inspectionDate.getTime())) {
             return json({
                 success: false,
                 title: 'Validation Error',
-                message: 'Technical inspection valid until date is required'
+                message: 'A valid technical inspection date is required'
             }, { status: 400 });
         }
 
@@ -74,8 +77,8 @@ export async function PUT (event: RequestEvent) {
                 year: Number(carData.year),
                 mileage: Number(carData.mileage),
                 licensePlate: carData.licensePlate,
-                insuranceValidUntil: new Date(carData.insuranceValidUntil),
-                technicalInspectionValidUntil: new Date(carData.technicalInspectionValidUntil),
+                insuranceValidUntil: insuranceDate,
+                technicalInspectionValidUntil: inspectionDate,
                 engineCapacity: carData.engineCapacity ? Number(carData.engineCapacity) : null,
                 fuelType: carData.fuelType || null,
                 power: carData.power ? Number(carData.power) : null,

@@ -40,6 +40,16 @@ model Expense {
   mileage     Int?
   liters      Float?
   car         Car      @relation(fields: [carVin], references: [VIN], onDelete: Cascade)
+  repairItems RepairItem[]
+}
+
+model RepairItem {
+  id        Int      @id @default(autoincrement())
+  expenseId Int
+  name      String   @db.VarChar(100)
+  cost      Float
+  bodyPart  String?  @db.VarChar(50)
+  expense   Expense  @relation(fields: [expenseId], references: [id], onDelete: Cascade)
 }
 
 model Car {

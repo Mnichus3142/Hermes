@@ -30,20 +30,23 @@ export async function POST (event: RequestEvent) {
             }, { status: 401 });
         }
 
-        // Date fields validation
-        if (!carData.insuranceValidUntil) {
+        // --- Date Validation ---
+        const insuranceDate = carData.insuranceValidUntil ? new Date(carData.insuranceValidUntil) : null;
+        const inspectionDate = carData.technicalInspectionValidUntil ? new Date(carData.technicalInspectionValidUntil) : null;
+
+        if (!insuranceDate || isNaN(insuranceDate.getTime())) {
             return json({
                 success: false,
                 title: 'Validation Error',
-                message: 'Insurance valid until date is required'
+                message: 'A valid insurance expiration date is required'
             }, { status: 400 });
         }
         
-        if (!carData.technicalInspectionValidUntil) {
+        if (!inspectionDate || isNaN(inspectionDate.getTime())) {
             return json({
                 success: false,
                 title: 'Validation Error',
-                message: 'Technical inspection valid until date is required'
+                message: 'A valid technical inspection date is required'
             }, { status: 400 });
         }
 
@@ -57,8 +60,8 @@ export async function POST (event: RequestEvent) {
                 year: Number(carData.year),
                 mileage: Number(carData.mileage),
                 licensePlate: carData.licensePlate,
-                insuranceValidUntil: carData.insuranceValidUntil ? new Date(carData.insuranceValidUntil) : null,
-                technicalInspectionValidUntil: carData.technicalInspectionValidUntil ? new Date(carData.technicalInspectionValidUntil) : null,
+                insuranceValidUntil: insuranceDate,
+                technicalInspectionValidUntil: inspectionDate,
                 engineCapacity: carData.engineCapacity ? Number(carData.engineCapacity) : null,
                 fuelType: carData.fuelType || null,
                 power: carData.power ? Number(carData.power) : null,

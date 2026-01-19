@@ -43,7 +43,8 @@ export class ExpenseTracker {
                             e.amount, 
                             e.mileage, 
                             e.id,
-                            e.subCategory
+                            e.subCategory,
+                            e.repairItems || []
                         );
                     });
                 this._repairExpenses.sort((a, b) => b.date.getTime() - a.date.getTime());

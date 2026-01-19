@@ -10,6 +10,11 @@ export async function POST(event: RequestEvent) {
         return json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    // --- Validation ---
+    if (!carVin || carVin.length !== 17) {
+        return json({ success: false, message: 'Invalid VIN number' }, { status: 400 });
+    }
+
     try {
         const car = await prisma.car.findUnique({
             where: { VIN: carVin }
@@ -21,6 +26,9 @@ export async function POST(event: RequestEvent) {
 
         const expenses = await prisma.expense.findMany({
             where: { carVin: carVin },
+            include: {
+                repairItems: true
+            },
             orderBy: { date: 'desc' }
         });
 

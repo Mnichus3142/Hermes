@@ -10,6 +10,15 @@ export async function DELETE(event: RequestEvent) {
         return json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
 
+    // --- Validation ---
+    if (!id || isNaN(Number(id))) {
+        return json({ success: false, message: 'Invalid expense ID' }, { status: 400 });
+    }
+
+    if (!carVin || carVin.length !== 17) {
+        return json({ success: false, message: 'Invalid VIN number' }, { status: 400 });
+    }
+
     try {
         // Verify car ownership
         const car = await prisma.car.findUnique({

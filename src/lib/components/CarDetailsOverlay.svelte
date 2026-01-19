@@ -1,6 +1,7 @@
 <script lang="ts">
     import { fade, scale } from 'svelte/transition';
     import AddNewCarForm from './addNewCarForm.svelte';
+    import AddRepairPopup from './AddRepairPopup.svelte';
     import { carStore } from '$lib/logic/carStore.svelte';
     import { createNewNotification } from '$lib/logic/notificationLogic.svelte';
     import ConfirmationDialog from './ConfirmationDialog.svelte';
@@ -15,6 +16,7 @@
     
     let showEditForm = $state(false);
     let showDeleteConfirm = $state(false);
+    let showRepairPopup = $state(false);
 
     // Categories
     const repairCategories = RepairCategories;
@@ -394,22 +396,26 @@
                         <form onsubmit={handleFormSubmit} class="space-y-5">
                             <div class="bg-black/20 p-4 rounded-lg border border-white/5 space-y-4">
                                 <div>
+                                    <!-- svelte-ignore a11y_label_has_associated_control -->
                                     <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Date</label>
                                     <input type="date" bind:value={fuelForm.date} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors" required />
                                 </div>
                                 
                                 <div class="grid grid-cols-2 gap-4">
                                      <div>
+                                        <!-- svelte-ignore a11y_label_has_associated_control -->
                                         <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Volume (L)</label>
                                         <input type="number" step="0.01" bind:value={fuelForm.liters} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" required />
                                     </div>
                                     <div>
+                                        <!-- svelte-ignore a11y_label_has_associated_control -->
                                         <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Price / L</label>
                                         <input type="number" step="0.01" bind:value={fuelForm.price} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" required />
                                     </div>
                                 </div>
 
                                 <div>
+                                    <!-- svelte-ignore a11y_label_has_associated_control -->
                                     <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Current Mileage</label>
                                     <div class="relative">
                                         <input type="number" bind:value={fuelForm.mileage} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono pl-6" 
@@ -421,7 +427,7 @@
                             </div>
                             
                             <div class="flex gap-3 pt-2">
-                                <button type="submit" disabled={loadingFuel} class="flex-1 bg-gradient-to-r from-mainAccent to-blue-600 text-white font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50">
+                                <button type="submit" disabled={loadingFuel} class="flex-1 bg-linear-to-r from-mainAccent to-blue-600 text-white font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50">
                                     {loadingFuel ? 'Saving...' : (editingExpenseId ? 'Update Record' : 'Save Entry')}
                                 </button>
                                 {#if editingExpenseId}
@@ -433,7 +439,7 @@
                         </form>
                     </div>
 
-                     <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg overflow-auto max-h-[600px]">
+                     <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg overflow-auto max-h-150">
                         <h3 class="text-lg font-bold text-mainAccent mb-6 flex justify-between items-center border-b border-white/5 pb-4">
                             <span>Filling History</span>
                             <div class="flex flex-col items-end">
@@ -475,99 +481,65 @@
                 </div>
 
             {:else if activeTab === 'faults'}
-                <div class="h-full grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6" in:fade={{ duration: 200 }}>
-                    <!-- ADD/EDIT FORM -->
-                    <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg h-fit">
-                        <div class="flex items-center gap-3 mb-6">
+                <div class="h-full flex flex-col gap-6" in:fade={{ duration: 200 }}>
+                    <!-- ACTION BAR -->
+                    <div class="flex justify-between items-center bg-mainBackground/50 backdrop-blur-sm p-4 rounded-xl border border-mainBorder shadow-lg">
+                        <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded-full bg-mainAccent/10 flex items-center justify-center text-mainAccent text-xl">🔧</div>
-                             <h3 class="text-xl font-bold text-mainAccent">{editingRepairId ? 'Edit Repair' : 'Log Maintenance'}</h3>
+                            <div>
+                                <h3 class="text-lg font-bold text-mainAccent">Maintenance & Repairs</h3>
+                                <p class="text-sm text-mainTextColor opacity-50">Log and track vehicle service history</p>
+                            </div>
                         </div>
-
-                        <form onsubmit={handleRepairFormSubmit} class="space-y-5">
-                            <div class="bg-black/20 p-4 rounded-lg border border-white/5 space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Date</label>
-                                        <input type="date" bind:value={repairForm.date} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors" required />
-                                    </div>
-                                    <div>
-                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Category</label>
-                                        <select bind:value={repairForm.subCategory} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors appearance-none cursor-pointer">
-                                            {#each repairCategories as cat}
-                                                <option value={cat} class="bg-gray-800">{cat}</option>
-                                            {/each}
-                                        </select>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Description</label>
-                                    <textarea rows="3" bind:value={repairForm.description} class="w-full bg-transparent border border-mainBorder rounded p-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors text-sm" placeholder="What was fixed?" required></textarea>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Cost</label>
-                                        <input type="number" step="0.01" bind:value={repairForm.cost} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" required />
-                                    </div>
-                                    <div>
-                                        <label class="text-xs font-bold text-mainTextColor opacity-50 uppercase tracking-wider mb-1 block">Mileage</label>
-                                        <input type="number" bind:value={repairForm.mileage} class="w-full bg-transparent border-b border-mainBorder py-2 text-mainTextColor focus:border-mainAccent outline-none transition-colors font-mono" placeholder={editingRepairId ? "Unchanged" : "Current km"} />
-                                    </div>
-                                </div>
-                            </div>
-
-                             <div class="flex gap-3 pt-2">
-                                <button type="submit" disabled={loadingRepairs} class="flex-1 bg-gradient-to-r from-mainAccent to-blue-600 text-white font-bold py-3 rounded-lg hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 transition-all disabled:opacity-50">
-                                    {loadingRepairs ? 'Saving...' : (editingRepairId ? 'Update Record' : 'Save Record')}
-                                </button>
-                                {#if editingRepairId}
-                                    <button type="button" onclick={resetRepairForm} disabled={loadingRepairs} class="px-5 py-3 border border-mainBorder text-mainTextColor rounded-lg hover:bg-white/5 active:scale-95 transition-all font-semibold">
-                                        Cancel
-                                    </button>
-                                {/if}
-                            </div>
-                        </form>
+                        <button 
+                            onclick={() => showRepairPopup = true}
+                            class="bg-mainAccent hover:bg-mainAccent/80 text-white font-bold py-2 px-6 rounded-lg transition-all active:scale-95 shadow-lg shadow-mainAccent/20 flex items-center gap-2"
+                        >
+                            <span>+</span> Add New Repair
+                        </button>
                     </div>
 
                     <!-- REPAIR LIST -->
-                    <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg overflow-auto max-h-[600px]">
+                    <div class="bg-mainBackground/50 backdrop-blur-sm p-6 rounded-xl border border-mainBorder shadow-lg overflow-auto flex-1">
                         <h3 class="text-lg font-bold text-mainAccent mb-6 flex justify-between items-center border-b border-white/5 pb-4">
                             <span>Service History</span>
                             <div class="flex flex-col items-end">
                                 <span class="text-xs text-mainTextColor opacity-50 uppercase">Total Spent</span>
-                                <span class="text-xl font-mono text-white">{expenseTracker.calculateTotalRepairExpenses().toFixed(2)}</span>
+                                <span class="text-xl font-mono text-white">{expenseTracker.calculateTotalRepairExpenses().toFixed(2)} PLN</span>
                             </div>
                         </h3>
 
                         {#if loadingRepairs && repairExpenses.length === 0}
-                            <div class="text-center opacity-50 py-10">Loading...</div>
+                            <div class="text-center opacity-50 py-10">Loading repairs...</div>
                         {:else if repairExpenses.length === 0}
-                             <div class="text-center opacity-50 py-10">No records found.</div>
+                             <div class="text-center opacity-50 py-20 flex flex-col items-center gap-4">
+                                <div class="text-4xl opacity-20 italic">No records yet</div>
+                                <button onclick={() => showRepairPopup = true} class="text-mainAccent hover:underline">Click here to log your first repair</button>
+                             </div>
                         {:else}
-                            <div class="space-y-3">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {#each repairExpenses as repair}
-                                    <div class="flex justify-between items-center border-b border-gray-700/20 pb-2 group">
-                                        <div class="flex gap-4 items-center">
-                                            <div class="w-10 h-10 rounded bg-mainAccent/10 flex items-center justify-center text-mainAccent font-bold text-xl">
-                                                🔧
+                                    <div class="bg-black/20 border border-white/5 rounded-xl p-4 group hover:border-mainAccent/30 transition-all">
+                                        <div class="flex justify-between items-start mb-3">
+                                            <div class="flex gap-3">
+                                                <div class="w-10 h-10 rounded-lg bg-mainAccent/10 flex items-center justify-center text-mainAccent text-xl">
+                                                    🔧
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold text-white leading-tight">{repair.description}</div>
+                                                    <div class="text-xs opacity-50 mt-1">{new Date(repair.date).toLocaleDateString()} {repair.mileage ? `• ${repair.mileage} km` : ''}</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div class="font-bold">{repair.description.substring(0, 30)}{repair.description.length > 30 ? '...' : ''}</div>
-                                                <div class="text-xs opacity-50">{new Date(repair.date).toLocaleDateString()} {repair.mileage ? `• ${repair.mileage} km` : ''}</div>
-                                            </div>
+                                            <div class="font-bold text-mainAccent font-mono">{repair.cost.toFixed(2)}</div>
                                         </div>
                                         
-                                        <div class="text-right flex items-center gap-4">
-                                            <div class="font-bold text-mainAccent">{repair.cost.toFixed(2)}</div>
-                                            <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button onclick={() => selectedRepair = repair} class="p-1 hover:text-green-400 text-mainTextColor/50 transition-colors" title="View Details">
+                                        <div class="flex justify-between items-center mt-4 pt-3 border-t border-white/5">
+                                            <span class="text-xs bg-mainAccent/10 text-mainAccent px-2 py-1 rounded-md font-bold uppercase tracking-wider">{repair.subCategory}</span>
+                                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onclick={() => selectedRepair = repair} class="p-1.5 hover:bg-white/5 rounded-md text-mainTextColor/50 hover:text-white transition-colors">
                                                     👁️
                                                 </button>
-                                                 <button onclick={() => handleStartEditRepair(repair)} class="p-1 hover:text-blue-400 text-mainTextColor/50 transition-colors" title="Edit">
-                                                    ✎
-                                                </button>
-                                                <button onclick={() => { repairIdToDelete = repair.id || null; showDeleteRepairConfirm = true; }} class="p-1 hover:text-red-400 text-mainTextColor/50 transition-colors" title="Delete">
+                                                <button onclick={() => { repairIdToDelete = repair.id || null; showDeleteRepairConfirm = true; }} class="p-1.5 hover:bg-white/5 rounded-md text-mainTextColor/50 hover:text-red-400 transition-colors">
                                                     ✖
                                                 </button>
                                             </div>
@@ -580,14 +552,19 @@
                 </div>
             {/if}
         </div>
-{#if showEditForm}
-    <AddNewCarForm 
-        onClose={toggleEditForm} 
-        carToEdit={carInfo}
+{#if showRepairPopup}
+    <AddRepairPopup 
+        carVin={carInfo.VIN} 
+        onClose={() => showRepairPopup = false}
+        onSuccess={() => {
+            expenseTracker.loadExpenses(carInfo.VIN).then(() => {
+                repairExpenses = expenseTracker.repairs;
+            });
+        }}
     />
 {/if}
 
-{#if showDeleteConfirm}
+{#if showEditForm}
     <ConfirmationDialog
         title="Delete Vehicle?"
         message="Are you sure you want to delete this vehicle? This action cannot be undone."
@@ -630,6 +607,7 @@
         role="dialog"
         tabindex="-1"
     >
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <div 
             class="bg-mainBackground border border-mainBorder rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col overflow-hidden relative" 
             onclick={(e) => e.stopPropagation()} 
@@ -651,7 +629,7 @@
 
             <div class="p-8 bg-mainBackground space-y-8">
                     <!-- Cost Card -->
-                    <div class="bg-gradient-to-br from-mainAccent/20 to-blue-900/20 p-6 rounded-2xl border border-mainAccent/20 flex justify-between items-center">
+                    <div class="bg-linear-to-br from-mainAccent/20 to-blue-900/20 p-6 rounded-2xl border border-mainAccent/20 flex justify-between items-center">
                         <div>
                             <div class="text-xs font-bold text-mainAccent opacity-80 uppercase tracking-widest mb-1">Total Cost</div>
                             <div class="text-4xl font-mono text-white font-bold">{selectedRepair.cost.toFixed(2)}</div>
@@ -664,11 +642,31 @@
 
                     <!-- Description -->
                     <div>
-                    <div class="text-sm font-bold opacity-50 uppercase tracking-widest mb-3">Technician Notes</div>
-                    <div class="bg-white/5 p-6 rounded-xl border border-white/5 text-sm leading-7 text-gray-300 whitespace-pre-wrap font-mono">
-                        {selectedRepair.description}
+                        <div class="text-sm font-bold opacity-50 uppercase tracking-widest mb-3">Technician Notes</div>
+                        <div class="bg-white/5 p-6 rounded-xl border border-white/5 text-sm leading-7 text-gray-300 whitespace-pre-wrap font-mono">
+                            {selectedRepair.description}
+                        </div>
                     </div>
-                    </div>
+
+                    <!-- Replaced Items -->
+                    {#if selectedRepair.repairItems && selectedRepair.repairItems.length > 0}
+                        <div>
+                            <div class="text-sm font-bold opacity-50 uppercase tracking-widest mb-3">Replaced Items</div>
+                            <div class="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                                {#each selectedRepair.repairItems as item}
+                                    <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5">
+                                        <div>
+                                            <div class="font-medium text-white">{item.name}</div>
+                                            {#if item.bodyPart}
+                                                <div class="text-[10px] text-mainAccent font-bold uppercase tracking-wider">{item.bodyPart.replace(/_/g, ' ')}</div>
+                                            {/if}
+                                        </div>
+                                        <div class="font-mono text-white">{item.cost.toFixed(2)} PLN</div>
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    {/if}
 
                     <!-- Actions -->
                     <div class="flex gap-3 pt-4 cursor-default border-t border-white/5">

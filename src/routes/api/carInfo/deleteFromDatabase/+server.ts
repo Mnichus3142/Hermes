@@ -6,22 +6,24 @@ export async function DELETE (event: RequestEvent) {
     const { vin } = await event.request.json();
     const userId = event.locals.user?.id;
 
-    if (!vin) {
+    if (!userId) {
+        return json({
+            success: false,
+            title: 'Authorization Error',
+            message: 'User not authenticated'
+        }, { status: 401 });
+    }
+
+    // --- Validation ---
+    if (!vin || typeof vin !== 'string' || vin.length !== 17) {
          return json({
             success: false,
             title: 'Validation Error',
-            message: 'VIN is required'
+            message: 'A valid VIN (17 characters) is required'
         }, { status: 400 });
     }
 
     try {
-        if (!userId) {
-            return json({
-                success: false,
-                title: 'Authorization Error',
-                message: 'User not authenticated'
-            }, { status: 401 });
-        }
 
         // Verify car belongs to user
         const existingCar = await prisma.car.findUnique({
