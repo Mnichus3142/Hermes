@@ -10,6 +10,6 @@ export type CarType = {
     licensePlate: string;
     insuranceValidUntil: Date | null;
     technicalInspectionValidUntil: Date | null;
-    insuranceValid: boolean | null;
-    technicalInspectionValid: boolean | null;
+    insuranceValid?: boolean | null;
+    technicalInspectionValid?: boolean | null;
 };

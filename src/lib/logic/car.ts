@@ -8,8 +8,8 @@ export class Car {
         car : CarType
     ) {
         this.car = car;
-        this.car.insuranceValid = car.insuranceValidUntil > new Date();
-        this.car.technicalInspectionValid = car.technicalInspectionValidUntil > new Date();
+        this.car.insuranceValid = car.insuranceValidUntil ? car.insuranceValidUntil > new Date() : false;
+        this.car.technicalInspectionValid = car.technicalInspectionValidUntil ? car.technicalInspectionValidUntil > new Date() : false;
     }
 
     getCarInfo() {

@@ -17,6 +17,7 @@ model Users {
   username String  @unique @db.VarChar(255)
   password String  @db.VarChar(255)
   refreshTokens refreshTokens[]
+  cars Car[]
 }
 
 model refreshTokens {
@@ -40,4 +41,6 @@ model Car {
   technicalInspectionValidUntil DateTime @db.Date
   insuranceValid Boolean?
   technicalInspectionValid Boolean?
+  userId  Int
+  user Users @relation(fields: [userId], references: [id])
 }
