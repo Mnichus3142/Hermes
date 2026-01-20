@@ -47,6 +47,7 @@ export class ExpenseTracker {
                             e.repairItems || []
                         );
                     });
+
                 this._repairExpenses.sort((a, b) => b.date.getTime() - a.date.getTime());
             }
         } catch (e) {
@@ -149,7 +150,7 @@ export class ExpenseTracker {
         }
     }
 
-    calculateTotalFuelExpenses(): number {
+    async calculateTotalFuelExpenses(): Promise<number> {
         return this._fuelExpenses.reduce((total, expense) => total + expense.totalCost, 0);
     }
 
@@ -248,7 +249,7 @@ export class ExpenseTracker {
         }
     }
 
-    calculateTotalRepairExpenses(): number {
+    async calculateTotalRepairExpenses(): Promise<number> {
         return this._repairExpenses.reduce((total, expense) => total + expense.cost, 0);
     }
 }

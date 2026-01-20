@@ -148,6 +148,8 @@
              createNewNotification({ type: 'error', title: 'Error', message: 'Operation failed', duration: 3000 });
         }
         loadingFuel = false;
+
+        fetchExpenses();
     }
 
     // --- REPAIR METHODS ---
@@ -264,6 +266,21 @@
     const toggleEditForm = () => {
         showEditForm = !showEditForm;
     }
+
+    let repairSum: Number = $state(0);
+    let consumptionSum: Number = $state(0);
+
+    const fetchExpenses = async () => {
+        await expenseTracker.loadExpenses(carInfo.VIN);
+        repairSum = await expenseTracker.calculateTotalRepairExpenses();
+        consumptionSum = await expenseTracker.calculateTotalFuelExpenses();
+    }
+
+    $effect(() => {
+        if (carInfo?.VIN) {
+            fetchExpenses();
+        }
+    });
 </script>
 
 <!-- No backdrop, just content wrapper -->
@@ -439,7 +456,7 @@
                             <span>Filling History</span>
                             <div class="flex flex-col items-end">
                                 <span class="text-xs text-mainTextColor opacity-50 uppercase">Total Cost</span>
-                                <span class="text-xl font-mono text-white">{expenseTracker.calculateTotalFuelExpenses().toFixed(2)}</span>
+                                <span class="text-xl font-mono text-white">{consumptionSum.toFixed(2)}</span>
                             </div>
                         </h3>
                         
@@ -500,7 +517,7 @@
                             <span>Service History</span>
                             <div class="flex flex-col items-end">
                                 <span class="text-xs text-mainTextColor opacity-50 uppercase">Total Spent</span>
-                                <span class="text-xl font-mono text-white">{expenseTracker.calculateTotalRepairExpenses().toFixed(2)} PLN</span>
+                                <span class="text-xl font-mono text-white">{repairSum.toFixed(2)} PLN</span>
                             </div>
                         </h3>
 
@@ -558,6 +575,7 @@
         onSuccess={() => {
             expenseTracker.loadExpenses(carInfo.VIN).then(() => {
                 repairExpenses = expenseTracker.repairs;
+                fetchExpenses();
             });
             repairToEdit = null;
         }}
