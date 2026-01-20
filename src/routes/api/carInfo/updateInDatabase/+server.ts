@@ -34,19 +34,19 @@ export async function PUT (event: RequestEvent) {
         const insuranceDate = carData.insuranceValidUntil ? new Date(carData.insuranceValidUntil) : null;
         const inspectionDate = carData.technicalInspectionValidUntil ? new Date(carData.technicalInspectionValidUntil) : null;
 
-        if (!insuranceDate || isNaN(insuranceDate.getTime())) {
+        if (insuranceDate && isNaN(insuranceDate.getTime())) {
             return json({
                 success: false,
                 title: 'Validation Error',
-                message: 'A valid insurance expiration date is required'
+                message: 'Insurance expiration date is invalid'
             }, { status: 400 });
         }
         
-        if (!inspectionDate || isNaN(inspectionDate.getTime())) {
+        if (inspectionDate && isNaN(inspectionDate.getTime())) {
             return json({
                 success: false,
                 title: 'Validation Error',
-                message: 'A valid technical inspection date is required'
+                message: 'Technical inspection date is invalid'
             }, { status: 400 });
         }
 

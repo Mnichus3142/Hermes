@@ -43,6 +43,7 @@
     let showDeleteRepairConfirm = $state(false);
     let repairIdToDelete = $state<number|null>(null);
     let selectedRepair = $state<repairExpense|null>(null);
+    let repairToEdit = $state<repairExpense|null>(null);
 
     let repairForm = $state({
         date: new Date().toISOString().split('T')[0],
@@ -163,14 +164,8 @@
 
     const handleStartEditRepair = (repair: repairExpense) => {
         if (!repair.id) return;
-        editingRepairId = repair.id;
-        repairForm = {
-            date: repair.date.toISOString().split('T')[0],
-            description: repair.description,
-            cost: repair.cost,
-            mileage: repair.mileage,
-            subCategory: repair.subCategory || 'OTHER'
-        };
+        repairToEdit = repair;
+        showRepairPopup = true;
     }
 
     const handleDeleteRepair = async () => {
@@ -555,16 +550,21 @@
 {#if showRepairPopup}
     <AddRepairPopup 
         carVin={carInfo.VIN} 
-        onClose={() => showRepairPopup = false}
+        repairToEdit={repairToEdit}
+        onClose={() => {
+            showRepairPopup = false;
+            repairToEdit = null;
+        }}
         onSuccess={() => {
             expenseTracker.loadExpenses(carInfo.VIN).then(() => {
                 repairExpenses = expenseTracker.repairs;
             });
+            repairToEdit = null;
         }}
     />
 {/if}
 
-{#if showEditForm}
+{#if showDeleteConfirm}
     <ConfirmationDialog
         title="Delete Vehicle?"
         message="Are you sure you want to delete this vehicle? This action cannot be undone."
@@ -573,6 +573,10 @@
         onConfirm={handleDelete}
         onCancel={() => showDeleteConfirm = false}
     />
+{/if}
+
+{#if showEditForm}
+    <AddNewCarForm carToEdit={car.getCarInfo().car} onClose={toggleEditForm} />
 {/if}
 
 {#if showDeleteFuelConfirm}

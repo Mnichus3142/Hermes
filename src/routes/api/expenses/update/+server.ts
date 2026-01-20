@@ -48,7 +48,7 @@ export async function PUT(event: RequestEvent) {
     }
 
     let mileage: number | null = null;
-    if (expenseData.mileage !== undefined && expenseData.mileage !== null && expenseData.mileage !== '') {
+    if (expenseData.mileage !== undefined && expenseData.mileage !== null && (expenseData.mileage as any) !== '') {
         mileage = Number(expenseData.mileage);
         if (isNaN(mileage) || mileage < 0) {
             return json({ success: false, message: 'Mileage must be a non-negative number' }, { status: 400 });
@@ -56,7 +56,7 @@ export async function PUT(event: RequestEvent) {
     }
 
     let liters: number | null = null;
-    if (expenseData.liters !== undefined && expenseData.liters !== null && expenseData.liters !== '') {
+    if (expenseData.liters !== undefined && expenseData.liters !== null && (expenseData.liters as any) !== '') {
         liters = Number(expenseData.liters);
         if (isNaN(liters) || liters <= 0) {
             return json({ success: false, message: 'Liters must be a positive number' }, { status: 400 });
@@ -73,17 +73,34 @@ export async function PUT(event: RequestEvent) {
             return json({ success: false, message: 'Car not found or unauthorized' }, { status: 403 });
         }
 
-        const updatedExpense = await prisma.expense.update({
-            where: { id: Number(expenseData.id) },
-            data: {
-                date: expenseDate,
-                description: expenseData.description.trim(),
-                amount: amount,
-                category: expenseData.category,
-                mileage: mileage,
-                liters: liters,
-                subCategory: expenseData.subCategory || null
+        // Use transaction to update expense and its items
+        const updatedExpense = await prisma.$transaction(async (tx) => {
+            // Delete existing repair items if it's a repair
+            if (expenseData.category === ExpenseCategoryEnum.REPAIR) {
+                await tx.repairItem.deleteMany({
+                    where: { expenseId: Number(expenseData.id) }
+                });
             }
+
+            return await tx.expense.update({
+                where: { id: Number(expenseData.id) },
+                data: {
+                    date: expenseDate,
+                    description: expenseData.description.trim(),
+                    amount: amount,
+                    category: expenseData.category,
+                    mileage: mileage,
+                    liters: liters,
+                    subCategory: expenseData.subCategory || null,
+                    repairItems: expenseData.repairItems ? {
+                        create: expenseData.repairItems.map(item => ({
+                            name: item.name,
+                            cost: Number(item.cost),
+                            bodyPart: item.bodyPart || null
+                        }))
+                    } : undefined
+                }
+            });
         });
 
         return json({ success: true, expense: updatedExpense });

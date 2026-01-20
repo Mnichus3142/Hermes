@@ -11,15 +11,24 @@
         carVin: string;
         onClose: () => void;
         onSuccess?: () => void;
+        repairToEdit?: any;
     }
 
-    let { carVin, onClose, onSuccess }: Props = $props();
+    let { carVin, onClose, onSuccess, repairToEdit }: Props = $props();
 
     let date = $state(new Date().toISOString().split('T')[0]);
     let description = $state('');
     let mileage = $state<number | undefined>(undefined);
-    
     let items = $state<RepairItemType[]>([]);
+
+    $effect(() => {
+        if (repairToEdit) {
+            date = new Date(repairToEdit.date).toISOString().split('T')[0];
+            description = repairToEdit.description;
+            mileage = repairToEdit.mileage;
+            items = repairToEdit.repairItems ? [...repairToEdit.repairItems] : [];
+        }
+    });
     
     let newItemName = $state('');
     let newItemCost = $state<number>(0);
@@ -66,6 +75,7 @@
         }
 
         const expenseData: ExpenseType = {
+            id: repairToEdit?.id,
             carVin,
             date,
             description,
@@ -76,8 +86,11 @@
         };
 
         try {
-            const response = await fetch('/api/expenses/add', {
-                method: 'POST',
+            const url = repairToEdit ? '/api/expenses/update' : '/api/expenses/add';
+            const method = repairToEdit ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(expenseData)
             });
@@ -87,7 +100,7 @@
             if (result.success) {
                 createNewNotification({
                     title: 'Success',
-                    message: 'Repair added successfully',
+                    message: repairToEdit ? 'Repair updated successfully' : 'Repair added successfully',
                     type: 'success',
                     duration: 3000
                 });
@@ -96,7 +109,7 @@
             } else {
                 createNewNotification({
                     title: 'Error',
-                    message: result.message || 'Failed to add repair',
+                    message: result.message || `Failed to ${repairToEdit ? 'update' : 'add'} repair`,
                     type: 'error',
                     duration: 5000
                 });
@@ -121,7 +134,7 @@
         transition:scale={{ duration: 200, start: 0.95 }}
     >
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-white">Add New Repair</h2>
+            <h2 class="text-2xl font-bold text-white">{repairToEdit ? 'Edit Repair' : 'Add New Repair'}</h2>
             <!-- svelte-ignore a11y_consider_explicit_label -->
             <button onclick={onClose} class="text-gray-400 hover:text-white transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -201,7 +214,7 @@
             </div>
             <div class="flex gap-3">
                 <button onclick={onClose} class="px-6 py-2 rounded-lg border border-gray-700 text-gray-300 hover:bg-gray-800 transition-all font-medium">Cancel</button>
-                <button onclick={handleSubmit} class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all font-bold shadow-lg shadow-green-900/20">Save Repair</button>
+                <button onclick={handleSubmit} class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white transition-all font-bold shadow-lg shadow-green-900/20">{repairToEdit ? 'Update Repair' : 'Save Repair'}</button>
             </div>
         </div>
     </div>
