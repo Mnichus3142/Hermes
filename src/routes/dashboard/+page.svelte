@@ -6,7 +6,6 @@
     import { carStore } from '$lib/logic/carStore.svelte';
     import { onMount } from 'svelte';
     import { fly, fade } from 'svelte/transition';
-    import { flip } from 'svelte/animate';
     
     let showAddCarForm = $state(false);
     let selectedCar = $state<any>(null);
@@ -65,7 +64,7 @@
     <div class="bg-mainBackground/80 backdrop-blur-md p-4 pt-8 flex flex-col items-center shadow-2xl m-4 rounded-lg">
         <!-- Title --> 
         <div class="text-sm dashboardTitle break-after-auto text-center">
-            Hello {$page.data.user?.username}, <br/> how are you today?
+            <TypeWriter typeWriterPayload={{ text: `Hello ${$page.data.user?.username}, how are you today?`, delay: 0, speed: 45 }} />
         </div>
 
         <!-- Navigation Buttons -->
@@ -73,10 +72,10 @@
            <div class="flex flex-col gap-4 my-auto w-full px-4 justify-center">
               {#each tabs as tab}
                 <button 
-                    class="py-3 px-4 w-full rounded-xl transition-all duration-300 font-semibold text-sm tracking-wide
+                    class="py-3 px-4 w-full rounded-xl transition-all duration-500 font-semibold text-sm tracking-wide cursor-pointer
                     {activeTab === tab.id 
-                        ? 'bg-mainAccent text-white shadow-lg scale-105' 
-                        : 'bg-mainBackground border border-mainBorder text-mainTextColor opacity-70 hover:opacity-100 hover:border-mainAccent/50'}"
+                        ? 'bg-mainAccent text-white shadow-2xl scale-110' 
+                        : 'bg-mainBackground border border-mainBorder text-mainTextColor shadow-2xl opacity-70 hover:opacity-100 hover:border-mainAccent/50 hover:scale-110 hover:bg-linear-to-r hover:from-mainAccent hover:to-mainAccent/60 hover:text-white hover:backdrop-blur-2xl'}"
                     onclick={() => activeTab = tab.id as Tab}
                 >
                     {tab.label}
@@ -93,7 +92,14 @@
                     type="submit"
                     class="logoutButton"
                 >
-                    Logout
+                    <span class="relative top-[0.5px] text-md font-semibold ">
+                        Logout
+                    </span>
+                    <svg width="46" height="46" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 relative -top-0.5">
+                        <path d="M14 8V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2v-2"></path>
+                        <path d="M21 12H7"></path>
+                        <path d="m18 15 3-3-3-3"></path>
+                    </svg>
                 </button>
             </form>
         </div>
@@ -102,7 +108,7 @@
     <div class="p-8 overflow-auto h-full flex flex-col relative w-full">
         
         {#if selectedCar}
-            <div class="absolute inset-0 p-4 bg-dashboardBackground z-10 w-full h-full"> 
+            <div class="absolute inset-0 p-4 z-10 w-full h-full"> 
                 <CarDetailsOverlay car={selectedCar} onClose={closeCarDetails} {activeTab} />
             </div>
         

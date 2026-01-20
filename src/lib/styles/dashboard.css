@@ -9,7 +9,7 @@
 }
 
 .logoutButton {
-    @apply px-4 py-2 bg-mainBorder text-mainTextColor text-sm font-title font-medium rounded-md hover:bg-mainAccent hover:scale-110 transition-all duration-200 cursor-pointer;
+    @apply text-mainTextColor/70 text-sm font-title font-medium rounded-md transition-all duration-200 cursor-pointer flex justify-center items-center pt-2.5 pb-1.5 px-4 hover:scale-110 hover:bg-linear-to-r hover:from-mainAccent hover:to-mainAccent/60 hover:text-white hover:backdrop-blur-2xl;
 }
 
 .addVehicleCard {
@@ -34,4 +34,8 @@
 
 .carSVG {
     @apply w-1/2 h-auto mb-4 ml-auto mr-auto;
+}
+
+.gradientText {
+    @apply bg-gradient-to-r from-mainAccent to-secondaryAccent bg-clip-text text-transparent;
 }
