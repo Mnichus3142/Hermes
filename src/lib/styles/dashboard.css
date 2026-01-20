@@ -35,7 +35,3 @@
 .carSVG {
     @apply w-1/2 h-auto mb-4 ml-auto mr-auto;
 }
-
-.gradientText {
-    @apply bg-gradient-to-r from-mainAccent to-secondaryAccent bg-clip-text text-transparent;
-}

@@ -6,7 +6,7 @@
 <div class="grid grid-cols-1 md:grid-cols-2 gap-6" in:fade={{ duration: 200 }}>
     <!-- Main Info -->
 <div class="box">
-        <h3 class="text-xl font-bold text-mainAccent mb-4">Vehicle Information</h3>
+        <h3 class="mb-4 text-xl font-bold gradientText w-fit">Vehicle Information</h3>
         <div class="space-y-3">
             <div class="element">
                 <span class="">VIN</span>
@@ -29,7 +29,7 @@
 
     <!-- Status -->
     <div class="box">
-        <h3 class="text-xl font-bold text-mainAccent mb-4">Status & Validity</h3>
+        <h3 class="text-xl font-bold text-secondaryAccent/80 mb-4">Status & Validity</h3>
         <div class="space-y-4">
             <div class="element">
                 <span class="">Insurance</span>
@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <h3 class="text-xl font-bold text-mainAccent mt-8 mb-4">Specifications</h3>
+        <h3 class="text-xl font-bold text-secondaryAccent/80 mt-8 mb-4">Specifications</h3>
         <div class="space-y-3">
             <div class="element">
                 <span class="">Engine</span>

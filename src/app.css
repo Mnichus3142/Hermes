@@ -46,3 +46,7 @@
 .textFont {
     @apply text-lg font-normal font-text;
 }
+
+.gradientText {
+    @apply bg-linear-to-r from-mainAccent to-secondaryAccent bg-clip-text text-transparent;
+}
