@@ -20,9 +20,11 @@
         }
     });
 
+    pageReady = true;
+
     onMount(async () => {
-        await getButtons();
-        checkForAuthNotification();
+        // await getButtons();
+        // checkForAuthNotification();
     });
     
     function toggleForms() {
