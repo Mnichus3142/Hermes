@@ -2,6 +2,8 @@ node_modules
 .vscode
 package-lock.json
 pnpm-lock.yaml
+bun.lock
+.npmrc
 
 # Output
 .output

@@ -1,0 +1,11 @@
+README.md
+Dockerfile
+editable/
+.git/
+.gitignore
+.env
+.env.example
+.npmrc
+node_modules/
+package-lock.json
+
