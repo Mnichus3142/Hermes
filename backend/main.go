@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	userManagement "backend/API"
 	"backend/database"
 )
 
@@ -26,10 +27,25 @@ func main() {
 	r := gin.Default()
 
 	// Define a simple GET endpoint
-	r.GET("/ping", func(c *gin.Context) {
+	// r.GET("/ping", func(c *gin.Context) {
 		// Return JSON response
+		// c.JSON(http.StatusOK, gin.H{
+			// "message": "pong",
+		// })
+	// })
+
+	r.GET("/user", func(c *gin.Context) {
+		username := c.Query("username")
+
+		if username == "" {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "You need to provide the username",
+			})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"userExists": userManagement.GET(username),
 		})
 	})
 
