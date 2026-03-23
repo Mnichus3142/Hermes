@@ -1,12 +1,27 @@
 package main
 
 import (
+	//"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"backend/database"
 )
 
 func main() {
+	if database.InitDB() != 0 {
+		return
+	}
+
+	var user database.User
+
+	result := database.DB.First(&user, 1)
+
+	if result.Error == nil {
+		println(user.ID)
+	}
+
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
 
