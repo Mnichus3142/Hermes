@@ -1,0 +1,11 @@
+$kind: http-request
+name: GET
+url: localhost:8080/user
+method: GET
+body:
+  type: json
+  content: |-
+    {
+        "username": "Michu"
+    }
+order: 1774265062199
