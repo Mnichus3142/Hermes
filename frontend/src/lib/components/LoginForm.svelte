@@ -201,7 +201,7 @@
         <button class="w-64 transition-all border-2 textFont loginButton h-14 border-mainBorder text-mainBorder hover:border-mainBorder hover:bg-mainBorder hover:text-mainTextColor" aria-label="Login button" onclick={handleInternalLogin}>
             Log in
         </button>
-        {#if buttons.discord || buttons.github || buttons.gitlab || buttons.google} 
+        {#if buttons.DISCORD || buttons.GITHUB || buttons.GITLAB || buttons.GOOGLE} 
             <!-- OAuth login -->
             <OAuthButtons {buttons} {handleThirdPartyLogin} />
         {/if}

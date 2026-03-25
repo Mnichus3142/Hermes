@@ -23,7 +23,7 @@
     pageReady = true;
 
     onMount(async () => {
-        // await getButtons();
+        await getButtons();
         // checkForAuthNotification();
     });
     
@@ -33,8 +33,9 @@
     
     async function getButtons() {
         try {
-            const response = await fetch('/api/info/OAuth');
+            const response = await fetch('http://localhost:8080/OAuth');
             const data = await response.json();
+            console.log(data)
             buttons = data;
         } catch (error) {
             console.error('Error during fetching buttons:', error);
@@ -72,7 +73,7 @@
         </div>
         <div class="flex items-center justify-center w-1/2 h-full">
             {#if loginVisible}
-                <LoginForm {toggleForms} {animationDuration} buttons={buttons || {discord: false, google: false, github: false, gitlab: false}} />
+                <LoginForm {toggleForms} {animationDuration} buttons={buttons || {DISCORD: false, GOOGLE: false, GITHUB: false, GITLAB: false}} />
             {:else}
                 <RegisterForm {toggleForms} {animationDuration} />
             {/if}

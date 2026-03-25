@@ -1,12 +1,15 @@
 package main
 
 import (
-	//"log"
 	"net/http"
+	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 
-	userManagement "backend/API"
+	"backend/API/OAuth"
+	"backend/API/userManagement"
 	"backend/database"
 )
 
@@ -15,24 +18,25 @@ func main() {
 		return
 	}
 
-	var user database.User
-
-	result := database.DB.First(&user, 1)
-
-	if result.Error == nil {
-		println(user.ID)
-	}
-
 	// Create a Gin router with default middleware (logger and recovery)
 	r := gin.Default()
 
-	// Define a simple GET endpoint
-	// r.GET("/ping", func(c *gin.Context) {
-		// Return JSON response
-		// c.JSON(http.StatusOK, gin.H{
-			// "message": "pong",
-		// })
-	// })
+	// Cors configutation
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{os.Getenv("ALLOWED_ORIGINS")},
+		AllowMethods:     []string{"GET"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	// ========================================================================================
+	// USER API
+	// ========================================================================================
+
+	// GET - Get information, if user with this name already exists in database
 
 	r.GET("/user", func(c *gin.Context) {
 		username := c.Query("username")
@@ -47,6 +51,14 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"userExists": userManagement.GET(username),
 		})
+	})
+
+	// ========================================================================================
+	// OAuth API
+	// ========================================================================================
+
+	r.GET("/OAuth", func(c *gin.Context) {
+		c.JSON(http.StatusOK, OAuth.GET())
 	})
 
 	// Start server on port 8080 (default)

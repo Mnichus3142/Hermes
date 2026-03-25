@@ -1,8 +1,8 @@
 type OAuthButtons = {
-    discord: boolean,
-    google: boolean,
-    github: boolean,
-    gitlab: boolean
+    DISCORD: boolean,
+    GOOGLE: boolean,
+    GITHUB: boolean,
+    GITLAB: boolean
 }
 
 export type { OAuthButtons }
