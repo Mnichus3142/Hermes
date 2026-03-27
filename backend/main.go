@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"net/http"
 	"os"
 	"time"
@@ -11,17 +12,38 @@ import (
 	"backend/API/OAuth"
 	"backend/API/userManagement"
 	"backend/database"
+	"backend/logs"
 )
 
 func main() {
+	// ========================================================================================
+	// Prepare handler for logs
+	// ========================================================================================
+
+	slog.Info("Prepearing logs handler...")
+	logs.Prepare()
+	slog.Info("Logs handler is ready")
+
+	// ========================================================================================
+	// Check if database connection is available
+	// ========================================================================================
+
+	slog.Info("Checking database connection...")
 	if database.InitDB() != 0 {
 		return
 	}
+	slog.Info("Database connection is available")
 
+	// ========================================================================================
 	// Create a Gin router with default middleware (logger and recovery)
+	// ========================================================================================
+
+	slog.Info("Starting server...")
 	r := gin.Default()
 
+	// ========================================================================================
 	// Cors configutation
+	// ========================================================================================
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{os.Getenv("ALLOWED_ORIGINS")},
@@ -63,5 +85,6 @@ func main() {
 
 	// Start server on port 8080 (default)
 	// Server will listen on 0.0.0.0:8080 (localhost:8080 on Windows)
+
 	r.Run()
 }
