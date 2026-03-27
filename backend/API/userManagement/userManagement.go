@@ -4,6 +4,13 @@ import (
 	"backend/database"
 )
 
+
+// ========================================================================================
+// Check if user exists in database
+//
+// @param username - username to check
+// ========================================================================================
+
 func GET (username string) bool {
 	var user database.User
 
