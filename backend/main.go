@@ -12,6 +12,7 @@ import (
 	"backend/API/OAuth"
 	"backend/API/userManagement"
 	"backend/database"
+	"backend/health"
 	"backend/logs"
 )
 
@@ -53,6 +54,16 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	// ========================================================================================
+	// HEALTH API
+	// ========================================================================================
+	
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"status": health.GET(),
+		})
+	})
 
 	// ========================================================================================
 	// USER API
