@@ -86,6 +86,35 @@ func main() {
 		})
 	})
 
+	// POST - Create new user in database
+
+	r.POST("/user", func(c *gin.Context) {
+		var request struct {
+			Username string `json:"username"`
+			Password string `json:"password"`
+		}
+
+		if err := c.BindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "Invalid request body",
+			})
+			return
+		}
+
+		success, message := userManagement.POST(request.Username, request.Password)
+
+		if !success {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": message,
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": message,
+		})
+	})
+
 	// ========================================================================================
 	// OAuth API
 	// ========================================================================================
