@@ -1,11 +1,10 @@
 $kind: http-request
 name: GET
-url: localhost:8080/user
+url: localhost:8080/user?username=Michus
 method: GET
+queryParams:
+  username: Michus
 body:
   type: json
-  content: |-
-    {
-        "username": "Michu"
-    }
+  content: ""
 order: 1774265062199

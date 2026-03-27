@@ -21,6 +21,7 @@ type OAuthActive struct {
 
 // ========================================================================================
 // Check which OAuth providers are active based on environment variables
+//
 // @return OAuthActive struct with boolean values indicating which providers are active
 // ========================================================================================
 
@@ -36,6 +37,7 @@ func createPayload () OAuthActive {
 
 // ========================================================================================
 // GET function to return OAuthActive struct with boolean values indicating which providers are active
+//
 // @return OAuthActive struct with boolean values indicating which providers are active
 // ========================================================================================
 

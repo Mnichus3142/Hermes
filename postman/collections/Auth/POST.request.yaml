@@ -1,6 +1,6 @@
 $kind: http-request
 name: POST
-url: localhost:8080/user
+url: localhost:8080/auth
 method: POST
 body:
   type: json
@@ -9,4 +9,4 @@ body:
         "username": "john_doe",
         "password": "secure_Password123"
     }
-order: 413633497784458
+order: 1774638656423

@@ -10,6 +10,7 @@ import (
 
 // ========================================================================================
 // User struct to represent a user in the database
+//
 // ID - primary key, auto-incremented
 // Username - unique username for the user
 // Password - hashed password for the user
@@ -25,6 +26,7 @@ type User struct {
 
 // ========================================================================================
 // RefreshToken struct to represent a refresh token in the database
+//
 // ID - primary key, auto-incremented
 // UserId - foreign key referencing the user who owns the refresh token
 // Token - unique string representing the refresh token
@@ -48,6 +50,7 @@ var DB *gorm.DB
 
 // ========================================================================================
 // InitDB function to initialize the database connection and perform auto-migration
+//
 // @return int - 0 if successful, 1 if there was an error connecting to the database
 // ========================================================================================
 
