@@ -1,8 +1,8 @@
 <!-- * Login page * -->
 
 <script lang="ts">
-    import LoginPage from "$lib/components/loginPage.svelte";
     import Loader from "$lib/components/loader.svelte";
+    import HomePage from "$lib/components/homePage.svelte";
 
     let loadState: Boolean = false;
 </script>
@@ -11,6 +11,6 @@
     {#if loadState}
         <Loader />
     {:else}
-        <LoginPage />
+        <HomePage />
     {/if}
 </main>
