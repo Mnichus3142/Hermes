@@ -1,5 +1,5 @@
 $kind: http-request
-name: POST
+name: LOGIN
 url: localhost:8080/auth
 method: POST
 body:
