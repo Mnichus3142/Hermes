@@ -1,0 +1,33 @@
+node_modules
+.vscode
+package-lock.json
+pnpm-lock.yaml
+bun.lock
+.npmrc
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+!.env.test
+.package-lock.json
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# ...
+.idea
+
+# Prisma
+prisma/migrations
