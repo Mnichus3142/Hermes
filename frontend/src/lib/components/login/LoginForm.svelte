@@ -11,7 +11,7 @@
         animationDuration: number;
         buttons: OAuthButtonsType;
     }>();
-    
+
     let username = $state('');
     let loginPassword = $state('password');
     let focusedField = $state<string | null>(null);
@@ -35,7 +35,7 @@
     // Username translation Y
     let usernameY = $derived(
         (focusedField === 'password' || hoveredField === 'password' || passwordCheck.firstPassword.length > 0) 
-            ? -24 
+            ? -8
             : 0
     );
 

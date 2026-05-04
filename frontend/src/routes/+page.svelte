@@ -1,8 +1,8 @@
 <!-- * Login page * -->
 
 <script lang="ts">
-    import Loader from "$lib/components/loader.svelte";
-    import HomePage from "$lib/components/homePage.svelte";
+    import Loader from "$lib/components/qol/loader.svelte";
+    import HomePage from "$lib/components/pages/homePage.svelte";
 
     let loadState: Boolean = false;
 </script>
