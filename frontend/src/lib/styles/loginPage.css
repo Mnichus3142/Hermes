@@ -1,23 +1,20 @@
-@import "tailwindcss";
-/* @import "../../app.css"; */
-
 /* Style for span containing elements */
 .spanStyle {
     @apply relative flex items-center justify-center w-64 h-10 transition-all duration-300;
 }
 
-.spanStyle > * {
+.spanStyle>* {
     @apply transition-all duration-200;
 }
 
-.spanStyle > label {
+.spanStyle>label {
     @apply text-mainBorder pointer-events-none;
 }
 
 /* Logika floating label (etykieta w górę) */
-.inputField:focus + label,
-.spanStyle:hover > label,
-.spanStyle.has-value > label {
+.inputField:focus+label,
+.spanStyle:hover>label,
+.spanStyle.has-value>label {
     @apply text-mainTextColor -translate-y-8 text-sm;
 }
 
@@ -25,7 +22,9 @@
     @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainBorder bg-transparent text-mainTextColor;
 }
 
-.inputField:focus, .inputField:hover, .spanStyle.has-value .inputField {
+.inputField:focus,
+.inputField:hover,
+.spanStyle.has-value .inputField {
     @apply border-mainTextColor outline-none;
 }
 

@@ -1,6 +1,4 @@
-@import "tailwindcss";
-
 /* Style for whole container */
-.navUI .topContainer {
-  @apply w-full h-20 bg-gunmetal-950 flex items-center justify-between px-3;
+.navUI .bar {
+    @apply fixed not-md:bottom-0 w-full h-20 flex items-center justify-center px-3;
 }

@@ -1,13 +1,15 @@
 <script lang="ts">
     import ProfileMenu from "./profileMenu.svelte";
 
-    let isLoggedIn = true;
+    let isLoggedIn = $state(true);
 </script>
 
 <!-- navUI container -->
 <div class="navUI">
-    <!-- Top bar container -->
-    <div class="topContainer">
+    <!-- Navigation content -->
+    <div></div>
+    <!-- Bar container -->
+    <div class="bar">
         <ProfileMenu {isLoggedIn} />
     </div>
 </div>

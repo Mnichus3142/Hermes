@@ -1,17 +1,25 @@
-@import "tailwindcss";
-
 .profileMenu {
-  @apply absolute right-8 text-gunmetal-300 flex;
+    @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
+    @apply absolute right-8 flex rounded-full p-2;
 }
 
-.profileMenuButton {
-  @apply relative right-0 top-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer;
+.profileMenu button {
+    @apply relative right-0 top-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer;
+}
+
+.profileMenu button svg {
+    @apply text-gunmetal-600;
 }
 
 .menu {
-  @apply absolute -right-2 top-16 w-48 bg-gunmetal-900 rounded-md shadow-md shadow-gunmetal-500 py-1 z-20;
+    @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
+    @apply fixed right-0 md:top-20 -top-44 w-48 rounded-2xl shadow-md z-20 flex flex-col gap-4;
 }
 
 .menu button {
-  @apply cursor-pointer w-full text-center py-2 text-gunmetal-200 hover:scale-125 transition-all;
+    @apply cursor-pointer w-full text-center hover:scale-125 transition-all text-gunmetal-700 flex items-center justify-center gap-2 py-2 rounded-lg;
+}
+
+.menu button svg {
+    @apply fill-gunmetal-700;
 }

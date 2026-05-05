@@ -7,7 +7,7 @@
     let { children }: LayoutProps = $props();
 </script>
 
-<main class="max-w-screen max-h-screen bg-blk">
+<main class="max-w-screen max-h-screen h-screen bg-gunmetal-50">
     <NavUI></NavUI>
     {@render children()}
     <Notification></Notification>

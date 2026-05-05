@@ -1,63 +1,63 @@
 @import "tailwindcss";
 
-/* Variables declaration */
-@theme {
-  --font-title: "Tajawal", serif;
-  --font-text: "Raleway", serif;
-  --font-playwrite: "Playwrite US Trad", serif;
-  --font-google-sans: "Google Sans Code", monospace;
-}
-
 @import "./lib/styles/loginPage.css";
 @import "./lib/styles/navUI.css";
 @import "./lib/styles/profileMenu.css";
 
+/* Variables declaration */
+@theme {
+    --font-title: "Tajawal", serif;
+    --font-text: "Raleway", serif;
+    --font-playwrite: "Playwrite US Trad", serif;
+    --font-google-sans: "Google Sans Code", monospace;
+}
+
 /* Light theme */
 :root {
-  --mainBackground: #2e2035;
-  --dashboardBackground: #2b2d42;
-  --mainBorder: #4e5c78;
-  --mainTextColor: #edf2f4;
-  --mainAccent: #ffa8a9;
-  --secondaryAccent: #54d0db;
+    --mainBackground: #2e2035;
+    --dashboardBackground: #2b2d42;
+    --mainBorder: #4e5c78;
+    --mainTextColor: #edf2f4;
+    --mainAccent: #ffa8a9;
+    --secondaryAccent: #54d0db;
 }
 
 /* Dark theme */
 [data-theme="dark"] {
-  --acme-canvas-color: oklch(0.21 0.034 264.665);
+    --acme-canvas-color: oklch(0.21 0.034 264.665);
 }
 
 @theme inline {
-  --color-gunmetal-50: #f2f2f3;
-  --color-gunmetal-100: #e4e6e7;
-  --color-gunmetal-200: #caccce;
-  --color-gunmetal-300: #afb3b6;
-  --color-gunmetal-400: #959a9d;
-  --color-gunmetal-500: #7a8185;
-  --color-gunmetal-600: #62676a;
-  --color-gunmetal-700: #494d50;
-  --color-gunmetal-800: #313335;
-  --color-gunmetal-900: #181a1b;
-  --color-gunmetal-950: #111213;
+    --color-gunmetal-50: #f2f2f3;
+    --color-gunmetal-100: #e4e6e7;
+    --color-gunmetal-200: #caccce;
+    --color-gunmetal-300: #afb3b6;
+    --color-gunmetal-400: #959a9d;
+    --color-gunmetal-500: #7a8185;
+    --color-gunmetal-600: #62676a;
+    --color-gunmetal-700: #494d50;
+    --color-gunmetal-800: #313335;
+    --color-gunmetal-900: #181a1b;
+    --color-gunmetal-950: #111213;
 
-  --color-mainBackground: var(--mainBackground);
-  --color-dashboardBackground: var(--dashboardBackground);
-  --color-mainBorder: var(--mainBorder);
-  --color-mainTextColor: var(--mainTextColor);
-  --color-mainAccent: var(--mainAccent);
-  --color-secondaryAccent: var(--secondaryAccent);
+    --color-mainBackground: var(--mainBackground);
+    --color-dashboardBackground: var(--dashboardBackground);
+    --color-mainBorder: var(--mainBorder);
+    --color-mainTextColor: var(--mainTextColor);
+    --color-mainAccent: var(--mainAccent);
+    --color-secondaryAccent: var(--secondaryAccent);
 }
 
 /* Font for titles */
 .titleFont {
-  @apply text-3xl font-medium font-title;
+    @apply text-3xl font-medium font-title;
 }
 
 /* Font for normal text */
 .textFont {
-  @apply text-lg font-normal font-text;
+    @apply text-lg font-normal font-text;
 }
 
 .gradientText {
-  @apply bg-linear-to-r from-mainAccent to-secondaryAccent bg-clip-text text-transparent;
+    @apply bg-linear-to-r from-mainAccent to-secondaryAccent bg-clip-text text-transparent;
 }
