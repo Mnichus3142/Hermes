@@ -1,4 +1,22 @@
-/* Style for whole container */
+/* navUI.css */
+
+.navUI {
+    @apply fixed not-md:bottom-0 not-md:left-0 not-md:w-full not-md:h-20;
+    @apply not-md:flex not-md:flex-row not-md:items-center not-md:justify-end;
+
+    @apply md:contents;
+}
+
+.navUI .nav-content {
+    @apply not-md:flex-1 not-md:flex not-md:justify-center not-md:items-center not-md:gap-5;
+
+    @apply md:w-48 md:h-screen md:fixed md:left-0 md:top-0;
+    @apply md:flex md:flex-col md:items-center md:justify-center md:gap-5;
+    @apply md:border-r-gunmetal-100 md:border-r-2 md:shadow-lg;
+}
+
 .navUI .bar {
-    @apply fixed not-md:bottom-0 w-full h-20 flex items-center justify-center px-3;
+    @apply not-md:flex not-md:items-center not-md:px-4;
+
+    @apply md:fixed md:top-6 md:right-8;
 }

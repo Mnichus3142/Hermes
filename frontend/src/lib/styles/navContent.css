@@ -1,0 +1,14 @@
+.nav-link {
+    @apply flex items-center gap-3 md:rounded-lg rounded-full p-2 cursor-pointer md:w-4/5;
+
+    @apply not-md:bg-gunmetal-100/25 not-md:shadow-gunmetal-50/10 not-md:backdrop-blur-sm not-md:border-gunmetal-100/50 not-md:border;
+    @apply md:hover:bg-gunmetal-100/25 md:hover:shadow-gunmetal-50/10 md:hover:backdrop-blur-sm md:hover:border-gunmetal-100/50 md:hover:border;
+}
+
+.nav-link svg {
+    @apply w-10 h-10 fill-gunmetal-600;
+}
+
+.nav-link .text {
+    @apply md:block hidden;
+}

@@ -42,9 +42,7 @@
         return {
             duration,
             css: (t: any) => `
-        overflow: hidden;
-        height: ${t * height}px;
-        transform: translateY(${(1 - t) * height}px);
+        clip-path: inset(${(1 - t) * 100}% 0 0 0);
       `,
         };
     };

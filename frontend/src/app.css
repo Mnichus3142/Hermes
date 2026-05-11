@@ -3,6 +3,7 @@
 @import "./lib/styles/loginPage.css";
 @import "./lib/styles/navUI.css";
 @import "./lib/styles/profileMenu.css";
+@import "./lib/styles/navContent.css";
 
 /* Variables declaration */
 @theme {

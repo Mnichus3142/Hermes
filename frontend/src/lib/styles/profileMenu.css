@@ -1,6 +1,6 @@
 .profileMenu {
     @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
-    @apply absolute right-8 flex rounded-full p-2;
+    @apply flex rounded-full p-2;
 }
 
 .profileMenu button {
@@ -13,7 +13,8 @@
 
 .menu {
     @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
-    @apply fixed right-0 md:top-20 -top-44 w-48 rounded-2xl shadow-md z-20 flex flex-col gap-4;
+    @apply fixed right-0 md:top-20 w-48 rounded-2xl shadow-md z-20 flex flex-col gap-4;
+    @apply not-md:bottom-20;
 }
 
 .menu button {
