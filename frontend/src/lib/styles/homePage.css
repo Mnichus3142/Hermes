@@ -1,0 +1,16 @@
+.authForm {
+    @apply h-screen bg-gunmetal-50 relative z-50;
+}
+
+.closeButton {
+    @apply absolute top-6 right-8 z-70 rounded-full flex items-center justify-center w-14 aspect-square cursor-pointer transition-all duration-200;
+    @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
+}
+
+.closeButton:hover {
+    @apply scale-125;
+}
+
+.closeButton svg {
+    @apply fill-gunmetal-600;
+}

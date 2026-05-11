@@ -4,6 +4,8 @@
 @import "./lib/styles/navUI.css";
 @import "./lib/styles/profileMenu.css";
 @import "./lib/styles/navContent.css";
+@import "./lib/styles/homePage.css";
+@import "./lib/styles/authForm.css";
 
 /* Variables declaration */
 @theme {
@@ -47,18 +49,4 @@
     --color-mainTextColor: var(--mainTextColor);
     --color-mainAccent: var(--mainAccent);
     --color-secondaryAccent: var(--secondaryAccent);
-}
-
-/* Font for titles */
-.titleFont {
-    @apply text-3xl font-medium font-title;
-}
-
-/* Font for normal text */
-.textFont {
-    @apply text-lg font-normal font-text;
-}
-
-.gradientText {
-    @apply bg-linear-to-r from-mainAccent to-secondaryAccent bg-clip-text text-transparent;
 }

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { browser } from "$app/environment";
-    import Loader from "../qol/loader.svelte";
     import LoginForm from "../login/LoginForm.svelte";
     import RegisterForm from "../register/RegisterForm.svelte";
     import type { OAuthButtons } from "$lib/types/OAuthButtons";
@@ -10,7 +9,7 @@
     let pageReady = $state(false);
     let loginVisible = $state(true);
 
-    const animationDuration = 400;
+    const animationDuration = 300;
 
     let buttons = $state<OAuthButtons | undefined>(undefined);
 
@@ -24,7 +23,7 @@
 
     onMount(async () => {
         await getButtons();
-        // checkForAuthNotification();
+        checkForAuthNotification();
     });
 
     function toggleForms() {
@@ -35,7 +34,6 @@
         try {
             const response = await fetch("http://localhost:8080/OAuth");
             const data = await response.json();
-            console.log(data);
             buttons = data;
         } catch (error) {
             console.error("Error during fetching buttons:", error);
@@ -65,34 +63,19 @@
     }
 </script>
 
-{#if !pageReady}
-    <Loader />
-{:else}
-    <main
-        class="fixed inset-0 flex items-center justify-center overflow-hidden bg-mainBackground"
-    >
-        <div
-            class="z-20 hidden w-1/2 h-full md:flex md:justify-center md:items-center"
-        >
-            <!-- svelte-ignore a11y_img_redundant_alt -->
-            <!-- <img src="/loginPagePhoto.jpg" alt="Login page photo" class="object-cover w-full h-full"/> -->
-            <img src="/logo.svg" alt="Login page photo" class="" />
-        </div>
-        <div class="flex items-center justify-center w-1/2 h-full">
-            {#if loginVisible}
-                <LoginForm
-                    {toggleForms}
-                    {animationDuration}
-                    buttons={buttons || {
-                        DISCORD: false,
-                        GOOGLE: false,
-                        GITHUB: false,
-                        GITLAB: false,
-                    }}
-                />
-            {:else}
-                <RegisterForm {toggleForms} {animationDuration} />
-            {/if}
-        </div>
-    </main>
-{/if}
+<div class="authCardWrapper">
+    {#if loginVisible}
+        <LoginForm
+            {toggleForms}
+            {animationDuration}
+            buttons={buttons || {
+                DISCORD: false,
+                GOOGLE: false,
+                GITHUB: false,
+                GITLAB: false,
+            }}
+        />
+    {:else}
+        <RegisterForm {toggleForms} {animationDuration} />
+    {/if}
+</div>

@@ -1,6 +1,58 @@
-/* Style for span containing elements */
+/* ─── Auth Card ─────────────────────────────────────────────── */
+
+.authCard {
+    @apply flex items-center justify-center w-full h-full;
+}
+
+.authCard form {
+    @apply flex flex-col gap-3 items-center justify-center w-full;
+}
+
+.authCard form .title {
+    @apply text-3xl font-medium font-title text-gunmetal-800 transition-all duration-200;
+}
+
+.authCard form .primaryButton {
+    @apply text-lg font-normal font-text w-64 h-14 rounded-lg cursor-pointer bg-gunmetal-100/25 backdrop-blur-sm border border-gunmetal-100/50 shadow-gunmetal-50/10 text-mainBorder transition-all duration-200 hover:bg-blue-400/70 hover:text-gunmetal-100 hover:border-gunmetal-100/75;
+}
+
+/* ─── Change Card ───────────────────────────────────────────── */
+
+.changeCard {
+    @apply flex flex-row items-center gap-1;
+}
+
+.changeCard p,
+.changeCard button {
+    @apply text-lg font-normal font-text;
+}
+
+.changeCard p {
+    @apply text-mainBorder;
+}
+
+.changeCard button {
+    @apply text-blue-400 cursor-pointer;
+}
+
+/* ─── Splitter ──────────────────────────────────────────────── */
+
+.splitter {
+    @apply flex flex-row items-center justify-center gap-3;
+}
+
+.splitter p {
+    @apply text-lg font-normal font-text text-gunmetal-800;
+}
+
+.splitter div {
+    @apply bg-gunmetal-200/80 min-w-28 h-0.5;
+}
+
+/* ─── Span / Input wrapper ──────────────────────────────────── */
+
 .spanStyle {
-    @apply relative flex items-center justify-center w-64 h-10 transition-all duration-300;
+    @apply relative flex items-center justify-center w-64 h-10 transition-all duration-200;
 }
 
 .spanStyle>* {
@@ -8,37 +60,47 @@
 }
 
 .spanStyle>label {
-    @apply text-mainBorder pointer-events-none;
+    @apply absolute left-3 text-lg font-normal font-text text-mainBorder pointer-events-none;
 }
 
-.inputField:focus+label,
-.spanStyle:hover>label,
-.spanStyle.has-value>label {
-    @apply text-mainTextColor -translate-y-8 text-sm;
+.spanStyle button {
+    @apply absolute right-3 cursor-pointer hover:scale-125 transition-all;
 }
+
+/* ─── Input Field ───────────────────────────────────────────── */
 
 .inputField {
-    @apply w-full h-10 px-2 py-1 border-2 rounded-md border-mainBorder bg-transparent text-mainTextColor;
+    @apply w-full h-10 px-2 py-1 rounded-lg bg-gunmetal-100/25 backdrop-blur-sm border border-gunmetal-100/50 shadow-gunmetal-50/10 text-gunmetal-300;
 }
 
 .inputField:focus,
 .inputField:hover,
 .spanStyle.has-value .inputField {
-    @apply border-mainTextColor outline-none;
+    @apply border-gunmetal-100/75 bg-gunmetal-100/40 outline-none;
 }
 
+/* ─── Floating label ──────────────────────────────── */
+
+.inputField:focus+label,
+.spanStyle:hover>label,
+.spanStyle.has-value>label {
+    @apply -translate-y-8 text-sm text-gunmetal-300;
+}
+
+/* ─── Login Button ────────────────────────────── */
+
 .loginButton {
-    @apply flex items-center justify-center transition-all rounded-md cursor-pointer max-h-16;
+    @apply flex items-center justify-center rounded-lg cursor-pointer max-h-16 transition-all duration-200 backdrop-blur-sm fill-gunmetal-50 border border-gunmetal-100/50 shadow-gunmetal-50/10;
 }
 
 .loginButton:hover {
-    @apply scale-110;
+    @apply scale-110 border-gunmetal-100/75;
 }
 
 .loginButton svg {
-    @apply h-1/2 fill-mainBorder;
+    @apply h-1/2;
 }
 
 button svg {
-    @apply text-mainTextColor;
+    @apply text-gunmetal-300;
 }
