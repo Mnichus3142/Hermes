@@ -35,17 +35,43 @@ if (await db.command({ ping: 1 })) {
 
 import { checkHealth } from "./health/health";
 
+logger.info("Setting up health check endpoint...");
+
 app.get("/health", async (req, res) => {
     try {
         const healthStatus = await checkHealth();
 
-        res.status(200).json({
-            status: healthStatus,
+        res.status(healthStatus.code).json({
+            status: healthStatus.code === 200 ? "Healthy" : "Unhealthy",
         });
     } catch (error) {
         res.status(500).json({ error: "Health check failed" });
     }
 });
+
+logger.info("Health check endpoint is ready");
+
+// =========================================================================================
+// OAuth buttons endpoint
+// =========================================================================================
+
+import { getOAuthButtons } from "./OAUTH/oauth";
+
+logger.info("Setting up OAuth buttons endpoint...");
+
+app.get("/OAuth", async (req, res) => {
+    try {
+        const buttons = await getOAuthButtons();
+
+        res.status(buttons.code).json({
+            buttons: buttons.buttons,
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to retrieve OAuth buttons" });
+    }
+});
+
+logger.info("OAuth buttons endpoint is ready");
 
 // ========================================================================================
 // Listen for incoming requests
