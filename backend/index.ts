@@ -59,6 +59,19 @@ import { getOAuthButtons } from "./OAUTH/oauth";
 
 logger.info("Setting up OAuth buttons endpoint...");
 
+(async () => {
+    try {
+        const buttons = await getOAuthButtons();
+        buttons.buttons.forEach((button) => {
+            button.status
+                ? logger.info(`${button.name} OAuth is enabled`)
+                : logger.warn(`${button.name} OAuth is disabled`);
+        });
+    } catch (error) {
+        logger.error("Failed to retrieve OAuth buttons", error);
+    }
+})();
+
 app.get("/OAuth", async (req, res) => {
     try {
         const buttons = await getOAuthButtons();
