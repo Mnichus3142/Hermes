@@ -12,6 +12,8 @@ import logger from "./logger/logger";
 import { connectToDatabase } from "./db/client";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsdoc from "swagger-jsdoc";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 
 // ========================================================================================
 // Config
@@ -19,6 +21,16 @@ import swaggerJsdoc from "swagger-jsdoc";
 
 const app = express();
 const port = 8080;
+
+app.use(
+    cors({
+        origin: process.env.ALLOWED_ORIGINS,
+        credentials: true,
+    }),
+);
+
+app.use(express.json());
+app.use(cookieParser());
 
 // ========================================================================================
 // Swagger setup
@@ -163,6 +175,156 @@ logger.info("OAuth buttons endpoint is ready");
 // ========================================================================================
 // User management endpoints (registration, login, etc.)
 // ========================================================================================
+
+// ========================================================================================
+// User
+// ========================================================================================
+
+// ========================================================================================
+// User creation
+// ========================================================================================
+
+logger.info("Setting up user creation endpoint...");
+
+import { User } from "./user/user";
+
+/** * @openapi
+ * /users:
+ *   get:
+ *     summary: Check the availability of a username for user registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username to check for availability
+ *     responses:
+ *       200:
+ *         description: A successful response indicating the username is available
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Username is available"
+ *       409:
+ *         description: A conflict response indicating the username is already taken
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Username is already taken"
+ *       500:
+ *         description: An error response indicating the username availability check failed
+ *   post:
+ *     summary: Create a new user account
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The desired username for the new account
+ *               password:
+ *                 type: string
+ *                 description: The desired password for the new account
+ *     responses:
+ *       201:
+ *         description: A successful response indicating the user account was created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User created successfully"
+ *       400:
+ *         description: A bad request response indicating invalid input data for user creation
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ */
+
+app.get("/user", (req, res) => {
+    const user = new User();
+    user.checkAvailability(req.query.username as string).then((available) => {
+        if (available) {
+            res.status(200).json({ message: "Username is available" });
+        } else {
+            res.status(409).json({ message: "Username is already taken" });
+        }
+    });
+});
+
+app.post("/user", (req, res) => {
+    const user = new User();
+
+    user
+        .create(req.body.username, req.body.password)
+        .then(([success, errorMessage]) => {
+            if (success) {
+                res.status(201).json({ message: "User created successfully" });
+            } else {
+                res.status(409).json({ message: errorMessage });
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            res.status(500).json({ message: "Server error" });
+        });
+});
+
+logger.info("User creation endpoint is ready");
+
+// ========================================================================================
+// User login / logout
+// ========================================================================================
+
+app.post("/auth", async (req, res) => {
+    const user = new User();
+
+    const [status, response] = await user.login(
+        req.body.username,
+        req.body.password,
+    );
+
+    if (!status) {
+        res.status(401).json({ message: response });
+    }
+
+    const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    };
+
+    res.cookie("accessToken", response.accessToken, {
+        ...cookieOptions,
+        maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", response.refreshToken, {
+        ...cookieOptions,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({ message: "Login successful" });
+});
 
 // ========================================================================================
 // Listen for incoming requests

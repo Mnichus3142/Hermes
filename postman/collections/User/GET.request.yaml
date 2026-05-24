@@ -1,9 +1,9 @@
 $kind: http-request
 name: GET
-url: localhost:8080/user?username=Michus
+url: localhost:8080/user?username=john_doe2
 method: GET
 queryParams:
-  username: Michus
+  username: john_doe2
 body:
   type: json
   content: ""
