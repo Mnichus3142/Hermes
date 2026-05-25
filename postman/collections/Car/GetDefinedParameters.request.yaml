@@ -1,0 +1,9 @@
+$kind: http-request
+name: GetDefinedParameters
+url: localhost:8080/car/parameters
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTE0MmJhYjU2MGM4NGYwZTY0NjFmYzEiLCJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWF0IjoxNzc5NzA3MzEwLCJleHAiOjE3Nzk3MDgyMTB9.c8yXgl2dl_0_DKHuHB4kBPfwH___GDW7YU3iOvtlKEE
+order: 1779707270903

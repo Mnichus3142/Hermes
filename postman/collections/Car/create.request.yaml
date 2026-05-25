@@ -1,0 +1,38 @@
+$kind: http-request
+name: create
+url: localhost:8080/car
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "make": "Toyota",
+        "model": "Camry",
+        "year": 2022,
+        "type": "sedan",
+        "engine": {
+            "type": "gasoline",
+            "displacement": 2.5,
+            "horsepower": 203,
+            "torque": 250
+        },
+        "transmission": {
+            "type": "automatic",
+            "gears": 8
+        },
+        "mileage": 15000,
+        "color": "Midnight Black",
+        "vin": "1HGBH41JXMN109186",
+        "registrationNumber": "WA12345",
+        "dates": {
+            "manufactureDate": "2022-03-15T00:00:00.000Z",
+            "registrationDate": "2022-06-01T00:00:00.000Z",
+            "insuranceExpiryDate": "2025-06-01T00:00:00.000Z",
+            "technicalInspectionExpiryDate": "2025-03-15T00:00:00.000Z"
+        }
+    }
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTE0MmJhYjU2MGM4NGYwZTY0NjFmYzEiLCJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWF0IjoxNzc5NzA5MzIzLCJleHAiOjE3Nzk3MTAyMjN9.fvjowEQsH1-AkVbu--MwQCCx2DMZDsw3haT1OqXsADs
+order: 2106531881919688

@@ -1,5 +1,5 @@
 $kind: http-request
 name: LOGOUT
-url: localhost:8080/protected/logout
+url: localhost:8080/logout
 method: POST
 order: 229761335343708

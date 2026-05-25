@@ -10,10 +10,9 @@ import "dotenv/config";
 import express from "express";
 import logger from "./logger/logger";
 import { connectToDatabase } from "./db/client";
-import swaggerUi from "swagger-ui-express";
-import swaggerJsdoc from "swagger-jsdoc";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { validateAccessToken, validateRefreshToken } from "./user/user";
 
 // ========================================================================================
 // Config
@@ -31,26 +30,6 @@ app.use(
 
 app.use(express.json());
 app.use(cookieParser());
-
-// ========================================================================================
-// Swagger setup
-// ========================================================================================
-
-const swaggerOptions = {
-    definition: {
-        openapi: "3.0.0",
-        info: {
-            title: "Hermes API Documentation",
-            version: "1.0.0",
-            description: "Hermes API - Endpoints documentation",
-        },
-        servers: [{ url: `http://localhost:${port}` }],
-    },
-    apis: ["./index.ts"],
-};
-
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ========================================================================================
 // Check if database connection is available
@@ -82,18 +61,6 @@ if (await db.command({ ping: 1 })) {
 logger.info("Setting up health check endpoint...");
 
 import { checkHealth } from "./health/health";
-
-/**
- * @openapi
- * /health:
- *   get:
- *     summary: Check the health of the application
- *     responses:
- *       200:
- *         description: A healthy response indicating the application is running properly
- *       500:
- *         description: An error response indicating the health check failed
- */
 
 app.get("/health", async (req, res) => {
     try {
@@ -130,34 +97,6 @@ import { getOAuthButtons } from "./OAUTH/oauth";
     }
 })();
 
-/**
- * @openapi
- * /OAuth:
- *   get:
- *     summary: Retrieve the status of OAuth buttons for various providers
- *     responses:
- *       200:
- *         description: A successful response containing the status of OAuth buttons
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 buttons:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       name:
- *                         type: string
- *                         description: The name of the OAuth provider (e.g., Google, GitHub)
- *                       status:
- *                         type: boolean
- *                         description: Indicates whether the OAuth button is enabled (true) or disabled (false)
- *       500:
- *         description: An error response indicating the retrieval of OAuth buttons failed
- */
-
 app.get("/OAuth", async (req, res) => {
     try {
         const buttons = await getOAuthButtons();
@@ -187,78 +126,6 @@ logger.info("OAuth buttons endpoint is ready");
 logger.info("Setting up user creation endpoint...");
 
 import { User } from "./user/user";
-
-/** * @openapi
- * /users:
- *   get:
- *     summary: Check the availability of a username for user registration
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: The username to check for availability
- *     responses:
- *       200:
- *         description: A successful response indicating the username is available
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Username is available"
- *       409:
- *         description: A conflict response indicating the username is already taken
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Username is already taken"
- *       500:
- *         description: An error response indicating the username availability check failed
- *   post:
- *     summary: Create a new user account
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *                 description: The desired username for the new account
- *               password:
- *                 type: string
- *                 description: The desired password for the new account
- *     responses:
- *       201:
- *         description: A successful response indicating the user account was created
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User created successfully"
- *       400:
- *         description: A bad request response indicating invalid input data for user creation
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- */
 
 app.get("/user", (req, res) => {
     const user = new User();
@@ -292,7 +159,7 @@ app.post("/user", (req, res) => {
 logger.info("User creation endpoint is ready");
 
 // ========================================================================================
-// User login / logout
+// User login / logout / refresh
 // ========================================================================================
 
 app.post("/auth", async (req, res) => {
@@ -304,14 +171,14 @@ app.post("/auth", async (req, res) => {
     );
 
     if (!status) {
-        res.status(401).json({ message: response });
+        return res.status(401).json({ message: response });
     }
 
     const cookieOptions = {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-    };
+        sameSite: "strict" as const,
+    } as const;
 
     res.cookie("accessToken", response.accessToken, {
         ...cookieOptions,
@@ -323,7 +190,105 @@ app.post("/auth", async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(200).json({ message: "Login successful" });
+    return res.status(200).json({ message: "Login successful" });
+});
+
+// ========================================================================================
+// Protected logout
+// ========================================================================================
+
+const COOKIE_OPTIONS = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict" as const,
+} as const;
+
+app.post("/logout", validateAccessToken, async (req, res) => {
+    const user = new User();
+    const refreshToken = req.cookies.refreshToken;
+
+    try {
+        const [status, errorMessage] = await user.logout(refreshToken);
+
+        if (status) {
+            res.clearCookie("accessToken", COOKIE_OPTIONS);
+            res.clearCookie("refreshToken", COOKIE_OPTIONS);
+            return res.status(200).json({ message: "Logout successful" });
+        } else {
+            return res.status(500).json({ message: errorMessage });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+});
+
+// ========================================================================================
+// Token refresh endpoint
+// ========================================================================================
+
+import { AuthTokens } from "./user/user";
+
+app.post("/refresh", validateRefreshToken, async (req, res) => {
+    const user = new User();
+    const [status, response] = await user.refresh(req.cookies.refreshToken);
+
+    if (!status) {
+        return res.status(401).json({ message: response });
+    }
+
+    const tokens = response as AuthTokens;
+
+    res.cookie("accessToken", tokens.accessToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", tokens.refreshToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ message: "Token refreshed successfully" });
+});
+
+// ========================================================================================
+// Car management endpoints (CRUD operations)
+// ========================================================================================
+
+// ========================================================================================
+// Get defined parameters for a car
+// ========================================================================================
+
+import { getDefinedParameters, createCar, Car } from "./car/car";
+
+app.get("/car/parameters", validateAccessToken, async (req, res) => {
+    try {
+        const parameters = getDefinedParameters();
+        res.status(200).json(parameters);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve car parameters" });
+    }
+});
+
+app.post("/car", validateAccessToken, async (req, res) => {
+    try {
+        const car: Car = {
+            ...req.body,
+            ownerId: req.user!._id,
+        };
+
+        const [status, message] = await createCar(car);
+
+        if (!status) {
+            return res.status(400).json({ message });
+        }
+
+        return res.status(201).json({ message: "Car created successfully" });
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to create car" });
+    }
 });
 
 // ========================================================================================
@@ -332,7 +297,4 @@ app.post("/auth", async (req, res) => {
 
 app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
-    logger.info(
-        `Swagger documentation available at http://localhost:${port}/api-docs`,
-    );
 });
