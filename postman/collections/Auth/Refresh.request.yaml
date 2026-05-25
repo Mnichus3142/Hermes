@@ -1,4 +1,5 @@
 $kind: http-request
-url: ""
-method: GET
+name: Refresh
+url: localhost:8080/refresh
+method: POST
 order: 3014561778463161

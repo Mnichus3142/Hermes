@@ -1,0 +1,5 @@
+$kind: http-request
+name: get
+url: localhost:8080/car
+method: GET
+order: 2581409523570948

@@ -155,3 +155,8 @@ export const createCar = async (car: Car): Promise<[boolean, string]> => {
         return [false, (error as Error).message];
     }
 };
+
+export const getCars = async (ownerId: ObjectId): Promise<Car[]> => {
+    const db = await connectToDatabase();
+    return await db.collection<Car>("cars").find({ ownerId }).toArray();
+};

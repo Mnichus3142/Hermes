@@ -260,7 +260,7 @@ app.post("/refresh", validateRefreshToken, async (req, res) => {
 // Get defined parameters for a car
 // ========================================================================================
 
-import { getDefinedParameters, createCar, Car } from "./car/car";
+import { getDefinedParameters, createCar, Car, getCars } from "./car/car";
 
 app.get("/car/parameters", validateAccessToken, async (req, res) => {
     try {
@@ -288,6 +288,16 @@ app.post("/car", validateAccessToken, async (req, res) => {
         return res.status(201).json({ message: "Car created successfully" });
     } catch (error) {
         return res.status(500).json({ message: "Failed to create car" });
+    }
+});
+
+app.get("/car", validateAccessToken, async (req, res) => {
+    try {
+        const cars = await getCars(req.user!._id);
+        res.status(200).json(cars);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve cars" });
     }
 });
 
