@@ -260,7 +260,15 @@ app.post("/refresh", validateRefreshToken, async (req, res) => {
 // Get defined parameters for a car
 // ========================================================================================
 
-import { getDefinedParameters, createCar, Car, getCars } from "./car/car";
+import {
+    getDefinedParameters,
+    createCar,
+    Car,
+    getCars,
+    getCarById,
+    updateCar,
+    deleteCar,
+} from "./car/car";
 
 app.get("/car/parameters", validateAccessToken, async (req, res) => {
     try {
@@ -298,6 +306,60 @@ app.get("/car", validateAccessToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Failed to retrieve cars" });
+    }
+});
+
+import { ObjectId } from "mongodb";
+
+app.get("/car/:id", validateAccessToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const car = await getCarById(new ObjectId(id), req.user!._id);
+
+        if (!car) {
+            return res.status(404).json({ message: "Car not found" });
+        }
+
+        res.status(200).json(car);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve car" });
+    }
+});
+
+app.patch("/car/:id", validateAccessToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates: Partial<Car> = req.body;
+
+        const [status, message] = await updateCar(new ObjectId(id), updates);
+
+        if (!status) {
+            return res.status(400).json({ message });
+        }
+
+        return res.status(200).json({ message: "Car updated successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Failed to update car" });
+    }
+});
+
+app.delete("/car/:id", validateAccessToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const success = await deleteCar(new ObjectId(id));
+
+        if (!success) {
+            return res.status(404).json({ message: "Car not found" });
+        }
+
+        return res.status(200).json({ message: "Car deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Failed to delete car" });
     }
 });
 

@@ -1,0 +1,9 @@
+$kind: http-request
+name: delete
+url: localhost:8080/car/6a1437c79344031a57addc2e
+method: DELETE
+auth:
+  type: bearer
+  credentials:
+    token: 6a1437c79344031a57addc2e
+order: 4491071277828976

@@ -55,81 +55,90 @@ export type Car = {
 };
 
 export const validateCar = (body: any): [boolean, string?] => {
-    const requiredFields: (keyof Car)[] = [
-        "make",
-        "model",
-        "year",
-        "type",
-        "mileage",
-        "color",
-        "vin",
-        "registrationNumber",
-    ];
+    if (body.make != null && typeof body.make !== "string") {
+        return [false, "Make must be a string"];
+    }
 
-    for (const field of requiredFields) {
+    if (body.model != null && typeof body.model !== "string") {
+        return [false, "Model must be a string"];
+    }
+
+    if (body.year != null && typeof body.year !== "number") {
+        return [false, "Year must be a number"];
+    }
+
+    if (body.type != null && !carTypes.includes(body.type)) {
+        return [false, `Type must be one of: ${carTypes.join(", ")}`];
+    }
+
+    if (body.engine != null) {
+        if (typeof body.engine !== "object") {
+            return [false, "Engine must be an object"];
+        }
+
+        if (body.engine.type != null && !fuelTypes.includes(body.engine.type)) {
+            return [false, `Engine type must be one of: ${fuelTypes.join(", ")}`];
+        }
+
         if (
-            body[field] === undefined ||
-            body[field] === null ||
-            body[field] === ""
+            body.engine.displacement != null &&
+            typeof body.engine.displacement !== "number"
         ) {
-            return [false, `Missing required field: ${field}`];
+            return [false, "Engine displacement must be a number"];
         }
-    }
 
-    const engineFields: (keyof engine)[] = [
-        "type",
-        "displacement",
-        "horsepower",
-        "torque",
-    ];
-    if (!body.engine || typeof body.engine !== "object") {
-        return [false, "Missing required field: engine"];
-    }
-    for (const field of engineFields) {
-        if (body.engine[field] === undefined || body.engine[field] === null) {
-            return [false, `Missing required field: engine.${field}`];
-        }
-    }
-
-    const transmissionFields: (keyof transmission)[] = ["type", "gears"];
-    if (!body.transmission || typeof body.transmission !== "object") {
-        return [false, "Missing required field: transmission"];
-    }
-    for (const field of transmissionFields) {
         if (
-            body.transmission[field] === undefined ||
-            body.transmission[field] === null
+            body.engine.horsepower != null &&
+            typeof body.engine.horsepower !== "number"
         ) {
-            return [false, `Missing required field: transmission.${field}`];
+            return [false, "Engine horsepower must be a number"];
+        }
+
+        if (body.engine.torque != null && typeof body.engine.torque !== "number") {
+            return [false, "Engine torque must be a number"];
         }
     }
 
-    const dateFields: (keyof dates)[] = [
-        "manufactureDate",
-        "registrationDate",
-        "insuranceExpiryDate",
-        "technicalInspectionExpiryDate",
-    ];
-    if (!body.dates || typeof body.dates !== "object") {
-        return [false, "Missing required field: dates"];
-    }
-    for (const field of dateFields) {
-        if (body.dates[field] === undefined || body.dates[field] === null) {
-            return [false, `Missing required field: dates.${field}`];
+    if (body.transmission != null) {
+        if (typeof body.transmission !== "object") {
+            return [false, "Transmission must be an object"];
+        }
+
+        if (
+            body.transmission.type != null &&
+            !transmissionTypes.includes(body.transmission.type)
+        ) {
+            return [
+                false,
+                `Transmission type must be one of: ${transmissionTypes.join(", ")}`,
+            ];
+        }
+
+        if (
+            body.transmission.gears != null &&
+            typeof body.transmission.gears !== "number"
+        ) {
+            return [false, "Transmission gears must be a number"];
         }
     }
 
-    if (!carTypes.includes(body.type)) {
-        return [false, `Invalid car type. Allowed types: ${carTypes.join(", ")}`];
+    if (body.mileage != null && typeof body.mileage !== "number") {
+        return [false, "Mileage must be a number"];
     }
-    if (!fuelTypes.includes(body.engine.type)) {
-        return [false, `Invalid fuel type. Allowed types: ${fuelTypes.join(", ")}`];
+
+    if (body.color != null && typeof body.color !== "string") {
+        return [false, "Color must be a string"];
     }
-    if (!transmissionTypes.includes(body.transmission.type)) {
-        return [
-            false,
-            `Invalid transmission type. Allowed types: ${transmissionTypes.join(", ")}`,
-        ];
+
+    if (body.vin != null && typeof body.vin !== "string") {
+        return [false, "VIN must be a string"];
+    }
+
+    if (
+        body.registrationNumber != null &&
+        typeof body.registrationNumber !== "string"
+    ) {
+        return [false, "Registration number must be a string"];
     }
 
     return [true];
@@ -159,4 +168,50 @@ export const createCar = async (car: Car): Promise<[boolean, string]> => {
 export const getCars = async (ownerId: ObjectId): Promise<Car[]> => {
     const db = await connectToDatabase();
     return await db.collection<Car>("cars").find({ ownerId }).toArray();
+};
+
+export const getCarById = async (
+    carId: ObjectId,
+    userId: ObjectId,
+): Promise<WithId<Car> | null> => {
+    const db = await connectToDatabase();
+    return await db
+        .collection<Car>("cars")
+        .findOne({ _id: carId, ownerId: userId });
+};
+
+export const deleteCar = async (carId: ObjectId): Promise<boolean> => {
+    const db = await connectToDatabase();
+    const result = await db.collection("cars").deleteOne({ _id: carId });
+    return result.deletedCount === 1;
+};
+
+export const updateCar = async (
+    carId: ObjectId,
+    updateData: Partial<Car>,
+): Promise<[boolean, string]> => {
+    const [valid, errorMessage] = validateCar(updateData);
+
+    if (!valid) {
+        return [false, errorMessage!];
+    }
+
+    try {
+        const db = await connectToDatabase();
+        const result = await db
+            .collection("cars")
+            .updateOne({ _id: carId }, { $set: updateData });
+
+        if (result.matchedCount === 0) {
+            return [false, "Car not found"];
+        }
+
+        if (result.modifiedCount === 0) {
+            return [false, "No changes made to the car"];
+        }
+
+        return [true, ""];
+    } catch (error) {
+        return [false, (error as Error).message];
+    }
 };
