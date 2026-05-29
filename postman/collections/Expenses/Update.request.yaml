@@ -1,0 +1,16 @@
+$kind: http-request
+name: Update
+url: localhost:8080/expense/6a199638d23daf56b4e497ec
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "amount": 1350.00,
+      "description": "Wymiana filtrów, oleju, klocków + dodatkowa diagnostyka komputerowa"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{Access token}}"
+order: 4436884326204354

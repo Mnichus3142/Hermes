@@ -1,0 +1,9 @@
+$kind: http-request
+name: Get expense by id
+url: localhost:8080/expense/
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{Access token}}"
+order: 3617276701341192

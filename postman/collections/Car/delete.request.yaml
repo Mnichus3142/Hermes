@@ -5,5 +5,5 @@ method: DELETE
 auth:
   type: bearer
   credentials:
-    token: 6a1437c79344031a57addc2e
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTE0MmJhYjU2MGM4NGYwZTY0NjFmYzEiLCJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWF0IjoxNzgwMDUxODIzLCJleHAiOjE3ODAwNTI3MjN9.NJzi2Vt60gyo0wZimgcNrfgur_nvDITjU1jPu_CgyP4
 order: 4491071277828976

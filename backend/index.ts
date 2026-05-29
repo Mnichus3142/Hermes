@@ -280,6 +280,10 @@ app.get("/car/parameters", validateAccessToken, async (req, res) => {
     }
 });
 
+// ========================================================================================
+// CRUD endpoints for cars
+// ========================================================================================
+
 app.post("/car", validateAccessToken, async (req, res) => {
     try {
         const car: Car = {
@@ -360,6 +364,100 @@ app.delete("/car/:id", validateAccessToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Failed to delete car" });
+    }
+});
+
+// ========================================================================================
+// CURD for expenses
+// ========================================================================================
+
+import {
+    updateExpense,
+    createExpense,
+    getExpenses,
+    deleteExpense,
+    getExpenseById,
+} from "./expenses/expenses";
+
+app.get("/expense", validateAccessToken, async (req, res) => {
+    try {
+        const expenses = await getExpenses(req.user!._id);
+        res.status(200).json(expenses);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve expenses" });
+    }
+});
+
+app.post("/expense", validateAccessToken, async (req, res) => {
+    try {
+        const expense = {
+            ...req.body,
+            ownerId: req.user!._id,
+        };
+
+        const [status, message] = await createExpense(expense);
+
+        if (!status) {
+            return res.status(400).json({ message });
+        }
+
+        return res.status(201).json({ message: "Expense created successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Failed to create expense" });
+    }
+});
+
+app.get("/expense/:id", validateAccessToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const expense = await getExpenseById(id, req.user!._id);
+
+        if (!expense) {
+            return res.status(404).json({ message: "Expense not found" });
+        }
+
+        res.status(200).json(expense);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve expense" });
+    }
+});
+
+app.patch("/expense/:id", validateAccessToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+
+        const [status, message] = await updateExpense(id, req.user!._id, updates);
+
+        if (!status) {
+            return res.status(400).json({ message });
+        }
+
+        return res.status(200).json({ message: "Expense updated successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Failed to update expense" });
+    }
+});
+
+app.delete("/expense/:id", validateAccessToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const [status, message] = await deleteExpense(id, req.user!._id);
+
+        if (!status) {
+            return res.status(404).json({ message });
+        }
+
+        return res.status(200).json({ message: "Expense deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Failed to delete expense" });
     }
 });
 

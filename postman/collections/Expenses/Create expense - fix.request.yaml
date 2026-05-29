@@ -1,0 +1,33 @@
+$kind: http-request
+name: Create expense - fix
+url: localhost:8080/expense
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "amount": 1200.00,
+      "date": "2026-05-28T15:30:00.000Z",
+      "category": "maintenance",
+      "description": "Wymiana filtrów i oleju + klocki",
+      "carId": "6a1437e99344031a57addc2f",
+      "ownerId": "6a142bab560c84f0e6461fc1",
+      "maintenanceWorks": [
+        {
+          "type": "Wymiana oleju",
+          "description": "Olej 5W30 wraz z filtrem oleju",
+          "amount": 450.00
+        },
+        {
+          "type": "Hamulce",
+          "description": "Wymiana klocków hamulcowych przód",
+          "amount": 750.00
+        }
+      ],
+      "mileageAtExpense": 1000
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{Access token}}"
+order: 4434644204379284

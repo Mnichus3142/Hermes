@@ -1,0 +1,25 @@
+$kind: http-request
+name: Create expense - fuel
+url: localhost:8080/expense
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "amount": 250.50,
+      "date": "2026-05-29T12:00:00.000Z",
+      "category": "fuel",
+      "description": "Tankowanie do pełna, PB95",
+      "carId": "6a1437e99344031a57addc2f",
+      "ownerId": "65f1a2b3c4d5e6f7a8b9c0d2",
+      "fuel": {
+        "type": "PB95",
+        "volume": 45.5,
+        "pricePerUnit": 5.51
+      }
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{Access token}}"
+order: 4108032298748373
