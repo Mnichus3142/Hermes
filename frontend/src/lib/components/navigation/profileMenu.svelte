@@ -1,9 +1,8 @@
 <script lang="ts">
     import { slide } from "svelte/transition";
     import { clickOutside } from "$lib/functions/clickOutside";
-    import { loginVisible } from "$lib/store/store";
-
-    let { isLoggedIn } = $props();
+    import { loginVisible, isLoggedIn } from "$lib/store/store";
+    import { createNewNotification } from "$lib/logic/notificationLogic.svelte";
 
     let menuOpen = $state(false);
 
@@ -20,7 +19,7 @@
         },
         {
             label: "Logout",
-            action: () => console.log("Logout"),
+            action: async () => await handleLogout(),
             icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>',
         },
     ];
@@ -58,6 +57,39 @@
             return slide(node, params);
         }
     };
+
+    async function handleLogout() {
+        try {
+            const response = await fetch("/api/logout", {
+                method: "POST",
+                credentials: "include",
+            });
+
+            console.log(response)
+
+            if (!response.ok) {
+                throw new Error("Logout failed");
+            }
+
+            isLoggedIn.set(false);
+            createNewNotification({
+                title: "Logout successful",
+                message: "You have been logged out",
+                type: "success",
+                duration: 3000,
+            });
+
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Logout error:", error);
+            createNewNotification({
+                title: "Logout failed",
+                message: "Error during logout",
+                type: "error",
+                duration: 5000,
+            });
+        }
+    }
 </script>
 
 <!-- Icon and corresponding menu -->
@@ -93,7 +125,7 @@
                 }
             }}
         >
-            {#if isLoggedIn}
+            {#if $isLoggedIn}
                 {#each options as option}
                     <button onclick={option.action} class="menuItem"
                         ><p>{option.label}</p>

@@ -5,6 +5,8 @@
     import OAuthButtons from "./OAuthButtons.svelte";
     import type { checkPasswordsType } from "$lib/types/checkPasswords";
     import { createNewNotification } from "$lib/logic/notificationLogic.svelte";
+    import { isLoggedIn, loginVisible } from "$lib/store/store";
+    import { enhance } from "$app/forms";
 
     const { toggleForms, animationDuration, buttons } = $props<{
         toggleForms: () => void;
@@ -65,7 +67,7 @@
             return 0;
         }
         try {
-            const response = await fetch("/api/auth/login", {
+            const response = await fetch("/api/auth", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -104,11 +106,12 @@
                         "redirectAfterLogin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 }
 
-                setTimeout(() => {
-                    window.location.href = redirectPath
+                isLoggedIn.set(true);
+                loginVisible.set(false);
+
+                window.location.href = redirectPath
                         ? decodeURIComponent(redirectPath)
                         : "/dashboard";
-                }, 1500);
             }
         } catch (error: any) {
             if (error.message !== "409") {

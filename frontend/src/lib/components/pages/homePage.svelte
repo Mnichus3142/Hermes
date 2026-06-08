@@ -5,33 +5,39 @@
     import { fly } from "svelte/transition";
 </script>
 
-{#if $loginVisible}
-    <div
-        in:fly={{
-            y: -1000,
-            duration: 300,
-            easing: quintOut,
-        }}
-        out:fly={{ y: -1000, duration: 300, easing: quintOut }}
-    >
-        <button
-            title="Profile button"
-            class="closeButton"
-            onclick={() => loginVisible.set(false)}
+<div class="landingPageContainer">
+    {#if $loginVisible}
+        <div
+            in:fly={{
+                y: -1000,
+                duration: 300,
+                easing: quintOut,
+            }}
+            out:fly={{
+                y: -1000,
+                duration: 300,
+                easing: quintOut,
+            }}
         >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                height="24px"
-                viewBox="0 -960 960 960"
-                width="24px"
-                fill="#e3e3e3"
-                ><path
-                    d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
-                /></svg
+            <button
+                title="Profile button"
+                class="closeButton"
+                onclick={() => loginVisible.set(false)}
             >
-        </button>
-        <div class="authForm">
-            <AuthForm />
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#e3e3e3"
+                    ><path
+                        d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
+                    /></svg
+                >
+            </button>
+            <div class="authForm">
+                <AuthForm />
+            </div>
         </div>
-    </div>
-{/if}
+    {/if}
+</div>

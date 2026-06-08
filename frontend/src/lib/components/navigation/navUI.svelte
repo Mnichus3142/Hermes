@@ -13,6 +13,6 @@
     {/if}
 
     <div class="bar">
-        <ProfileMenu {isLoggedIn} />
+        <ProfileMenu/>
     </div>
 </div>

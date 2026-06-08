@@ -4,6 +4,8 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
+			isLoggedIn: boolean;
+            username: string | null;
 			user?: {
 				id: number;
 			}

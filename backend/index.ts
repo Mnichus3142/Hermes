@@ -23,8 +23,10 @@ const port = 8080;
 
 app.use(
     cors({
-        origin: process.env.ALLOWED_ORIGINS,
+        origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
         credentials: true,
+        methods: ["GET", "POST", "PATCH", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
     }),
 );
 
@@ -145,14 +147,26 @@ app.post("/user", (req, res) => {
         .create(req.body.username, req.body.password)
         .then(([success, errorMessage]) => {
             if (success) {
-                res.status(201).json({ message: "User created successfully" });
+                res.status(201).json({ 
+                    success: true,
+                    title: "Registration successful",
+                    message: "You can now log in" 
+                });
             } else {
-                res.status(409).json({ message: errorMessage });
+                res.status(409).json({ 
+                    success: false,
+                    title: "Registration failed",
+                    message: errorMessage 
+                });
             }
         })
         .catch((error) => {
             console.error(error);
-            res.status(500).json({ message: "Server error" });
+            res.status(500).json({ 
+                success: false,
+                title: "Server error",
+                message: "An error occurred during registration" 
+            });
         });
 });
 
@@ -165,17 +179,24 @@ logger.info("User creation endpoint is ready");
 app.post("/auth", async (req, res) => {
     const user = new User();
 
+    console.log(req.body);
+
     const [status, response] = await user.login(
         req.body.username,
         req.body.password,
     );
 
     if (!status) {
-        return res.status(401).json({ message: response });
+        return res.status(401).json({ 
+            success: false,
+            title: "Login failed",
+            message: response 
+        });
     }
 
     const cookieOptions = {
         httpOnly: true,
+
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict" as const,
     } as const;
@@ -190,7 +211,11 @@ app.post("/auth", async (req, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res.status(200).json({ message: "Login successful" });
+    return res.status(200).json({ 
+        success: true,
+        title: "Login successful",
+        message: "Welcome back!" 
+    });
 });
 
 // ========================================================================================
@@ -203,24 +228,22 @@ const COOKIE_OPTIONS = {
     sameSite: "strict" as const,
 } as const;
 
-app.post("/logout", validateAccessToken, async (req, res) => {
+app.post("/logout", async (req, res) => {
     const user = new User();
     const refreshToken = req.cookies.refreshToken;
 
     try {
-        const [status, errorMessage] = await user.logout(refreshToken);
-
-        if (status) {
-            res.clearCookie("accessToken", COOKIE_OPTIONS);
-            res.clearCookie("refreshToken", COOKIE_OPTIONS);
-            return res.status(200).json({ message: "Logout successful" });
-        } else {
-            return res.status(500).json({ message: errorMessage });
+        if (refreshToken) {
+            await user.logout(refreshToken);
         }
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Server error" });
+        console.error("Database token revocation failed:", error);
     }
+
+    res.clearCookie("accessToken", COOKIE_OPTIONS);
+    res.clearCookie("refreshToken", COOKIE_OPTIONS);
+    
+    return res.status(200).json({ message: "Logout successful" });
 });
 
 // ========================================================================================
