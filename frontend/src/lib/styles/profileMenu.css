@@ -1,20 +1,24 @@
 .profileMenu {
     @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
-    @apply flex rounded-full p-2;
+    @apply relative z-60 flex rounded-full p-2;
 }
 
-.profileMenu button {
+.profileMenu > button {
     @apply relative right-0 top-0 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer;
 }
 
-.profileMenu button svg {
+.profileMenu > button svg {
     @apply text-gunmetal-600;
 }
 
 .menu {
     @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
-    @apply fixed right-0 md:top-20 w-48 rounded-2xl shadow-md z-20 flex flex-col gap-4;
+    @apply fixed right-0 md:top-20 w-48 rounded-2xl shadow-md z-60 flex flex-col gap-4;
     @apply not-md:bottom-20;
+}
+
+.menuBackdrop {
+    @apply fixed inset-0 z-50 bg-gunmetal-900/20 backdrop-blur-sm;
 }
 
 .menu button {

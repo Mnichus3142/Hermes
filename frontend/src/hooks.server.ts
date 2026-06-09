@@ -12,12 +12,27 @@ export const handle: Handle = async ({ event, resolve }) => {
     const refreshToken = event.cookies.get("refreshToken");
 
     if (accessToken) {
-        event.locals.isLoggedIn = true;
+        if (isAccessTokenExpired(accessToken)) {
+            if (refreshToken) {
+                const refreshed = await tryRefresh(event, refreshToken);
+                if (refreshed) {
+                    accessToken = event.cookies.get("accessToken");
+                    event.locals.isLoggedIn = Boolean(accessToken);
+                } else {
+                    event.cookies.delete("accessToken", { path: "/" });
+                    event.cookies.delete("refreshToken", { path: "/" });
+                }
+            } else {
+                event.cookies.delete("accessToken", { path: "/" });
+            }
+        } else {
+            event.locals.isLoggedIn = true;
+        }
     } else if (refreshToken) {
         const refreshed = await tryRefresh(event, refreshToken);
         if (refreshed) {
             event.locals.isLoggedIn = true;
-            accessToken = event.cookies.get("accessToken"); 
+            accessToken = event.cookies.get("accessToken");
         } else {
             event.cookies.delete("accessToken", { path: "/" });
             event.cookies.delete("refreshToken", { path: "/" });
@@ -41,9 +56,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     return resolve(event);
 };
 
-async function tryRefresh(event: any, refreshToken: string): Promise<boolean> {
+const refreshApiUrl = (origin: string) => `${origin}/api/refresh`;
+
+const tryRefresh = async (event: any, refreshToken: string): Promise<boolean> => {
     try {
-        const res = await fetch("http://127.0.0.1:8080/refresh", {
+        const res = await event.fetch(refreshApiUrl(event.url.origin), {
             method: "POST",
             headers: {
                 Cookie: `refreshToken=${refreshToken}`,
@@ -52,7 +69,7 @@ async function tryRefresh(event: any, refreshToken: string): Promise<boolean> {
 
         if (!res.ok) return false;
 
-        const setCookieHeaders = res.headers.getSetCookie();
+        const setCookieHeaders = getSetCookieHeaders(res.headers);
         for (const raw of setCookieHeaders) {
             parseAndSetCookie(event, raw);
         }
@@ -61,15 +78,23 @@ async function tryRefresh(event: any, refreshToken: string): Promise<boolean> {
     } catch {
         return false;
     }
-}
+};
 
-function parseAndSetCookie(event: any, raw: string) {
+const parseAndSetCookie = (event: any, raw: string) => {
     const parts = raw.split("; ");
-    const [name, value] = parts[0].split("=");
+    const firstPair = parts[0];
+    const separatorIndex = firstPair.indexOf("=");
+
+    if (separatorIndex === -1) {
+        return;
+    }
+
+    const name = firstPair.slice(0, separatorIndex);
+    const value = firstPair.slice(separatorIndex + 1);
 
     const maxAgePart = parts.find((p) => p.toLowerCase().startsWith("max-age="));
     const maxAge = maxAgePart
-        ? parseInt(maxAgePart.split("=")[1]) * 1000
+        ? parseInt(maxAgePart.split("=")[1], 10)
         : undefined;
 
     event.cookies.set(name, value, {
@@ -79,9 +104,49 @@ function parseAndSetCookie(event: any, raw: string) {
         sameSite: "strict",
         ...(maxAge && { maxAge }),
     });
-}
+};
 
-function redirectToLogin(event: any, path: string): never {
+const getSetCookieHeaders = (headers: Headers): string[] => {
+    const customHeaders = headers as Headers & {
+        getSetCookie?: () => string[];
+    };
+
+    if (typeof customHeaders.getSetCookie === "function") {
+        return customHeaders.getSetCookie();
+    }
+
+    const raw = headers.get("set-cookie");
+    if (!raw) {
+        return [];
+    }
+
+    return raw.split(/,(?=\s*[\w-]+=)/);
+};
+
+const isAccessTokenExpired = (token: string): boolean => {
+    try {
+        const parts = token.split(".");
+        if (parts.length !== 3) {
+            return true;
+        }
+
+        const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+        const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+        const payload = JSON.parse(
+            Buffer.from(padded, "base64").toString("utf-8"),
+        ) as { exp?: number };
+
+        if (!payload.exp) {
+            return false;
+        }
+
+        return payload.exp * 1000 <= Date.now() + 10_000;
+    } catch {
+        return true;
+    }
+};
+
+const redirectToLogin = (event: any, path: string): never => {
     const encoded = encodeURIComponent(path + event.url.search);
 
     event.cookies.set("redirectAfterLogin", encoded, {
@@ -92,4 +157,4 @@ function redirectToLogin(event: any, path: string): never {
     });
 
     throw redirect(303, "/");
-}
+};

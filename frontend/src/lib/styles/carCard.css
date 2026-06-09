@@ -1,0 +1,43 @@
+.carCardLink {
+    @apply block h-full rounded-xl outline-none ring-0 transition-transform duration-200 hover:scale-[1.01] focus-visible:ring-2 focus-visible:ring-gunmetal-500/50;
+}
+
+.carCard {
+    @apply flex h-full min-h-44 flex-col rounded-xl border border-gunmetal-200 bg-gunmetal-50 p-5 transition-colors duration-200 hover:border-gunmetal-400;
+}
+
+.carCardHeader {
+    @apply mb-3 flex items-start justify-between gap-2;
+}
+
+.carCardNameWrap {
+    @apply min-w-0;
+}
+
+.carCardTitle {
+    @apply truncate font-title text-lg font-semibold text-gunmetal-900;
+}
+
+.carCardYear {
+    @apply font-text text-sm text-gunmetal-600;
+}
+
+.carCardTypeBadge {
+    @apply shrink-0 rounded-full border border-gunmetal-300 bg-gunmetal-100 px-2.5 py-0.5 font-text text-xs text-gunmetal-700;
+}
+
+.carCardList {
+    @apply mt-auto space-y-2 font-text text-sm;
+}
+
+.carCardRow {
+    @apply flex justify-between gap-2;
+}
+
+.carCardLabel {
+    @apply text-gunmetal-600;
+}
+
+.carCardValue {
+    @apply truncate font-medium text-gunmetal-900;
+}

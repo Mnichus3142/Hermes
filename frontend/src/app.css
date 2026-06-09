@@ -6,6 +6,10 @@
 @import "./lib/styles/navContent.css";
 @import "./lib/styles/homePage.css";
 @import "./lib/styles/authForm.css";
+@import "./lib/styles/addCarForm.css";
+@import "./lib/styles/garagePage.css";
+@import "./lib/styles/carCard.css";
+@import "./lib/styles/carDetailsPage.css";
 
 /* Variables declaration */
 @theme {

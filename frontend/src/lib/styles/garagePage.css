@@ -1,0 +1,35 @@
+.garagePage {
+    @apply min-h-screen px-4 py-8 pb-24 sm:px-6 lg:px-8 md:ml-48 md:pb-8;
+}
+
+.garagePageHeader {
+    @apply mb-8;
+}
+
+.garagePageTitle {
+    @apply font-title text-3xl font-bold text-gunmetal-900;
+}
+
+.garagePageSubtitle {
+    @apply mt-1 font-text text-sm text-gunmetal-700;
+}
+
+.garageGrid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+}
+
+.garageAddCard {
+    @apply flex min-h-44 cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-gunmetal-300 bg-gunmetal-50 p-5 text-gunmetal-600 transition-all duration-200 hover:scale-[1.01] hover:border-gunmetal-500 hover:bg-gunmetal-100 hover:text-gunmetal-800;
+}
+
+.garageAddCardIcon {
+    @apply h-10 w-10 fill-current;
+}
+
+.garageAddCardLabel {
+    @apply font-text text-sm font-medium;
+}
+
+.garageEmptyState {
+    @apply rounded-xl border border-gunmetal-300 bg-gunmetal-100 p-6 text-center font-text text-gunmetal-700;
+}

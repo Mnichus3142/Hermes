@@ -134,6 +134,13 @@ export const validateCar = (body: any): [boolean, string?] => {
         return [false, "VIN must be a string"];
     }
 
+    if (body.vin != null && typeof body.vin === "string") {
+        const normalizedVin = body.vin.trim();
+        if (normalizedVin.length !== 17) {
+            return [false, "VIN must contain exactly 17 characters"];
+        }
+    }
+
     if (
         body.registrationNumber != null &&
         typeof body.registrationNumber !== "string"
