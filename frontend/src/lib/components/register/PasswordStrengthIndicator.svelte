@@ -1,9 +1,11 @@
 <script lang="ts">
     import type { checkPasswordsType } from '$lib/types/checkPasswords';
     
-    export let passwordCheck: checkPasswordsType;
-    export let movePasswordConditions: boolean;
-    export let thirdSpanClicked: boolean;
+    const { passwordCheck, movePasswordConditions, thirdSpanClicked } = $props<{
+        passwordCheck: checkPasswordsType;
+        movePasswordConditions: boolean;
+        thirdSpanClicked: boolean;
+    }>();
 </script>
 
 {#if !passwordCheck.conditions.allConditionsMet}

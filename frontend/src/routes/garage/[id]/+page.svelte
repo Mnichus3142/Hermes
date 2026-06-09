@@ -46,8 +46,10 @@
         mileageAtExpense: string;
         maintenanceType: string;
     };
+    type DateStatus = "expired" | "warning" | "valid";
 
     let { data }: { data: PageData } = $props();
+    const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
     const car = $derived(data.car as Car);
     const expenses = $derived((data.expenses ?? []) as GarageExpense[]);
@@ -92,43 +94,87 @@
         return (volume * pricePerUnit).toFixed(2);
     });
 
-    function formatDate(value?: string): string {
+    const parseDate = (value?: string): Date | null => {
         if (!value) {
-            return "-";
+            return null;
         }
 
         if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-            return value;
+            const [year, month, day] = value.split("-").map(Number);
+            return new Date(year, month - 1, day);
         }
 
         const parsed = new Date(value);
         if (Number.isNaN(parsed.getTime())) {
-            return "-";
+            return null;
         }
 
-        return parsed.toISOString().slice(0, 10);
-    }
+        return new Date(
+            parsed.getFullYear(),
+            parsed.getMonth(),
+            parsed.getDate(),
+        );
+    };
 
-    function getInputDate(value?: string): string {
+    const formatDate = (value?: string): string => {
+        const parsedDate = parseDate(value);
+        if (!parsedDate) {
+            return "-";
+        }
+        return parsedDate.toISOString().slice(0, 10);
+    };
+
+    const getDateStatus = (value?: string): DateStatus | null => {
+        const parsedDate = parseDate(value);
+        if (!parsedDate) {
+            return null;
+        }
+
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        if (today.getTime() > parsedDate.getTime()) {
+            return "expired";
+        }
+
+        const daysUntilDate = Math.ceil(
+            (parsedDate.getTime() - today.getTime()) / DAY_IN_MS,
+        );
+        if (daysUntilDate <= 7) {
+            return "warning";
+        }
+
+        return "valid";
+    };
+
+    const getInputDate = (value?: string): string => {
         const formatted = formatDate(value);
         return formatted === "-" ? "" : formatted;
-    }
+    };
 
-    function formatAmount(value?: number): string {
+    const formatAmount = (value?: number): string => {
         if (value === undefined || value === null || Number.isNaN(value)) {
             return "-";
         }
         return `${value.toFixed(2)} PLN`;
-    }
+    };
 
-    function formatCarType(value?: string): string {
+    const formatCarType = (value?: string): string => {
         if (!value) {
             return "-";
         }
         return value.charAt(0).toUpperCase() + value.slice(1);
-    }
+    };
 
-    function resetFuelExpenseDraft() {
+    const insuranceExpiry = $derived(formatDate(car.dates?.insuranceExpiryDate));
+    const insuranceStatus = $derived(getDateStatus(car.dates?.insuranceExpiryDate));
+    const inspectionExpiry = $derived(
+        formatDate(car.dates?.technicalInspectionExpiryDate),
+    );
+    const inspectionStatus = $derived(
+        getDateStatus(car.dates?.technicalInspectionExpiryDate),
+    );
+
+    const resetFuelExpenseDraft = () => {
         fuelExpenseDraft = {
             date: "",
             description: "",
@@ -136,9 +182,9 @@
             fuelVolume: "",
             fuelPricePerUnit: "",
         };
-    }
+    };
 
-    function resetMaintenanceExpenseDraft() {
+    const resetMaintenanceExpenseDraft = () => {
         maintenanceExpenseDraft = {
             amount: "",
             date: "",
@@ -146,9 +192,9 @@
             mileageAtExpense: "",
             maintenanceType: "",
         };
-    }
+    };
 
-    function openCreateExpenseModal(category: ExpenseCategory) {
+    const openCreateExpenseModal = (category: ExpenseCategory) => {
         expenseModalMode = "create";
         if (category === "fuel") {
             resetFuelExpenseDraft();
@@ -156,9 +202,9 @@
             resetMaintenanceExpenseDraft();
         }
         activeExpenseModal = category;
-    }
+    };
 
-    function openEditExpenseModal(expense: GarageExpense) {
+    const openEditExpenseModal = (expense: GarageExpense) => {
         expenseModalMode = "edit";
         if (expense.category === "fuel") {
             fuelExpenseDraft = {
@@ -193,14 +239,14 @@
             };
         }
         activeExpenseModal = expense.category;
-    }
+    };
 
-    function closeExpenseModal() {
+    const closeExpenseModal = () => {
         activeExpenseModal = null;
         expenseSubmitting = false;
-    }
+    };
 
-    function handleExpenseEnhance(kind: "create" | "update" | "delete") {
+    const handleExpenseEnhance = (kind: "create" | "update" | "delete") => {
         return () => {
             if (kind !== "delete") {
                 expenseSubmitting = true;
@@ -249,7 +295,13 @@
                 }
             };
         };
-    }
+    };
+
+    const confirmDeleteCar = (event: SubmitEvent) => {
+        if (!window.confirm("Are you sure you want to delete this car?")) {
+            event.preventDefault();
+        }
+    };
 </script>
 
 <svelte:head>
@@ -281,13 +333,20 @@
                         {car.year ?? "-"} • {formatCarType(car.type)}
                     </p>
                 </div>
-                <button
-                    type="button"
-                    class="carDetailsActionButton"
-                    onclick={() => (showEditCarModal = true)}
-                >
-                    Edit car
-                </button>
+                <div class="carDetailsHeaderActions">
+                    <button
+                        type="button"
+                        class="carDetailsActionButton"
+                        onclick={() => (showEditCarModal = true)}
+                    >
+                        Edit car
+                    </button>
+                    <form method="POST" action="?/deleteCar" onsubmit={confirmDeleteCar}>
+                        <button type="submit" class="carDetailsDangerButton">
+                            Delete car
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div class="carDetailsStatsGrid">
@@ -315,14 +374,26 @@
                 </div>
                 <div class="carDetailsStat">
                     <p class="carDetailsStatLabel">Insurance expiry</p>
-                    <p class="carDetailsStatValue">
-                        {formatDate(car.dates?.insuranceExpiryDate)}
+                    <p class="carDetailsStatValue carDetailsStatValueWithStatus">
+                        <span>{insuranceExpiry}</span>
+                        {#if insuranceStatus}
+                            <span
+                                class={`carDetailsStatusDot carDetailsStatusDot--${insuranceStatus}`}
+                                aria-hidden="true"
+                            ></span>
+                        {/if}
                     </p>
                 </div>
                 <div class="carDetailsStat">
                     <p class="carDetailsStatLabel">Inspection expiry</p>
-                    <p class="carDetailsStatValue">
-                        {formatDate(car.dates?.technicalInspectionExpiryDate)}
+                    <p class="carDetailsStatValue carDetailsStatValueWithStatus">
+                        <span>{inspectionExpiry}</span>
+                        {#if inspectionStatus}
+                            <span
+                                class={`carDetailsStatusDot carDetailsStatusDot--${inspectionStatus}`}
+                                aria-hidden="true"
+                            ></span>
+                        {/if}
                     </p>
                 </div>
             </div>

@@ -157,6 +157,9 @@ export const createCar = async (car: Car): Promise<[boolean, string]> => {
     if (!valid) {
         return [false, errorMessage!];
     }
+    if (!car.make || !car.model || !car.type || car.year == null) {
+        return [false, "Make, model, year and type are required"];
+    }
 
     try {
         const db = await connectToDatabase();
@@ -187,16 +190,23 @@ export const getCarById = async (
         .findOne({ _id: carId, ownerId: userId });
 };
 
-export const deleteCar = async (carId: ObjectId): Promise<boolean> => {
+export const deleteCar = async (
+    carId: ObjectId,
+    ownerId: ObjectId,
+): Promise<boolean> => {
     const db = await connectToDatabase();
-    const result = await db.collection("cars").deleteOne({ _id: carId });
+    const result = await db.collection("cars").deleteOne({ _id: carId, ownerId });
     return result.deletedCount === 1;
 };
 
 export const updateCar = async (
     carId: ObjectId,
+    ownerId: ObjectId,
     updateData: Partial<Car>,
 ): Promise<[boolean, string]> => {
+    if ("ownerId" in updateData) {
+        return [false, "ownerId cannot be modified"];
+    }
     const [valid, errorMessage] = validateCar(updateData);
 
     if (!valid) {
@@ -207,7 +217,7 @@ export const updateCar = async (
         const db = await connectToDatabase();
         const result = await db
             .collection("cars")
-            .updateOne({ _id: carId }, { $set: updateData });
+            .updateOne({ _id: carId, ownerId }, { $set: updateData });
 
         if (result.matchedCount === 0) {
             return [false, "Car not found"];

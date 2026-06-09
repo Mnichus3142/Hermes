@@ -6,13 +6,13 @@ import { connectToDatabase } from "../db/client";
 import { ObjectId, WithId } from "mongodb";
 
 export type maintenanceWork = {
-    type: String;
-    description: String;
+    type: string;
+    description: string;
     amount: number;
 };
 
 export type fuel = {
-    type: String;
+    type: string;
     volume: number;
     pricePerUnit: number;
 };
@@ -94,12 +94,17 @@ export const validateExpense = async (
         return [false, "Description must be a string"];
     }
     if (body.carId != null && typeof body.carId !== "string") {
-        return [false, "Car ID must be a string"];
+        if (!(body.carId instanceof ObjectId)) {
+            return [false, "Car ID must be a string or ObjectId"];
+        }
     }
-    if (body.ownerId != null && typeof body.ownerId !== "object") {
-        return [false, "Owner ID must be a string"];
+    if (body.ownerId != null && !(body.ownerId instanceof ObjectId)) {
+        return [false, "Owner ID must be an ObjectId"];
     }
     if (body.maintenanceWorks != null && !Array.isArray(body.maintenanceWorks)) {
+        return [false, "Maintenance works must be an array"];
+    }
+    if (Array.isArray(body.maintenanceWorks)) {
         if (
             body.maintenanceWorks.some(
                 (work: any) =>
@@ -143,35 +148,48 @@ export const validateExpense = async (
     return [true];
 };
 
-export const getExpenses = async (ownerId: string) => {
+export const getExpenses = async (ownerId: ObjectId) => {
     const db = await connectToDatabase();
     const expenses = await db
         .collection<WithId<Expense>>("expenses")
-        .find({ ownerId: new ObjectId(ownerId) })
+        .find({ ownerId })
         .toArray();
     return expenses;
 };
 
 export const getExpenseById = async (
     expenseId: string,
-    ownerId: string,
+    ownerId: ObjectId,
 ): Promise<WithId<Expense> | null> => {
     const db = await connectToDatabase();
     return await db
         .collection<Expense>("expenses")
-        .findOne({ _id: new ObjectId(expenseId), ownerId: new ObjectId(ownerId) });
+        .findOne({ _id: new ObjectId(expenseId), ownerId });
 };
 
 export const createExpense = async (
     expense: Expense,
 ): Promise<[boolean, string?]> => {
-    const normalizedExpense = normalizeDateField(expense);
+    const normalizedExpense = normalizeDateField({
+        ...expense,
+        carId:
+            typeof expense.carId === "string"
+                ? new ObjectId(expense.carId)
+                : expense.carId,
+    });
     const [valid, errorMessage] = await validateExpense(normalizedExpense);
     if (!valid) {
         return [false, errorMessage];
     }
     try {
         const db = await connectToDatabase();
+        const ownedCar = await db.collection("cars").findOne({
+            _id: normalizedExpense.carId,
+            ownerId: normalizedExpense.ownerId,
+        });
+        if (!ownedCar) {
+            return [false, "Car not found or not owned by user"];
+        }
         const result = await db.collection("expenses").insertOne(normalizedExpense);
         if (!result.acknowledged) {
             return [false, "Failed to create expense"];
@@ -181,7 +199,7 @@ export const createExpense = async (
             const result2 = await db
                 .collection("cars")
                 .updateOne(
-                    { _id: new ObjectId(normalizedExpense.carId) },
+                    { _id: normalizedExpense.carId },
                     { $set: { mileage: normalizedExpense.mileageAtExpense } },
                 );
             if (result2.matchedCount === 0) {
@@ -197,13 +215,13 @@ export const createExpense = async (
 
 export const deleteExpense = async (
     expenseId: string,
-    ownerId: string,
+    ownerId: ObjectId,
 ): Promise<[boolean, string?]> => {
     try {
         const db = await connectToDatabase();
         const result = await db.collection("expenses").deleteOne({
             _id: new ObjectId(expenseId),
-            ownerId: new ObjectId(ownerId),
+            ownerId,
         });
         if (result.deletedCount === 0) {
             return [false, "Expense not found or not owned by user"];
@@ -216,10 +234,16 @@ export const deleteExpense = async (
 
 export const updateExpense = async (
     expenseId: string,
-    ownerId: string,
+    ownerId: ObjectId,
     updatedExpense: Partial<Expense>,
 ): Promise<[boolean, string?]> => {
+    if ("ownerId" in updatedExpense) {
+        return [false, "ownerId cannot be modified"];
+    }
     const normalizedExpense = normalizeDateField(updatedExpense);
+    if (normalizedExpense.carId && typeof normalizedExpense.carId === "string") {
+        normalizedExpense.carId = new ObjectId(normalizedExpense.carId);
+    }
     const [valid, errorMessage] = await validateExpense(normalizedExpense);
     if (!valid) {
         return [false, errorMessage];
@@ -229,7 +253,7 @@ export const updateExpense = async (
         const result = await db
             .collection("expenses")
             .updateOne(
-                { _id: new ObjectId(expenseId), ownerId: new ObjectId(ownerId) },
+                { _id: new ObjectId(expenseId), ownerId },
                 { $set: normalizedExpense },
             );
         if (result.matchedCount === 0) {

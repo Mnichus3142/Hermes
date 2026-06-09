@@ -1,4 +1,10 @@
-import { error, fail, type Cookies, type ServerLoadEvent } from "@sveltejs/kit";
+import {
+    error,
+    fail,
+    redirect,
+    type Cookies,
+    type ServerLoadEvent,
+} from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 import {
     normalizeCarParameters,
@@ -292,9 +298,13 @@ const getCarFuelType = async ({
     accessToken: string;
     carId: string;
 }): Promise<string | undefined> => {
-    const response = await fetch(apiUrl(origin, `/car/${carId}`), {
+    let response = await fetch(apiUrl(origin, `/car/${carId}`), {
         headers: authHeaders(accessToken),
     });
+
+    if (response.status === 401) {
+        return undefined;
+    }
 
     if (!response.ok) {
         return undefined;
@@ -328,7 +338,11 @@ export const load: PageServerLoad = async ({ cookies, fetch, url, params }) => {
         }),
     ]);
 
-    if (carResponse.status === 401) {
+    if (
+        carResponse.status === 401 ||
+        expensesResponse.status === 401 ||
+        parametersResponse.status === 401
+    ) {
         const refreshed = await refreshAccessToken({
             fetch,
             cookies,
@@ -382,7 +396,7 @@ export const load: PageServerLoad = async ({ cookies, fetch, url, params }) => {
 
 export const actions: Actions = {
     updateCar: async ({ request, cookies, fetch, params }) => {
-        const accessToken = cookies.get("accessToken");
+        let accessToken = cookies.get("accessToken");
 
         if (!accessToken) {
             return fail(401, { message: "Not authenticated" });
@@ -390,8 +404,9 @@ export const actions: Actions = {
 
         const payload = buildCarFromFormData(await request.formData());
 
-        const response = await fetch(
-            apiUrl(new URL(request.url).origin, `/car/${params.id}`),
+        const requestOrigin = new URL(request.url).origin;
+        let response = await fetch(
+            apiUrl(requestOrigin, `/car/${params.id}`),
             {
                 method: "PATCH",
                 headers: {
@@ -401,6 +416,29 @@ export const actions: Actions = {
                 body: JSON.stringify(payload),
             },
         );
+
+        if (response.status === 401) {
+            const refreshed = await refreshAccessToken({
+                fetch,
+                cookies,
+                origin: requestOrigin,
+            });
+            if (!refreshed) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            accessToken = cookies.get("accessToken");
+            if (!accessToken) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            response = await fetch(apiUrl(requestOrigin, `/car/${params.id}`), {
+                method: "PATCH",
+                headers: {
+                    ...authHeaders(accessToken),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+        }
 
         const result = await response.json();
 
@@ -413,7 +451,7 @@ export const actions: Actions = {
         return { success: true };
     },
     createExpense: async ({ request, cookies, fetch, params }) => {
-        const accessToken = cookies.get("accessToken");
+        let accessToken = cookies.get("accessToken");
 
         if (!accessToken) {
             return fail(401, { message: "Not authenticated" });
@@ -421,9 +459,10 @@ export const actions: Actions = {
 
         const formData = await request.formData();
         const category = getOptionalString(formData.get("category"));
+        const requestOrigin = new URL(request.url).origin;
         const enforcedFuelType = await getCarFuelType({
             fetch,
-            origin: new URL(request.url).origin,
+            origin: requestOrigin,
             accessToken,
             carId: params.id,
         });
@@ -437,7 +476,7 @@ export const actions: Actions = {
 
         const payload = buildExpensePayload(formData, params.id, enforcedFuelType);
 
-        const response = await fetch(apiUrl(new URL(request.url).origin, "/expense"), {
+        let response = await fetch(apiUrl(requestOrigin, "/expense"), {
             method: "POST",
             headers: {
                 ...authHeaders(accessToken),
@@ -445,6 +484,29 @@ export const actions: Actions = {
             },
             body: JSON.stringify(payload),
         });
+
+        if (response.status === 401) {
+            const refreshed = await refreshAccessToken({
+                fetch,
+                cookies,
+                origin: requestOrigin,
+            });
+            if (!refreshed) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            accessToken = cookies.get("accessToken");
+            if (!accessToken) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            response = await fetch(apiUrl(requestOrigin, "/expense"), {
+                method: "POST",
+                headers: {
+                    ...authHeaders(accessToken),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+        }
 
         const result = await response.json();
 
@@ -457,7 +519,7 @@ export const actions: Actions = {
         return { success: true };
     },
     updateExpense: async ({ request, cookies, fetch, params }) => {
-        const accessToken = cookies.get("accessToken");
+        let accessToken = cookies.get("accessToken");
 
         if (!accessToken) {
             return fail(401, { message: "Not authenticated" });
@@ -471,9 +533,10 @@ export const actions: Actions = {
         }
 
         const category = getOptionalString(formData.get("category"));
+        const requestOrigin = new URL(request.url).origin;
         const enforcedFuelType = await getCarFuelType({
             fetch,
-            origin: new URL(request.url).origin,
+            origin: requestOrigin,
             accessToken,
             carId: params.id,
         });
@@ -487,8 +550,8 @@ export const actions: Actions = {
 
         const payload = buildExpensePayload(formData, params.id, enforcedFuelType);
 
-        const response = await fetch(
-            apiUrl(new URL(request.url).origin, `/expense/${expenseId}`),
+        let response = await fetch(
+            apiUrl(requestOrigin, `/expense/${expenseId}`),
             {
                 method: "PATCH",
                 headers: {
@@ -498,6 +561,29 @@ export const actions: Actions = {
                 body: JSON.stringify(payload),
             },
         );
+
+        if (response.status === 401) {
+            const refreshed = await refreshAccessToken({
+                fetch,
+                cookies,
+                origin: requestOrigin,
+            });
+            if (!refreshed) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            accessToken = cookies.get("accessToken");
+            if (!accessToken) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            response = await fetch(apiUrl(requestOrigin, `/expense/${expenseId}`), {
+                method: "PATCH",
+                headers: {
+                    ...authHeaders(accessToken),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
+        }
 
         const result = await response.json();
 
@@ -509,8 +595,52 @@ export const actions: Actions = {
 
         return { success: true };
     },
+    deleteCar: async ({ request, cookies, fetch, params }) => {
+        let accessToken = cookies.get("accessToken");
+
+        if (!accessToken) {
+            return fail(401, { message: "Not authenticated" });
+        }
+
+        const requestOrigin = new URL(request.url).origin;
+        let response = await fetch(apiUrl(requestOrigin, `/car/${params.id}`), {
+            method: "DELETE",
+            headers: authHeaders(accessToken),
+        });
+
+        if (response.status === 401) {
+            const refreshed = await refreshAccessToken({
+                fetch,
+                cookies,
+                origin: requestOrigin,
+            });
+            if (!refreshed) {
+                return fail(401, { message: "Not authenticated" });
+            }
+
+            accessToken = cookies.get("accessToken");
+            if (!accessToken) {
+                return fail(401, { message: "Not authenticated" });
+            }
+
+            response = await fetch(apiUrl(requestOrigin, `/car/${params.id}`), {
+                method: "DELETE",
+                headers: authHeaders(accessToken),
+            });
+        }
+
+        const result = await parseJsonBody<{ message?: string }>(response);
+
+        if (!response.ok) {
+            return fail(response.status, {
+                message: result?.message ?? "Failed to delete car",
+            });
+        }
+
+        redirect(303, "/garage");
+    },
     deleteExpense: async ({ request, cookies, fetch }) => {
-        const accessToken = cookies.get("accessToken");
+        let accessToken = cookies.get("accessToken");
 
         if (!accessToken) {
             return fail(401, { message: "Not authenticated" });
@@ -523,13 +653,33 @@ export const actions: Actions = {
             return fail(400, { message: "Missing expense id" });
         }
 
-        const response = await fetch(
-            apiUrl(new URL(request.url).origin, `/expense/${expenseId}`),
+        const requestOrigin = new URL(request.url).origin;
+        let response = await fetch(
+            apiUrl(requestOrigin, `/expense/${expenseId}`),
             {
                 method: "DELETE",
                 headers: authHeaders(accessToken),
             },
         );
+
+        if (response.status === 401) {
+            const refreshed = await refreshAccessToken({
+                fetch,
+                cookies,
+                origin: requestOrigin,
+            });
+            if (!refreshed) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            accessToken = cookies.get("accessToken");
+            if (!accessToken) {
+                return fail(401, { message: "Not authenticated" });
+            }
+            response = await fetch(apiUrl(requestOrigin, `/expense/${expenseId}`), {
+                method: "DELETE",
+                headers: authHeaders(accessToken),
+            });
+        }
 
         const result = await response.json();
 

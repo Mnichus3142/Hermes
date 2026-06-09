@@ -20,17 +20,49 @@ import { validateAccessToken, validateRefreshToken } from "./user/user";
 
 const app = express();
 const port = 8080;
+const allowedOrigins = (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+const corsOrigin = allowedOrigins.length
+    ? allowedOrigins
+    : ["http://localhost:5173", "http://127.0.0.1:5173"];
+
+const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
+const authRateLimitWindowMs = 60_000;
+const authRateLimitMax = 20;
+const authRateLimit = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const key = `${req.ip}:${req.path}`;
+    const now = Date.now();
+    const current = rateLimitStore.get(key);
+
+    if (!current || now > current.resetAt) {
+        rateLimitStore.set(key, {
+            count: 1,
+            resetAt: now + authRateLimitWindowMs,
+        });
+        return next();
+    }
+
+    if (current.count >= authRateLimitMax) {
+        return res.status(429).json({ message: "Too many requests. Try again later." });
+    }
+
+    current.count += 1;
+    rateLimitStore.set(key, current);
+    return next();
+};
 
 app.use(
     cors({
-        origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+        origin: corsOrigin,
         credentials: true,
         methods: ["GET", "POST", "PATCH", "DELETE"],
         allowedHeaders: ["Content-Type", "Authorization"],
     }),
 );
 
-app.use(express.json());
+app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 
 // ========================================================================================
@@ -130,17 +162,29 @@ logger.info("Setting up user creation endpoint...");
 import { User } from "./user/user";
 
 app.get("/user", (req, res) => {
+    const username =
+        typeof req.query.username === "string" ? req.query.username.trim() : "";
+    if (!username) {
+        return res.status(400).json({ message: "Username is required" });
+    }
+
     const user = new User();
-    user.checkAvailability(req.query.username as string).then((available) => {
-        if (available) {
-            res.status(200).json({ message: "Username is available" });
-        } else {
-            res.status(409).json({ message: "Username is already taken" });
-        }
-    });
+    user
+        .checkAvailability(username)
+        .then((available) => {
+            if (available) {
+                res.status(200).json({ message: "Username is available" });
+            } else {
+                res.status(409).json({ message: "Username is already taken" });
+            }
+        })
+        .catch((error) => {
+            logger.error("Failed to check username availability", error);
+            res.status(500).json({ message: "Failed to check username availability" });
+        });
 });
 
-app.post("/user", (req, res) => {
+app.post("/user", authRateLimit, (req, res) => {
     const user = new User();
 
     user
@@ -176,10 +220,8 @@ logger.info("User creation endpoint is ready");
 // User login / logout / refresh
 // ========================================================================================
 
-app.post("/auth", async (req, res) => {
+app.post("/auth", authRateLimit, async (req, res) => {
     const user = new User();
-
-    console.log(req.body);
 
     const [status, response] = await user.login(
         req.body.username,
@@ -310,9 +352,9 @@ app.get("/car/parameters", validateAccessToken, async (req, res) => {
 app.post("/car", validateAccessToken, async (req, res) => {
     try {
         const car: Car = {
-            ...req.body,
+            ...sanitizeCarUpdates(req.body),
             ownerId: req.user!._id,
-        };
+        } as Car;
 
         const [status, message] = await createCar(car);
 
@@ -339,11 +381,109 @@ app.get("/car", validateAccessToken, async (req, res) => {
 import { ObjectId } from "mongodb";
 
 const parseObjectId = (value: string): ObjectId | null => {
-    if (!ObjectId.isValid(value)) {
+    if (!ObjectId.isValid(value) || !/^[a-fA-F0-9]{24}$/.test(value)) {
         return null;
     }
 
     return new ObjectId(value);
+};
+
+const sanitizeCarUpdates = (input: unknown): Partial<Car> => {
+    if (!input || typeof input !== "object") {
+        return {};
+    }
+    const source = input as Record<string, unknown>;
+    const allowedTopLevel = [
+        "make",
+        "model",
+        "year",
+        "type",
+        "mileage",
+        "color",
+        "vin",
+        "registrationNumber",
+        "engine",
+        "transmission",
+        "dates",
+    ] as const;
+    const sanitized = Object.fromEntries(
+        Object.entries(source).filter(([key]) =>
+            (allowedTopLevel as readonly string[]).includes(key),
+        ),
+    ) as Partial<Car>;
+
+    if (sanitized.engine && typeof sanitized.engine === "object") {
+        sanitized.engine = Object.fromEntries(
+            Object.entries(sanitized.engine).filter(([key]) =>
+                ["type", "displacement", "horsepower", "torque"].includes(key),
+            ),
+        ) as Car["engine"];
+    }
+
+    if (sanitized.transmission && typeof sanitized.transmission === "object") {
+        sanitized.transmission = Object.fromEntries(
+            Object.entries(sanitized.transmission).filter(([key]) =>
+                ["type", "gears"].includes(key),
+            ),
+        ) as Car["transmission"];
+    }
+
+    if (sanitized.dates && typeof sanitized.dates === "object") {
+        sanitized.dates = Object.fromEntries(
+            Object.entries(sanitized.dates).filter(([key]) =>
+                [
+                    "manufactureDate",
+                    "registrationDate",
+                    "insuranceExpiryDate",
+                    "technicalInspectionExpiryDate",
+                ].includes(key),
+            ),
+        ) as Car["dates"];
+    }
+
+    return sanitized;
+};
+
+const sanitizeExpenseUpdates = (input: unknown): Record<string, unknown> => {
+    if (!input || typeof input !== "object") {
+        return {};
+    }
+    const source = input as Record<string, unknown>;
+    const allowedTopLevel = [
+        "amount",
+        "date",
+        "category",
+        "description",
+        "carId",
+        "maintenanceWorks",
+        "fuel",
+        "mileageAtExpense",
+    ];
+    const sanitized = Object.fromEntries(
+        Object.entries(source).filter(([key]) => allowedTopLevel.includes(key)),
+    );
+
+    if (sanitized.fuel && typeof sanitized.fuel === "object") {
+        sanitized.fuel = Object.fromEntries(
+            Object.entries(sanitized.fuel as Record<string, unknown>).filter(
+                ([key]) => ["type", "volume", "pricePerUnit"].includes(key),
+            ),
+        );
+    }
+
+    if (Array.isArray(sanitized.maintenanceWorks)) {
+        sanitized.maintenanceWorks = sanitized.maintenanceWorks.map((work) =>
+            work && typeof work === "object"
+                ? Object.fromEntries(
+                      Object.entries(work).filter(([key]) =>
+                          ["type", "description", "amount"].includes(key),
+                      ),
+                  )
+                : work,
+        );
+    }
+
+    return sanitized;
 };
 
 app.get("/car/:id", validateAccessToken, async (req, res) => {
@@ -371,14 +511,14 @@ app.get("/car/:id", validateAccessToken, async (req, res) => {
 app.patch("/car/:id", validateAccessToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const updates: Partial<Car> = req.body;
+        const updates: Partial<Car> = sanitizeCarUpdates(req.body);
         const carId = parseObjectId(id);
 
         if (!carId) {
             return res.status(400).json({ message: "Invalid car id" });
         }
 
-        const [status, message] = await updateCar(carId, updates);
+        const [status, message] = await updateCar(carId, req.user!._id, updates);
 
         if (!status) {
             return res.status(400).json({ message });
@@ -400,7 +540,7 @@ app.delete("/car/:id", validateAccessToken, async (req, res) => {
             return res.status(400).json({ message: "Invalid car id" });
         }
 
-        const success = await deleteCar(carId);
+        const success = await deleteCar(carId, req.user!._id);
 
         if (!success) {
             return res.status(404).json({ message: "Car not found" });
@@ -420,6 +560,7 @@ app.delete("/car/:id", validateAccessToken, async (req, res) => {
 import {
     updateExpense,
     createExpense,
+    Expense,
     getExpenses,
     deleteExpense,
     getExpenseById,
@@ -440,9 +581,9 @@ app.get("/expense", validateAccessToken, async (req, res) => {
 app.post("/expense", validateAccessToken, async (req, res) => {
     try {
         const expense = {
-            ...req.body,
+            ...sanitizeExpenseUpdates(req.body),
             ownerId: req.user!._id,
-        };
+        } as Expense;
 
         const [status, message] = await createExpense(expense);
 
@@ -477,7 +618,7 @@ app.get("/expense/:id", validateAccessToken, async (req, res) => {
 app.patch("/expense/:id", validateAccessToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
+        const updates = sanitizeExpenseUpdates(req.body);
 
         const [status, message] = await updateExpense(id, req.user!._id, updates);
 

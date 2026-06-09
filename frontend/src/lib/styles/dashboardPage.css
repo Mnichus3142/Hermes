@@ -63,7 +63,7 @@
 }
 
 .dashboardMiniBarFill {
-    @apply w-full rounded-md bg-linear-to-t from-gunmetal-700 to-gunmetal-500 transition-all duration-300;
+    @apply w-full rounded-md bg-linear-to-t from-blue-600 to-blue-400 transition-all duration-300;
 }
 
 .dashboardMiniLabel {
@@ -87,7 +87,7 @@
 }
 
 .dashboardSpendingMiniFill {
-    @apply h-full rounded-full bg-gunmetal-600 transition-all duration-300;
+    @apply h-full rounded-full bg-linear-to-r from-blue-600 to-blue-400 transition-all duration-300;
 }
 
 .dashboardModalOverlay {
@@ -188,7 +188,7 @@
 }
 
 .dashboardModalBarFill {
-    @apply w-full rounded-lg bg-linear-to-t from-gunmetal-800 to-gunmetal-500;
+    @apply w-full rounded-lg bg-linear-to-t from-blue-700 to-blue-400;
 }
 
 .dashboardModalBarLabel {
@@ -212,7 +212,7 @@
 }
 
 .dashboardModalSpendingFill {
-    @apply h-full rounded-full bg-linear-to-r from-gunmetal-700 to-gunmetal-500;
+    @apply h-full rounded-full bg-linear-to-r from-blue-700 to-blue-400;
 }
 
 .dashboardModalSpendingValue {

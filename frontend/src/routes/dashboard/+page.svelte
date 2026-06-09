@@ -64,22 +64,7 @@
         return `Showing up to ${toDate}`;
     });
 
-    const fuelByMonth = $derived.by(() => aggregateFuelByMonth(expenses));
-    const spendingByCar = $derived.by(() => aggregateSpendingByCar(expenses, cars));
-    const filteredExpenses = $derived.by(() => getFilteredExpenses(expenses, fromDate, toDate));
-    const filteredFuelByMonth = $derived.by(() => aggregateFuelByMonth(filteredExpenses));
-    const filteredSpendingByCar = $derived.by(() =>
-        aggregateSpendingByCar(filteredExpenses, cars),
-    );
-
-    const modalFuelChart = $derived(
-        activeChart === "fuel" ? filteredFuelByMonth : [],
-    );
-    const modalSpendingChart = $derived(
-        activeChart === "spending" ? filteredSpendingByCar : [],
-    );
-
-    function parseDateInput(value: string, endOfDay = false): number | null {
+    const parseDateInput = (value: string, endOfDay = false): number | null => {
         if (!value) {
             return null;
         }
@@ -90,13 +75,13 @@
         }
 
         return endOfDay ? stamp + 24 * 60 * 60 * 1000 - 1 : stamp;
-    }
+    };
 
-    function getFilteredExpenses(
+    const getFilteredExpenses = (
         source: DashboardExpense[],
         from: string,
         to: string,
-    ): DashboardExpense[] {
+    ): DashboardExpense[] => {
         const fromStamp = parseDateInput(from);
         const toStamp = parseDateInput(to, true);
 
@@ -119,16 +104,16 @@
 
             return true;
         });
-    }
+    };
 
-    function monthLabelFromDate(date: Date): string {
+    const monthLabelFromDate = (date: Date): string => {
         return date.toLocaleDateString("en-US", {
             month: "short",
             year: "2-digit",
         });
-    }
+    };
 
-    function aggregateFuelByMonth(source: DashboardExpense[]): FuelChartPoint[] {
+    const aggregateFuelByMonth = (source: DashboardExpense[]): FuelChartPoint[] => {
         const totals = new Map<string, number>();
 
         for (const expense of source) {
@@ -165,12 +150,12 @@
                     value,
                 };
             });
-    }
+    };
 
-    function aggregateSpendingByCar(
+    const aggregateSpendingByCar = (
         source: DashboardExpense[],
         availableCars: DashboardCar[],
-    ): SpendingChartPoint[] {
+    ): SpendingChartPoint[] => {
         const totals = new Map<string, number>();
         const labels = new Map<string, string>();
 
@@ -202,16 +187,16 @@
                 value,
             }))
             .sort((a, b) => b.value - a.value);
-    }
+    };
 
-    function formatValue(value: number, fractionDigits = 1): string {
+    const formatValue = (value: number, fractionDigits = 1): string => {
         return new Intl.NumberFormat("en-US", {
             minimumFractionDigits: 0,
             maximumFractionDigits: fractionDigits,
         }).format(value);
-    }
+    };
 
-    function openChart(chart: ChartType, event: MouseEvent) {
+    const openChart = (chart: ChartType, event: MouseEvent) => {
         const card = event.currentTarget as HTMLElement | null;
         const rect = card?.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
@@ -241,20 +226,35 @@
         requestAnimationFrame(() => {
             isModalExpanded = true;
         });
-    }
+    };
 
-    function closeChart() {
+    const closeChart = () => {
         isModalExpanded = false;
         closeTimeoutId = setTimeout(() => {
             activeChart = null;
             closeTimeoutId = null;
         }, 280);
-    }
+    };
 
-    function clearDateFilters() {
+    const clearDateFilters = () => {
         fromDate = "";
         toDate = "";
-    }
+    };
+
+    const fuelByMonth = $derived.by(() => aggregateFuelByMonth(expenses));
+    const spendingByCar = $derived.by(() => aggregateSpendingByCar(expenses, cars));
+    const filteredExpenses = $derived.by(() => getFilteredExpenses(expenses, fromDate, toDate));
+    const filteredFuelByMonth = $derived.by(() => aggregateFuelByMonth(filteredExpenses));
+    const filteredSpendingByCar = $derived.by(() =>
+        aggregateSpendingByCar(filteredExpenses, cars),
+    );
+
+    const modalFuelChart = $derived(
+        activeChart === "fuel" ? filteredFuelByMonth : [],
+    );
+    const modalSpendingChart = $derived(
+        activeChart === "spending" ? filteredSpendingByCar : [],
+    );
 </script>
 
 <svelte:head>

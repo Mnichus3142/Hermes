@@ -15,27 +15,27 @@ export const getOAuthButtons = async (): Promise<{
     const buttons = [
         {
             name: "Google",
-            statis:
-                process.env.GOOGLE_CLIENT_ID != "" &&
-                process.env.GOOGLE_CLIENT_SECRET != "",
+            status:
+                Boolean(process.env.GOOGLE_CLIENT_ID?.trim()) &&
+                Boolean(process.env.GOOGLE_CLIENT_SECRET?.trim()),
         },
         {
             name: "GitHub",
-            statis:
-                process.env.GITHUB_CLIENT_ID != "" &&
-                process.env.GITHUB_CLIENT_SECRET != "",
+            status:
+                Boolean(process.env.GITHUB_CLIENT_ID?.trim()) &&
+                Boolean(process.env.GITHUB_CLIENT_SECRET?.trim()),
         },
         {
             name: "GitLab",
-            statis:
-                process.env.GITLAB_CLIENT_ID != "" &&
-                process.env.GITLAB_CLIENT_SECRET != "",
+            status:
+                Boolean(process.env.GITLAB_CLIENT_ID?.trim()) &&
+                Boolean(process.env.GITLAB_CLIENT_SECRET?.trim()),
         },
         {
             name: "Discord",
-            statis:
-                process.env.DISCORD_CLIENT_ID != "" &&
-                process.env.DISCORD_CLIENT_SECRET != "",
+            status:
+                Boolean(process.env.DISCORD_CLIENT_ID?.trim()) &&
+                Boolean(process.env.DISCORD_CLIENT_SECRET?.trim()),
         },
     ];
 
@@ -43,7 +43,7 @@ export const getOAuthButtons = async (): Promise<{
         code: 200,
         buttons: buttons.map((button) => ({
             name: button.name,
-            status: button.statis,
+            status: button.status,
         })),
     };
 };

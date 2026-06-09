@@ -41,3 +41,23 @@
 .carCardValue {
     @apply truncate font-medium text-gunmetal-900;
 }
+
+.carCardValueWithStatus {
+    @apply inline-flex items-center gap-2;
+}
+
+.carCardStatusDot {
+    @apply inline-block h-2.5 w-2.5 shrink-0 rounded-full;
+}
+
+.carCardStatusDot--expired {
+    @apply bg-red-500;
+}
+
+.carCardStatusDot--warning {
+    @apply bg-amber-400;
+}
+
+.carCardStatusDot--valid {
+    @apply bg-emerald-500;
+}

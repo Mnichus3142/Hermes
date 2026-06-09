@@ -6,9 +6,6 @@ declare global {
 		interface Locals {
 			isLoggedIn: boolean;
             username: string | null;
-			user?: {
-				id: number;
-			}
 		}
 		// interface PageData {}
 		// interface PageState {}

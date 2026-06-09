@@ -15,6 +15,12 @@ interface DbUser {
     refreshToken?: string | null;
 }
 
+interface AuthenticatedUser {
+    _id: ObjectId;
+    username: string;
+    refreshToken?: string | null;
+}
+
 interface TokenPayload {
     userId: string;
     username: string;
@@ -28,7 +34,7 @@ export interface AuthTokens {
 declare global {
     namespace Express {
         interface Request {
-            user?: DbUser;
+            user?: AuthenticatedUser;
         }
     }
 }
@@ -43,11 +49,17 @@ const getSecret = (key: "JWT_SECRET" | "JWT_REFRESH_SECRET"): string => {
     return secret;
 };
 
-const findUserByRefreshToken = async (
-    refreshToken: string,
-): Promise<DbUser | null> => {
+const findUserById = async (userId: string): Promise<DbUser | null> => {
     const db = await connectToDatabase();
-    return db.collection<DbUser>("users").findOne({ refreshToken });
+    if (!ObjectId.isValid(userId)) {
+        return null;
+    }
+    return db.collection<DbUser>("users").findOne({ _id: new ObjectId(userId) });
+};
+
+const ensureUserIndexes = async () => {
+    const db = await connectToDatabase();
+    await db.collection<DbUser>("users").createIndex({ username: 1 }, { unique: true });
 };
 
 // ========================================================================================
@@ -75,9 +87,16 @@ export const validateAccessToken = async (
         ) as TokenPayload;
 
         const db = await connectToDatabase();
-        const user = await db.collection<DbUser>("users").findOne({
-            _id: new ObjectId(payload.userId),
-        });
+        const user = await db.collection<DbUser>("users").findOne(
+            {
+                _id: new ObjectId(payload.userId),
+            },
+            {
+                projection: {
+                    password: 0,
+                },
+            },
+        );
 
         if (!user) {
             res.status(401).json({ message: "User not found" });
@@ -104,25 +123,30 @@ export const validateRefreshToken = async (
     }
 
     try {
-        jwt.verify(refreshToken, getSecret("JWT_REFRESH_SECRET"));
-    } catch {
-        res.status(401).json({ message: "Invalid or expired refresh token" });
-        return;
-    }
+        const payload = jwt.verify(
+            refreshToken,
+            getSecret("JWT_REFRESH_SECRET"),
+        ) as TokenPayload;
+        const user = await findUserById(payload.userId);
 
-    try {
-        const user = await findUserByRefreshToken(refreshToken);
-
-        if (!user) {
+        if (
+            !user?.refreshToken ||
+            !(await bcrypt.compare(refreshToken, user.refreshToken))
+        ) {
             res.status(401).json({ message: "Refresh token has been revoked" });
             return;
         }
 
-        req.user = user;
-        next();
+        req.user = {
+            _id: user._id,
+            username: user.username,
+            refreshToken: user.refreshToken,
+        };
     } catch {
-        res.status(500).json({ message: "Error processing request" });
+        res.status(401).json({ message: "Invalid or expired refresh token" });
+        return;
     }
+    next();
 };
 
 // ========================================================================================
@@ -154,7 +178,9 @@ export class User {
 
     async checkAvailability(username: string): Promise<boolean> {
         const db = await connectToDatabase();
-        const existing = await db.collection<DbUser>("users").findOne({ username });
+        const existing = await db
+            .collection<DbUser>("users")
+            .findOne({ username: username.trim() });
         return existing === null;
     }
 
@@ -162,22 +188,44 @@ export class User {
         username: string,
         password: string,
     ): Promise<[boolean, string?]> {
-        if (!(await this.checkAvailability(username))) {
+        const normalizedUsername = username.trim();
+        if (!normalizedUsername) {
+            return [false, "Username is required"];
+        }
+        if (normalizedUsername.length < 3 || normalizedUsername.length > 64) {
+            return [false, "Username must be between 3 and 64 characters"];
+        }
+        if (password.length < 8 || password.length > 128) {
+            return [false, "Password must be between 8 and 128 characters"];
+        }
+        if (
+            !/[a-z]/.test(password) ||
+            !/[A-Z]/.test(password) ||
+            !/[0-9]/.test(password) ||
+            !/[^A-Za-z0-9]/.test(password)
+        ) {
+            return [
+                false,
+                "Password must contain uppercase, lowercase, number and special character",
+            ];
+        }
+        if (!(await this.checkAvailability(normalizedUsername))) {
             return [false, "Username is already taken"];
         }
 
         try {
             const db = await connectToDatabase();
+            await ensureUserIndexes();
             const passwordHash = await bcrypt.hash(password, 10);
             const result = await db.collection<DbUser>("users").insertOne({
-                username,
+                username: normalizedUsername,
                 password: passwordHash,
                 refreshToken: null,
             } as WithId<DbUser>);
 
             return result.acknowledged ? [true] : [false, "Failed to create user"];
         } catch {
-            return [false, "Error processing request"];
+            return [false, "Username is already taken"];
         }
     }
 
@@ -187,7 +235,9 @@ export class User {
     ): Promise<[boolean, AuthTokens | string]> {
         try {
             const db = await connectToDatabase();
-            const user = await db.collection<DbUser>("users").findOne({ username });
+            const user = await db
+                .collection<DbUser>("users")
+                .findOne({ username: username.trim() });
 
             if (!user || !(await bcrypt.compare(password, user.password))) {
                 return [false, "Invalid username or password"];
@@ -195,10 +245,11 @@ export class User {
 
             const accessToken = this.generateAccessToken(user);
             const refreshToken = this.generateRefreshToken(user);
+            const refreshTokenHash = await bcrypt.hash(refreshToken, 10);
 
             await db
                 .collection<DbUser>("users")
-                .updateOne({ _id: user._id }, { $set: { refreshToken } });
+                .updateOne({ _id: user._id }, { $set: { refreshToken: refreshTokenHash } });
 
             return [true, { accessToken, refreshToken }];
         } catch {
@@ -207,27 +258,35 @@ export class User {
     }
 
     async refresh(refreshToken: string): Promise<[boolean, AuthTokens | string]> {
+        let payload: TokenPayload;
         try {
-            jwt.verify(refreshToken, getSecret("JWT_REFRESH_SECRET"));
+            payload = jwt.verify(
+                refreshToken,
+                getSecret("JWT_REFRESH_SECRET"),
+            ) as TokenPayload;
         } catch {
             return [false, "Invalid or expired refresh token"];
         }
 
         try {
-            const user = await findUserByRefreshToken(refreshToken);
+            const user = await findUserById(payload.userId);
 
-            if (!user) {
+            if (
+                !user?.refreshToken ||
+                !(await bcrypt.compare(refreshToken, user.refreshToken))
+            ) {
                 return [false, "Refresh token has been revoked"];
             }
 
             const newAccessToken = this.generateAccessToken(user);
             const newRefreshToken = this.generateRefreshToken(user);
+            const newRefreshTokenHash = await bcrypt.hash(newRefreshToken, 10);
 
             await (await connectToDatabase())
                 .collection<DbUser>("users")
                 .updateOne(
                     { _id: user._id },
-                    { $set: { refreshToken: newRefreshToken } },
+                    { $set: { refreshToken: newRefreshTokenHash } },
                 );
 
             return [
@@ -240,17 +299,28 @@ export class User {
     }
 
     async logout(refreshToken: string): Promise<[boolean, string?]> {
+        let payload: TokenPayload;
         try {
-            jwt.verify(refreshToken, getSecret("JWT_REFRESH_SECRET"));
+            payload = jwt.verify(
+                refreshToken,
+                getSecret("JWT_REFRESH_SECRET"),
+            ) as TokenPayload;
         } catch {
             return [false, "Invalid or expired refresh token"];
         }
 
         try {
+            const user = await findUserById(payload.userId);
+            if (
+                !user?.refreshToken ||
+                !(await bcrypt.compare(refreshToken, user.refreshToken))
+            ) {
+                return [false, "Refresh token not found"];
+            }
             const db = await connectToDatabase();
             const result = await db
                 .collection<DbUser>("users")
-                .updateOne({ refreshToken }, { $set: { refreshToken: null } });
+                .updateOne({ _id: user._id }, { $set: { refreshToken: null } });
 
             return result.matchedCount > 0
                 ? [true]

@@ -6,6 +6,14 @@
 // Function to check the health of the application. Currently, it simply returns a 200 status code.
 // =========================================================================================
 
+import { connectToDatabase } from "../db/client";
+
 export const checkHealth = async (): Promise<{ code: number }> => {
-    return { code: 200 };
+    try {
+        const db = await connectToDatabase();
+        await db.command({ ping: 1 });
+        return { code: 200 };
+    } catch {
+        return { code: 503 };
+    }
 };

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { scale, fade } from "svelte/transition";
+    import { fade } from "svelte/transition";
 
     interface Props {
         title?: string;
@@ -26,16 +26,16 @@
         <p class="text-mainTextColor mb-6">{message}</p>
         
         <div class="flex justify-end gap-3">
-            <!-- svelte-ignore event_directive_deprecated -->
             <button 
-                on:click={onCancel}
+                type="button"
+                onclick={onCancel}
                 class="px-4 py-2 text-sm font-medium text-mainTextColor hover:bg-white/10 rounded-md transition-all cursor-pointer hover:scale-110 duration-200"
             >
                 {cancelText}
             </button>
-            <!-- svelte-ignore event_directive_deprecated -->
             <button 
-                on:click={onConfirm}
+                type="button"
+                onclick={onConfirm}
                 class="px-4 py-2 text-sm font-medium bg-red-500 text-white rounded-md hover:bg-red-600 transition-all cursor-pointer hover:scale-110 duration-200"
             >
                 {confirmText}

@@ -116,7 +116,7 @@ export const load: PageServerLoad = async ({ cookies, fetch, url }) => {
         }),
     ]);
 
-    if (carsResponse.status === 401) {
+    if (carsResponse.status === 401 || parametersResponse.status === 401) {
         const refreshed = await refreshAccessToken({
             fetch,
             cookies,
@@ -259,7 +259,7 @@ const buildCarFromFormData = (data: FormData): Partial<CreateCarPayload> => {
 
 export const actions: Actions = {
     create: async ({ request, cookies, fetch }) => {
-        const accessToken = cookies.get("accessToken");
+        let accessToken = cookies.get("accessToken");
 
         if (!accessToken) {
             return fail(401, { message: "Not authenticated" });
@@ -267,7 +267,8 @@ export const actions: Actions = {
 
         const car = buildCarFromFormData(await request.formData());
 
-        const response = await fetch(apiUrl(new URL(request.url).origin, "/car"), {
+        const requestOrigin = new URL(request.url).origin;
+        let response = await fetch(apiUrl(requestOrigin, "/car"), {
             method: "POST",
             headers: {
                 ...authHeaders(accessToken),
@@ -275,6 +276,32 @@ export const actions: Actions = {
             },
             body: JSON.stringify(car),
         });
+
+        if (response.status === 401) {
+            const refreshed = await refreshAccessToken({
+                fetch,
+                cookies,
+                origin: requestOrigin,
+            });
+
+            if (!refreshed) {
+                return fail(401, { message: "Not authenticated" });
+            }
+
+            accessToken = cookies.get("accessToken");
+            if (!accessToken) {
+                return fail(401, { message: "Not authenticated" });
+            }
+
+            response = await fetch(apiUrl(requestOrigin, "/car"), {
+                method: "POST",
+                headers: {
+                    ...authHeaders(accessToken),
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(car),
+            });
+        }
 
         const result = await response.json();
 

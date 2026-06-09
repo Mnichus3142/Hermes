@@ -11,15 +11,15 @@
 }
 
 .calculatorPageTitle {
-    @apply font-title text-3xl font-bold text-gunmetal-900;
+    @apply font-title text-3xl font-bold text-mainTextColor;
 }
 
 .calculatorPageSubtitle {
-    @apply mt-1 font-text text-sm text-gunmetal-700;
+    @apply mt-1 font-text text-sm text-mainBorder;
 }
 
 .calculatorCard {
-    @apply w-full rounded-xl border border-gunmetal-200 bg-gunmetal-50 p-5;
+    @apply w-full rounded-xl border border-gunmetal-100/50 bg-gunmetal-100/25 p-5 backdrop-blur-sm;
 }
 
 .calculatorFormGrid {
@@ -35,11 +35,11 @@
 }
 
 .calculatorLabel {
-    @apply font-text text-xs font-medium text-gunmetal-700;
+    @apply font-text text-xs font-semibold text-gunmetal-500;
 }
 
 .calculatorInput {
-    @apply w-full rounded-lg border border-gunmetal-300 bg-gunmetal-50 px-3 py-2.5 font-text text-sm text-gunmetal-900 outline-none transition-all duration-200;
+    @apply w-full rounded-lg border border-gunmetal-100/50 bg-gunmetal-100/25 px-3 py-2.5 font-text text-sm text-gunmetal-600 outline-none transition-all duration-200;
 }
 
 .calculatorInput::placeholder {
@@ -47,19 +47,19 @@
 }
 
 .calculatorInput:hover {
-    @apply border-gunmetal-400 bg-gunmetal-100;
+    @apply border-gunmetal-100/75 bg-gunmetal-100/40;
 }
 
 .calculatorInput:focus {
-    @apply border-gunmetal-500 ring-2 ring-gunmetal-300/40;
+    @apply border-blue-400/70 ring-2 ring-blue-300/35;
 }
 
 .calculatorMessage {
-    @apply mt-4 rounded-lg border border-dashed border-gunmetal-300 bg-gunmetal-100 p-3 font-text text-sm text-gunmetal-700;
+    @apply mt-4 rounded-lg border border-dashed border-gunmetal-100/50 bg-gunmetal-100/20 p-3 font-text text-sm text-mainBorder;
 }
 
 .calculatorResults {
-    @apply mt-4 space-y-2 rounded-lg border border-gunmetal-200 bg-gunmetal-50 p-4;
+    @apply mt-4 space-y-2 rounded-lg border border-gunmetal-100/50 bg-gunmetal-100/25 p-4;
 }
 
 .calculatorResultItem {
@@ -67,9 +67,9 @@
 }
 
 .calculatorResultLabel {
-    @apply font-text text-sm text-gunmetal-700;
+    @apply font-text text-sm text-gunmetal-500;
 }
 
 .calculatorResultValue {
-    @apply font-title text-lg font-semibold text-gunmetal-900;
+    @apply font-title text-lg font-semibold text-gunmetal-600;
 }

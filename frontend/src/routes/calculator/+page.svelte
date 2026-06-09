@@ -59,9 +59,9 @@
         return null;
     });
 
-    function formatValue(value: number): string {
+    const formatValue = (value: number): string => {
         return numberFormatter.format(value);
-    }
+    };
 </script>
 
 <svelte:head>

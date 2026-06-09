@@ -42,7 +42,7 @@
         return isEditMode ? "Update car" : "Add car";
     });
 
-    function formatDateForInput(value?: string): string {
+    const formatDateForInput = (value?: string): string => {
         if (!value) {
             return "";
         }
@@ -57,17 +57,86 @@
         }
 
         return parsed.toISOString().slice(0, 10);
-    }
+    };
 
-    function formatNumberForInput(value?: number): string {
+    const formatNumberForInput = (value?: number): string => {
         if (value === undefined || value === null || Number.isNaN(value)) {
             return "";
         }
 
         return String(value);
-    }
+    };
 
-    function handleEnhance() {
+    const VIN_LENGTH = 17;
+    const VIN_ALLOWED_CHARACTERS = /^[A-HJ-NPR-Z0-9]+$/;
+    const VIN_FORBIDDEN_LETTERS = /[IOQ]/;
+    const VIN_ALPHA_NUMERIC = /^[A-Z0-9]+$/;
+
+    const normalizeVinValue = (value: string): string => {
+        return value.trim().toUpperCase();
+    };
+
+    const getVinValidationMessage = (value: string): string => {
+        const normalizedVin = normalizeVinValue(value);
+
+        if (normalizedVin.length === 0) {
+            return "";
+        }
+
+        if (normalizedVin.length !== VIN_LENGTH) {
+            return "VIN must contain exactly 17 characters.";
+        }
+
+        if (!VIN_ALPHA_NUMERIC.test(normalizedVin)) {
+            return "VIN can contain only letters and digits.";
+        }
+
+        if (VIN_FORBIDDEN_LETTERS.test(normalizedVin)) {
+            return "VIN cannot contain the letters I, O, or Q.";
+        }
+
+        if (!VIN_ALLOWED_CHARACTERS.test(normalizedVin)) {
+            return "VIN can use only A-H, J-N, P, R-Z, and digits.";
+        }
+
+        return "";
+    };
+
+    const handleVinBlur = (event: FocusEvent): void => {
+        const input = event.currentTarget;
+        if (!(input instanceof HTMLInputElement)) {
+            return;
+        }
+
+        input.value = normalizeVinValue(input.value);
+        input.setCustomValidity("");
+    };
+
+    const handleVinSubmit = (event: SubmitEvent): void => {
+        const form = event.currentTarget;
+        if (!(form instanceof HTMLFormElement)) {
+            return;
+        }
+
+        const vinField = form.elements.namedItem("vin");
+        if (!(vinField instanceof HTMLInputElement)) {
+            return;
+        }
+
+        vinField.value = normalizeVinValue(vinField.value);
+        const vinValidationMessage = getVinValidationMessage(vinField.value);
+        vinField.setCustomValidity(vinValidationMessage);
+
+        if (vinValidationMessage) {
+            event.preventDefault();
+            vinField.reportValidity();
+            return;
+        }
+
+        vinField.setCustomValidity("");
+    };
+
+    const handleEnhance = () => {
         submitting = true;
 
         return async ({ result }: { result: ActionResult }) => {
@@ -98,7 +167,7 @@
                 });
             }
         };
-    }
+    };
 </script>
 
 {#if open}
@@ -135,6 +204,7 @@
                 method="POST"
                 {action}
                 use:enhance={handleEnhance}
+                onsubmit={handleVinSubmit}
                 class="addCarForm"
             >
                 <div class="addCarFormBody">
@@ -246,12 +316,12 @@
                                         class="addCarInput"
                                         id="vin"
                                         name="vin"
-                                        minlength="17"
                                         maxlength="17"
-                                        pattern="[A-HJ-NPR-Z0-9]{17}"
-                                        title="VIN must contain exactly 17 characters (A-H, J-N, P, R-Z and digits)."
+                                        onblur={handleVinBlur}
                                         placeholder="1HGBH41JXMN109186"
-                                        value={initialValues.vin ?? ""}
+                                        value={normalizeVinValue(
+                                            initialValues.vin ?? "",
+                                        )}
                                     />
                                 </div>
                                 <div class="addCarField">

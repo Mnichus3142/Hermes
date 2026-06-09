@@ -13,8 +13,15 @@ import logger from "../logger/logger";
 // Get environment variables for database connection.
 // =========================================================================================
 
-const uri = process.env.DATABASE_URL as string;
+const uri = process.env.DATABASE_URL;
 const databaseName = process.env.DATABASE_NAME;
+
+if (!uri) {
+    throw new Error("DATABASE_URL is not set");
+}
+if (!databaseName) {
+    throw new Error("DATABASE_NAME is not set");
+}
 
 // =========================================================================================
 // Database object

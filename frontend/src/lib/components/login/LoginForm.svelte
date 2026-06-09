@@ -53,7 +53,7 @@
 
     const notificationTimeout = 5000;
 
-    async function handleInternalLogin(e: Event) {
+    const handleInternalLogin = async (e: Event) => {
         e.preventDefault();
 
         if (passwordCheck.firstPassword === "" || username === "") {
@@ -126,12 +126,12 @@
                 });
             }
         }
-    }
+    };
 
-    function handleThirdPartyLogin(e: Event) {
+    const handleThirdPartyLogin = (e: Event) => {
         e.preventDefault();
         console.log("Login with third party");
-    }
+    };
 </script>
 
 <div

@@ -32,12 +32,16 @@ export const handle: Handle = async ({ event, resolve }) => {
             }
         } else {
             event.locals.isLoggedIn = true;
+            event.locals.username = getUsernameFromAccessToken(accessToken);
         }
     } else if (refreshToken) {
         const refreshed = await tryRefresh(event, refreshToken);
         if (refreshed) {
             event.locals.isLoggedIn = true;
             accessToken = event.cookies.get("accessToken");
+            event.locals.username = accessToken
+                ? getUsernameFromAccessToken(accessToken)
+                : null;
         } else {
             event.cookies.delete("accessToken", { path: "/" });
             event.cookies.delete("refreshToken", { path: "/" });
@@ -63,7 +67,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 const refreshApiUrl = (origin: string) => `${origin}/api/refresh`;
 
-const tryRefresh = async (event: any, refreshToken: string): Promise<boolean> => {
+const tryRefresh = async (
+    event: Parameters<Handle>[0]["event"],
+    refreshToken: string,
+): Promise<boolean> => {
     try {
         const res = await event.fetch(refreshApiUrl(event.url.origin), {
             method: "POST",
@@ -85,7 +92,7 @@ const tryRefresh = async (event: any, refreshToken: string): Promise<boolean> =>
     }
 };
 
-const parseAndSetCookie = (event: any, raw: string) => {
+const parseAndSetCookie = (event: Parameters<Handle>[0]["event"], raw: string) => {
     const parts = raw.split("; ");
     const firstPair = parts[0];
     const separatorIndex = firstPair.indexOf("=");
@@ -142,7 +149,7 @@ const isAccessTokenExpired = (token: string): boolean => {
         ) as { exp?: number };
 
         if (!payload.exp) {
-            return false;
+            return true;
         }
 
         return payload.exp * 1000 <= Date.now() + 10_000;
@@ -151,7 +158,29 @@ const isAccessTokenExpired = (token: string): boolean => {
     }
 };
 
-const redirectToLogin = (event: any, path: string): never => {
+const getUsernameFromAccessToken = (token: string): string | null => {
+    try {
+        const parts = token.split(".");
+        if (parts.length !== 3) {
+            return null;
+        }
+
+        const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+        const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+        const payload = JSON.parse(
+            Buffer.from(padded, "base64").toString("utf-8"),
+        ) as { username?: unknown };
+
+        return typeof payload.username === "string" ? payload.username : null;
+    } catch {
+        return null;
+    }
+};
+
+const redirectToLogin = (
+    event: Parameters<Handle>[0]["event"],
+    path: string,
+): never => {
     const encoded = encodeURIComponent(path + event.url.search);
 
     event.cookies.set("redirectAfterLogin", encoded, {
