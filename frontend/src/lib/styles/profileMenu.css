@@ -12,7 +12,7 @@
 }
 
 .menu {
-    @apply bg-gunmetal-100/25 shadow-gunmetal-50/10 backdrop-blur-sm border-gunmetal-100/50 border;
+    @apply bg-gunmetal-100/45 shadow-gunmetal-50/20 backdrop-blur-md border-gunmetal-100/70 border;
     @apply fixed right-0 md:top-20 w-48 rounded-2xl shadow-md z-60 flex flex-col gap-4;
     @apply not-md:bottom-20;
 }

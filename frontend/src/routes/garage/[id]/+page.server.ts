@@ -89,12 +89,16 @@ const refreshAccessToken = async ({
 };
 
 const parseJsonBody = async <T>(response: Response): Promise<T | null> => {
-    const body = await response.text();
-    if (!body) {
-        return null;
-    }
-
     try {
+        if (response.bodyUsed) {
+            return null;
+        }
+
+        const body = await response.text();
+        if (!body) {
+            return null;
+        }
+
         return JSON.parse(body) as T;
     } catch {
         return null;

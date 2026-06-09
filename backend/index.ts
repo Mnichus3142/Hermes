@@ -338,11 +338,24 @@ app.get("/car", validateAccessToken, async (req, res) => {
 
 import { ObjectId } from "mongodb";
 
+const parseObjectId = (value: string): ObjectId | null => {
+    if (!ObjectId.isValid(value)) {
+        return null;
+    }
+
+    return new ObjectId(value);
+};
+
 app.get("/car/:id", validateAccessToken, async (req, res) => {
     try {
         const { id } = req.params;
+        const carId = parseObjectId(id);
 
-        const car = await getCarById(new ObjectId(id), req.user!._id);
+        if (!carId) {
+            return res.status(400).json({ message: "Invalid car id" });
+        }
+
+        const car = await getCarById(carId, req.user!._id);
 
         if (!car) {
             return res.status(404).json({ message: "Car not found" });
@@ -359,8 +372,13 @@ app.patch("/car/:id", validateAccessToken, async (req, res) => {
     try {
         const { id } = req.params;
         const updates: Partial<Car> = req.body;
+        const carId = parseObjectId(id);
 
-        const [status, message] = await updateCar(new ObjectId(id), updates);
+        if (!carId) {
+            return res.status(400).json({ message: "Invalid car id" });
+        }
+
+        const [status, message] = await updateCar(carId, updates);
 
         if (!status) {
             return res.status(400).json({ message });
@@ -376,8 +394,13 @@ app.patch("/car/:id", validateAccessToken, async (req, res) => {
 app.delete("/car/:id", validateAccessToken, async (req, res) => {
     try {
         const { id } = req.params;
+        const carId = parseObjectId(id);
 
-        const success = await deleteCar(new ObjectId(id));
+        if (!carId) {
+            return res.status(400).json({ message: "Invalid car id" });
+        }
+
+        const success = await deleteCar(carId);
 
         if (!success) {
             return res.status(404).json({ message: "Car not found" });
@@ -400,6 +423,8 @@ import {
     getExpenses,
     deleteExpense,
     getExpenseById,
+    getFuelUsageByMonth,
+    getSpendingByCar,
 } from "./expenses/expenses";
 
 app.get("/expense", validateAccessToken, async (req, res) => {
@@ -481,6 +506,39 @@ app.delete("/expense/:id", validateAccessToken, async (req, res) => {
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Failed to delete expense" });
+    }
+});
+
+const parseOptionalDate = (value: unknown): Date | undefined => {
+    if (typeof value !== "string") {
+        return undefined;
+    }
+
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+};
+
+app.get("/dashboard/fuel-by-month", validateAccessToken, async (req, res) => {
+    try {
+        const from = parseOptionalDate(req.query.from);
+        const to = parseOptionalDate(req.query.to);
+        const data = await getFuelUsageByMonth(req.user!._id, { from, to });
+        res.status(200).json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve fuel usage statistics" });
+    }
+});
+
+app.get("/dashboard/spending-by-car", validateAccessToken, async (req, res) => {
+    try {
+        const from = parseOptionalDate(req.query.from);
+        const to = parseOptionalDate(req.query.to);
+        const data = await getSpendingByCar(req.user!._id, { from, to });
+        res.status(200).json(data);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Failed to retrieve spending statistics" });
     }
 });
 

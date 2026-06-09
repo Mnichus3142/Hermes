@@ -29,6 +29,39 @@ export type Expense = {
     mileageAtExpense?: number;
 };
 
+export type DashboardDateRange = {
+    from?: Date;
+    to?: Date;
+};
+
+const buildNormalizedDateFilter = ({ from, to }: DashboardDateRange) => {
+    const filters: Record<string, unknown>[] = [];
+
+    if (from) {
+        filters.push({ normalizedDate: { $gte: from } });
+    }
+
+    if (to) {
+        filters.push({ normalizedDate: { $lte: to } });
+    }
+
+    return filters;
+};
+
+const normalizeDateField = <T extends { date?: unknown }>(value: T): T => {
+    if (typeof value.date === "string") {
+        const parsed = new Date(value.date);
+        if (!Number.isNaN(parsed.getTime())) {
+            return {
+                ...value,
+                date: parsed,
+            };
+        }
+    }
+
+    return value;
+};
+
 export const getCarCurrentMileage = async (
     carId: string,
 ): Promise<number | null> => {
@@ -132,23 +165,24 @@ export const getExpenseById = async (
 export const createExpense = async (
     expense: Expense,
 ): Promise<[boolean, string?]> => {
-    const [valid, errorMessage] = await validateExpense(expense);
+    const normalizedExpense = normalizeDateField(expense);
+    const [valid, errorMessage] = await validateExpense(normalizedExpense);
     if (!valid) {
         return [false, errorMessage];
     }
     try {
         const db = await connectToDatabase();
-        const result = await db.collection("expenses").insertOne(expense);
+        const result = await db.collection("expenses").insertOne(normalizedExpense);
         if (!result.acknowledged) {
             return [false, "Failed to create expense"];
         }
 
-        if (expense.mileageAtExpense != null) {
+        if (normalizedExpense.mileageAtExpense != null) {
             const result2 = await db
                 .collection("cars")
                 .updateOne(
-                    { _id: new ObjectId(expense.carId) },
-                    { $set: { mileage: expense.mileageAtExpense } },
+                    { _id: new ObjectId(normalizedExpense.carId) },
+                    { $set: { mileage: normalizedExpense.mileageAtExpense } },
                 );
             if (result2.matchedCount === 0) {
                 return [false, "Car not found"];
@@ -185,7 +219,8 @@ export const updateExpense = async (
     ownerId: string,
     updatedExpense: Partial<Expense>,
 ): Promise<[boolean, string?]> => {
-    const [valid, errorMessage] = await validateExpense(updatedExpense);
+    const normalizedExpense = normalizeDateField(updatedExpense);
+    const [valid, errorMessage] = await validateExpense(normalizedExpense);
     if (!valid) {
         return [false, errorMessage];
     }
@@ -195,18 +230,18 @@ export const updateExpense = async (
             .collection("expenses")
             .updateOne(
                 { _id: new ObjectId(expenseId), ownerId: new ObjectId(ownerId) },
-                { $set: updatedExpense },
+                { $set: normalizedExpense },
             );
         if (result.matchedCount === 0) {
             return [false, "Expense not found or not owned by user"];
         }
 
-        if (updatedExpense.mileageAtExpense != null) {
+        if (normalizedExpense.mileageAtExpense != null) {
             const result2 = await db
                 .collection("cars")
                 .updateOne(
-                    { _id: updatedExpense.carId },
-                    { $set: { mileage: updatedExpense.mileageAtExpense } },
+                    { _id: normalizedExpense.carId },
+                    { $set: { mileage: normalizedExpense.mileageAtExpense } },
                 );
             if (result2.matchedCount === 0) {
                 return [false, "Car not found"];
@@ -217,4 +252,138 @@ export const updateExpense = async (
     } catch (error) {
         return [false, (error as Error).message];
     }
+};
+
+export const getFuelUsageByMonth = async (
+    ownerId: ObjectId,
+    range: DashboardDateRange = {},
+) => {
+    const db = await connectToDatabase();
+    const normalizedDateFilter = buildNormalizedDateFilter(range);
+
+    const result = await db
+        .collection<Expense>("expenses")
+        .aggregate([
+            { $match: { ownerId, category: "fuel" } },
+            {
+                $addFields: {
+                    normalizedDate: {
+                        $convert: {
+                            input: "$date",
+                            to: "date",
+                            onError: null,
+                            onNull: null,
+                        },
+                    },
+                },
+            },
+            {
+                $match: {
+                    $and: [
+                        { normalizedDate: { $ne: null } },
+                        ...normalizedDateFilter,
+                    ],
+                },
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: "%Y-%m",
+                            date: "$normalizedDate",
+                        },
+                    },
+                    totalFuelVolume: { $sum: { $ifNull: ["$fuel.volume", 0] } },
+                    totalAmount: { $sum: { $ifNull: ["$amount", 0] } },
+                },
+            },
+            { $sort: { _id: 1 } },
+            {
+                $project: {
+                    _id: 0,
+                    month: "$_id",
+                    totalFuelVolume: { $round: ["$totalFuelVolume", 2] },
+                    totalAmount: { $round: ["$totalAmount", 2] },
+                },
+            },
+        ])
+        .toArray();
+
+    return result;
+};
+
+export const getSpendingByCar = async (
+    ownerId: ObjectId,
+    range: DashboardDateRange = {},
+) => {
+    const db = await connectToDatabase();
+    const normalizedDateFilter = buildNormalizedDateFilter(range);
+
+    const result = await db
+        .collection<Expense>("expenses")
+        .aggregate([
+            { $match: { ownerId } },
+            {
+                $addFields: {
+                    normalizedDate: {
+                        $convert: {
+                            input: "$date",
+                            to: "date",
+                            onError: null,
+                            onNull: null,
+                        },
+                    },
+                },
+            },
+            {
+                $match: {
+                    $and: [
+                        { normalizedDate: { $ne: null } },
+                        ...normalizedDateFilter,
+                    ],
+                },
+            },
+            {
+                $group: {
+                    _id: "$carId",
+                    totalAmount: { $sum: { $ifNull: ["$amount", 0] } },
+                },
+            },
+            {
+                $lookup: {
+                    from: "cars",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "car",
+                },
+            },
+            {
+                $unwind: {
+                    path: "$car",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    carId: { $toString: "$_id" },
+                    totalAmount: { $round: ["$totalAmount", 2] },
+                    carLabel: {
+                        $trim: {
+                            input: {
+                                $concat: [
+                                    { $ifNull: ["$car.make", "Unknown"] },
+                                    " ",
+                                    { $ifNull: ["$car.model", "car"] },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+            { $sort: { totalAmount: -1 } },
+        ])
+        .toArray();
+
+    return result;
 };

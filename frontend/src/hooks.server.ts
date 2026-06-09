@@ -1,9 +1,14 @@
 import { redirect, type Handle } from "@sveltejs/kit";
 
 const PUBLIC_ROUTES = ["/"];
+const API_PREFIX = "/api";
 
 export const handle: Handle = async ({ event, resolve }) => {
     const path = event.url.pathname;
+
+    if (path.startsWith(API_PREFIX)) {
+        return resolve(event);
+    }
 
     event.locals.isLoggedIn = false;
     event.locals.username = null;

@@ -14,7 +14,7 @@
     });
 </script>
 
-<main class="max-w-screen max-h-screen h-screen bg-gunmetal-50 z-4000">
+<main class="max-w-screen min-h-screen bg-gunmetal-50 z-4000">
     {#if !$loginVisible}
         <div
             in:fly={{
