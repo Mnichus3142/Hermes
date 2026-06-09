@@ -7,6 +7,7 @@
     import { createNewNotification } from "$lib/logic/notificationLogic.svelte";
     import { isLoggedIn, loginVisible } from "$lib/store/store";
     import { enhance } from "$app/forms";
+    import { sanitizeRedirectPath } from "$lib/utils/authRedirect";
 
     const { toggleForms, animationDuration, buttons } = $props<{
         toggleForms: () => void;
@@ -96,12 +97,16 @@
                     duration: notificationTimeout,
                 });
 
-                const redirectPath = document.cookie
-                    .split("; ")
-                    .find((row) => row.startsWith("redirectAfterLogin="))
-                    ?.split("=")[1];
+                const redirectCookie = document.cookie
+                    .split(";")
+                    .map((row) => row.trim())
+                    .find((row) => row.startsWith("redirectAfterLogin="));
+                const cookieValue = redirectCookie
+                    ? redirectCookie.slice("redirectAfterLogin=".length)
+                    : null;
+                const nextPath = sanitizeRedirectPath(cookieValue);
 
-                if (redirectPath) {
+                if (redirectCookie) {
                     document.cookie =
                         "redirectAfterLogin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 }
@@ -109,9 +114,7 @@
                 isLoggedIn.set(true);
                 loginVisible.set(false);
 
-                window.location.href = redirectPath
-                        ? decodeURIComponent(redirectPath)
-                        : "/dashboard";
+                window.location.href = nextPath;
             }
         } catch (error: any) {
             if (error.message !== "409") {
