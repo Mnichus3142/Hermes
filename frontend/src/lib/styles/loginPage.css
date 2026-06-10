@@ -1,7 +1,7 @@
 /* ─── Auth Card ─────────────────────────────────────────────── */
 
 .authCard {
-    @apply flex items-center justify-center w-full h-full;
+    @apply flex items-center justify-center w-full h-full bg-transparent;
 }
 
 .authCard form {

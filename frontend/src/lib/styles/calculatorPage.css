@@ -1,0 +1,75 @@
+.calculatorPage {
+    @apply min-h-screen px-4 py-8 pb-24 sm:px-6 lg:px-8 md:ml-48 md:pb-8 grid items-center;
+}
+
+.calculatorContent {
+    @apply mx-auto w-full max-w-3xl;
+}
+
+.calculatorPageHeader {
+    @apply mb-8 text-center;
+}
+
+.calculatorPageTitle {
+    @apply font-title text-3xl font-bold text-mainTextColor;
+}
+
+.calculatorPageSubtitle {
+    @apply mt-1 font-text text-sm text-mainBorder;
+}
+
+.calculatorCard {
+    @apply w-full rounded-xl border border-gunmetal-100/50 bg-gunmetal-100/25 p-5 backdrop-blur-sm;
+}
+
+.calculatorFormGrid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+}
+
+.calculatorField {
+    @apply flex flex-col gap-1.5;
+}
+
+.calculatorFieldWide {
+    @apply sm:col-span-2;
+}
+
+.calculatorLabel {
+    @apply font-text text-xs font-semibold text-gunmetal-500;
+}
+
+.calculatorInput {
+    @apply w-full rounded-lg border border-gunmetal-100/50 bg-gunmetal-100/25 px-3 py-2.5 font-text text-sm text-gunmetal-600 outline-none transition-all duration-200;
+}
+
+.calculatorInput::placeholder {
+    @apply text-gunmetal-500;
+}
+
+.calculatorInput:hover {
+    @apply border-gunmetal-100/75 bg-gunmetal-100/40;
+}
+
+.calculatorInput:focus {
+    @apply border-blue-400/70 ring-2 ring-blue-300/35;
+}
+
+.calculatorMessage {
+    @apply mt-4 rounded-lg border border-dashed border-gunmetal-100/50 bg-gunmetal-100/20 p-3 font-text text-sm text-mainBorder;
+}
+
+.calculatorResults {
+    @apply mt-4 space-y-2 rounded-lg border border-gunmetal-100/50 bg-gunmetal-100/25 p-4;
+}
+
+.calculatorResultItem {
+    @apply flex flex-wrap items-center justify-between gap-2;
+}
+
+.calculatorResultLabel {
+    @apply font-text text-sm text-gunmetal-500;
+}
+
+.calculatorResultValue {
+    @apply font-title text-lg font-semibold text-gunmetal-600;
+}

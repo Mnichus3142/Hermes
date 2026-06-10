@@ -22,12 +22,12 @@
         };
     });
 
-    function calculateProgress(notification: Notification): number {
+    const calculateProgress = (notification: Notification): number => {
         if (notification.getDuration() === 0) return 0;
         const remaining = notification.getRemainingTime();
         const total = notification.getDuration();
         return (remaining / total) * 100;
-    }
+    };
 </script>
 
 <main class='max-h-svh max-w-svw flex justify-center'>

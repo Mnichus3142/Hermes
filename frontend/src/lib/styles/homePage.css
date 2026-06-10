@@ -1,5 +1,5 @@
 .authForm {
-    @apply h-screen bg-gunmetal-50 relative z-50;
+    @apply h-screen bg-transparent backdrop-blur-2xl relative z-50;
 }
 
 .closeButton {
@@ -13,4 +13,8 @@
 
 .closeButton svg {
     @apply fill-gunmetal-600;
+}
+
+.landingPageContainer {
+    @apply h-full w-full bg-gunmetal-400/40 z-20;
 }

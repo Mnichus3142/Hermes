@@ -7,6 +7,7 @@
     let firstCircleRotation: number = 0;
     let secondCircleRotation: number = 0;
     let thirdCircleRotation: number = 0;
+    let rafId: number | null = null;
 
     onMount(() => {
         // Function to animate the circles
@@ -14,11 +15,18 @@
             firstCircleRotation += 1;
             secondCircleRotation -= 2;
             thirdCircleRotation += 3;
-            requestAnimationFrame(animate);
+            rafId = requestAnimationFrame(animate);
         };
 
         // Start the animation
         animate();
+
+        return () => {
+            if (rafId !== null) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+        };
     });
 </script>
 

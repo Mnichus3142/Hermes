@@ -1,0 +1,119 @@
+/* ─── Overlay ───────────────────────────────────────────────── */
+
+.addCarOverlay {
+    @apply fixed inset-0 z-200 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm;
+}
+
+/* ─── Modal panel ───────────────────────────────────────────── */
+
+.addCarModal {
+    @apply flex max-h-[min(90vh,52rem)] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-gunmetal-200 bg-gunmetal-50 shadow-2xl;
+}
+
+/* ─── Header ────────────────────────────────────────────────── */
+
+.addCarHeader {
+    @apply flex shrink-0 items-center justify-between border-b border-gunmetal-200 px-6 py-4;
+}
+
+.addCarTitle {
+    @apply font-title text-2xl font-semibold text-gunmetal-900;
+}
+
+.addCarCloseButton {
+    @apply flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-gunmetal-300 bg-gunmetal-100 text-gunmetal-700 transition-all duration-200 hover:scale-110 hover:border-gunmetal-500 hover:bg-gunmetal-200 hover:text-gunmetal-900;
+}
+
+.addCarCloseButton svg {
+    @apply h-5 w-5 fill-current;
+}
+
+/* ─── Form layout ───────────────────────────────────────────── */
+
+.addCarForm {
+    @apply flex min-h-0 flex-1 flex-col;
+}
+
+.addCarFormBody {
+    @apply min-h-0 flex-1 overflow-y-auto px-6 py-5;
+    color-scheme: light;
+}
+
+.addCarFormBody fieldset {
+    @apply m-0 flex flex-col gap-6 border-0 p-0;
+}
+
+.addCarFormBody fieldset:disabled {
+    @apply opacity-60;
+}
+
+/* ─── Sections ──────────────────────────────────────────────── */
+
+.addCarSection {
+    @apply rounded-xl border border-gunmetal-200 bg-gunmetal-100/70 p-4;
+}
+
+.addCarSectionTitle {
+    @apply mb-4 border-b border-gunmetal-300 pb-2 font-text text-xs font-semibold uppercase tracking-widest text-gunmetal-700;
+}
+
+.addCarFieldGrid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+}
+
+/* ─── Fields ────────────────────────────────────────────────── */
+
+.addCarField {
+    @apply flex flex-col gap-1.5;
+}
+
+.addCarLabel {
+    @apply font-text text-xs font-medium text-gunmetal-700;
+}
+
+.addCarInput {
+    @apply w-full rounded-lg border border-gunmetal-300 bg-white px-3 py-2.5 font-text text-sm text-gunmetal-900 outline-none transition-all duration-200;
+}
+
+.addCarInput::placeholder {
+    @apply text-gunmetal-500;
+}
+
+.addCarInput:hover {
+    @apply border-gunmetal-400 bg-gunmetal-50;
+}
+
+.addCarInput:focus {
+    @apply border-gunmetal-500 ring-2 ring-gunmetal-300/40;
+}
+
+.addCarSelect {
+    @apply w-full cursor-pointer appearance-none rounded-lg border border-gunmetal-300 bg-white px-3 py-2.5 pr-9 font-text text-sm text-gunmetal-900 outline-none transition-all duration-200 bg-size-[1rem] bg-position-[right_0.75rem_center] bg-no-repeat;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23494d50' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.addCarSelect:hover {
+    @apply border-gunmetal-400 bg-gunmetal-50;
+}
+
+.addCarSelect:focus {
+    @apply border-gunmetal-500 ring-2 ring-gunmetal-300/40;
+}
+
+.addCarSelect option {
+    @apply bg-white text-gunmetal-900;
+}
+
+/* ─── Footer ────────────────────────────────────────────────── */
+
+.addCarFooter {
+    @apply flex shrink-0 items-center justify-end gap-3 border-t border-gunmetal-200 bg-gunmetal-50 px-6 py-4;
+}
+
+.addCarCancelButton {
+    @apply cursor-pointer rounded-lg border border-gunmetal-300 bg-gunmetal-100 px-5 py-2.5 font-text text-sm font-medium text-gunmetal-800 transition-all duration-200 hover:scale-105 hover:border-gunmetal-500 hover:bg-gunmetal-200;
+}
+
+.addCarSubmitButton {
+    @apply cursor-pointer rounded-lg border border-gunmetal-600 bg-gunmetal-800 px-5 py-2.5 font-text text-sm font-semibold text-gunmetal-50 shadow-lg shadow-black/15 transition-all duration-200 hover:scale-105 hover:bg-gunmetal-700 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100;
+}

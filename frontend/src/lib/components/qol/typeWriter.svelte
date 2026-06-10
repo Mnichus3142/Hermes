@@ -24,11 +24,11 @@
     let showCursor = true;
     let cursorInterval: ReturnType<typeof setInterval>;
   
-    function wait(ms: number) {
+    const wait = (ms: number) => {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    };
   
-    async function display() {
+    const display = async () => {
         await wait(typeWriterPayload.delay ?? 100);
         visible = true;
         actualText = "";
@@ -44,16 +44,16 @@
         } else {
             showCursor = false;
         }
-    }
+    };
   
-    function startCursorBlink() {
+    const startCursorBlink = () => {
         if (cursorInterval) clearInterval(cursorInterval);
         if (typeWriterPayload.cursorBlink) {
             cursorInterval = setInterval(() => {
                 showCursor = !showCursor;
             }, typeWriterPayload.cursorSpeed ?? 500);
         }
-    }
+    };
   
     onMount(() => {
         display();

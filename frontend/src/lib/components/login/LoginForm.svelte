@@ -5,6 +5,9 @@
     import OAuthButtons from "./OAuthButtons.svelte";
     import type { checkPasswordsType } from "$lib/types/checkPasswords";
     import { createNewNotification } from "$lib/logic/notificationLogic.svelte";
+    import { isLoggedIn, loginVisible } from "$lib/store/store";
+    import { enhance } from "$app/forms";
+    import { sanitizeRedirectPath } from "$lib/utils/authRedirect";
 
     const { toggleForms, animationDuration, buttons } = $props<{
         toggleForms: () => void;
@@ -51,7 +54,7 @@
 
     const notificationTimeout = 5000;
 
-    async function handleInternalLogin(e: Event) {
+    const handleInternalLogin = async (e: Event) => {
         e.preventDefault();
 
         if (passwordCheck.firstPassword === "" || username === "") {
@@ -65,7 +68,7 @@
             return 0;
         }
         try {
-            const response = await fetch("/api/auth/login", {
+            const response = await fetch("/api/auth", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -94,21 +97,24 @@
                     duration: notificationTimeout,
                 });
 
-                const redirectPath = document.cookie
-                    .split("; ")
-                    .find((row) => row.startsWith("redirectAfterLogin="))
-                    ?.split("=")[1];
+                const redirectCookie = document.cookie
+                    .split(";")
+                    .map((row) => row.trim())
+                    .find((row) => row.startsWith("redirectAfterLogin="));
+                const cookieValue = redirectCookie
+                    ? redirectCookie.slice("redirectAfterLogin=".length)
+                    : null;
+                const nextPath = sanitizeRedirectPath(cookieValue);
 
-                if (redirectPath) {
+                if (redirectCookie) {
                     document.cookie =
                         "redirectAfterLogin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
                 }
 
-                setTimeout(() => {
-                    window.location.href = redirectPath
-                        ? decodeURIComponent(redirectPath)
-                        : "/dashboard";
-                }, 1500);
+                isLoggedIn.set(true);
+                loginVisible.set(false);
+
+                window.location.href = nextPath;
             }
         } catch (error: any) {
             if (error.message !== "409") {
@@ -123,12 +129,12 @@
                 });
             }
         }
-    }
+    };
 
-    function handleThirdPartyLogin(e: Event) {
+    const handleThirdPartyLogin = (e: Event) => {
         e.preventDefault();
         console.log("Login with third party");
-    }
+    };
 </script>
 
 <div

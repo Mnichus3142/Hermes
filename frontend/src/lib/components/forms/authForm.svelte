@@ -26,21 +26,21 @@
         checkForAuthNotification();
     });
 
-    function toggleForms() {
+    const toggleForms = () => {
         loginVisible = !loginVisible;
-    }
+    };
 
-    async function getButtons() {
+    const getButtons = async () => {
         try {
-            const response = await fetch("http://localhost:8080/OAuth");
+            const response = await fetch("/api/OAuth");
             const data = await response.json();
             buttons = data;
         } catch (error) {
             console.error("Error during fetching buttons:", error);
         }
-    }
+    };
 
-    function checkForAuthNotification() {
+    const checkForAuthNotification = () => {
         if (!browser) return;
 
         const authNotificationCookie = document.cookie
@@ -60,7 +60,7 @@
                 console.error("Error parsing auth notification:", error);
             }
         }
-    }
+    };
 </script>
 
 <div class="authCardWrapper">

@@ -1,16 +1,19 @@
 <script lang="ts">
     import type { OAuthButtons } from "$lib/types/OAuthButtons";
 
-    export let buttons: OAuthButtons;
-    export let handleThirdPartyLogin: (e: Event) => void;
+    const { buttons, handleThirdPartyLogin } = $props<{
+        buttons: OAuthButtons;
+        handleThirdPartyLogin: (e: Event, provider: string) => void;
+    }>();
 </script>
 
 <div class="grid grid-cols-[repeat(auto-fit,minmax(0,1fr))] gap-2 w-64 h-16">
     {#if buttons.DISCORD}
         <button
+            type="button"
             class="loginButton bg-[#7289da]"
             aria-label="Login with OAuth - Discord"
-            on:click={handleThirdPartyLogin}
+            onclick={(event) => handleThirdPartyLogin(event, "DISCORD")}
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"
                 ><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
@@ -21,9 +24,10 @@
     {/if}
     {#if buttons.GOOGLE}
         <button
+            type="button"
             class="bg-white loginButton"
             aria-label="Login with OAuth - Google"
-            on:click={handleThirdPartyLogin}
+            onclick={(event) => handleThirdPartyLogin(event, "GOOGLE")}
         >
             <svg
                 width="800px"
@@ -49,9 +53,10 @@
     {/if}
     {#if buttons.GITHUB}
         <button
+            type="button"
             class="loginButton bg-[#24292e]"
             aria-label="Login with OAuth - Github"
-            on:click={handleThirdPartyLogin}
+            onclick={(event) => handleThirdPartyLogin(event, "GITHUB")}
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"
                 ><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path
@@ -62,9 +67,10 @@
     {/if}
     {#if buttons.GITLAB}
         <button
+            type="button"
             class="loginButton bg-[#FC6D27]"
             aria-label="Login with OAuth - Gitlab"
-            on:click={handleThirdPartyLogin}
+            onclick={(event) => handleThirdPartyLogin(event, "GITLAB")}
         >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
                 ><!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path

@@ -1,5 +1,17 @@
-import { ExpenseCategoryEnum } from "$lib/enums/expenseCategoryEnum";
-import { BodyPartEnum } from "$lib/enums/bodyPartEnum";
+export type ExpenseCategoryEnum =
+    | "fuel"
+    | "maintenance"
+    | "insurance"
+    | "taxes"
+    | "other";
+
+export type BodyPartEnum =
+    | "engine"
+    | "transmission"
+    | "suspension"
+    | "brakes"
+    | "body"
+    | "other";
 
 export type RepairItemType = {
     id?: number;

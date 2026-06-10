@@ -1,4 +1,10 @@
-import { CarEnum } from "$lib/enums/carEnum";
+export type CarEnum =
+    | "sedan"
+    | "suv"
+    | "truck"
+    | "coupe"
+    | "convertible"
+    | "other";
 
 export type CarType = {
     VIN: string;

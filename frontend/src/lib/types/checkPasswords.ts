@@ -10,7 +10,7 @@ type checkPasswordsType = {
         hasAtLeast1Number: boolean;
         hasAtLeast1SpecialCharacter: boolean;
         allConditionsMet: boolean;
-    }
+    };
 };
 
-export type { checkPasswordsType }
+export type { checkPasswordsType };

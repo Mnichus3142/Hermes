@@ -1,16 +1,19 @@
 <!-- * Login page * -->
 
 <script lang="ts">
-    import Loader from "$lib/components/qol/loader.svelte";
+    import { goto } from "$app/navigation";
     import HomePage from "$lib/components/pages/homePage.svelte";
+    import type { PageProps } from "./$types";
 
-    let loadState: Boolean = false;
+    let { data }: PageProps = $props();
+
+    $effect(() => {
+        if (data.isLoggedIn) {
+            goto("/dashboard");
+        }
+    });
 </script>
 
 <main class="h-full w-full">
-    {#if loadState}
-        <Loader />
-    {:else}
-        <HomePage />
-    {/if}
+    <HomePage />
 </main>
