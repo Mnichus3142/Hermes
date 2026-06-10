@@ -1,0 +1,9 @@
+$kind: http-request
+name: getOne
+url: localhost:8080/car/6a1437e99344031a57addc2f
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTE0MmJhYjU2MGM4NGYwZTY0NjFmYzEiLCJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWF0IjoxNzgwMDUwODI0LCJleHAiOjE3ODAwNTE3MjR9.FV73ziLw9pKkBFD0HAbV-gRFcZKphiKWhlmnx3H1HJU
+order: 4090989775368843

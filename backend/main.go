@@ -8,15 +8,23 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"backend/API/OAuth"
 	"backend/API/auth"
 	"backend/API/userManagement"
 	"backend/database"
+	_ "backend/docs"
 	"backend/health"
 	"backend/logs"
 )
 
+// @title           Swagger for Hermes API
+// @version         v0.1
+// @description     Backend for Hermes
+// @host            localhost:8080
+// @BasePath        /api/v1
 func main() {
 	// ========================================================================================
 	// Prepare handler for logs
@@ -40,7 +48,7 @@ func main() {
 	// Create a Gin router with default middleware (logger and recovery)
 	// ========================================================================================
 
-	slog.Info("Starting server...")
+	slog.Info("Starting server version " + os.Getenv("VERSION") + "...")
 	r := gin.Default()
 
 	// ========================================================================================
@@ -57,6 +65,20 @@ func main() {
 	}))
 
 	// ========================================================================================
+	// Swagger
+	// ========================================================================================
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	slog.Info("Swagger on: localhost:8080/swagger/index.html")
+
+	// ========================================================================================
+	// Register group
+	// ========================================================================================
+
+	api := r.Group("/api/v1")
+
+	// ========================================================================================
 	// MIDDLEWARE
 	// ========================================================================================
 
@@ -64,11 +86,7 @@ func main() {
 	// HEALTH API
 	// ========================================================================================
 
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"status": health.GET(),
-		})
-	})
+	health.RegisterHealthRoutes(api)
 
 	// ========================================================================================
 	// USER API

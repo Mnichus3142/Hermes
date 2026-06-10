@@ -1,0 +1,12 @@
+$kind: http-request
+name: New Request
+url: localhost:8080/expense/6a1996ea8b1ad47ffaf7b126
+method: DELETE
+body:
+  type: json
+  content: ""
+auth:
+  type: bearer
+  credentials:
+    token: "{{Access token}}"
+order: 4482874918822224

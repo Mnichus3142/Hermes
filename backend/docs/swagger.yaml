@@ -1,0 +1,24 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact: {}
+  description: Backend for Hermes
+  title: Swagger for Hermes API
+  version: v0.1
+paths:
+  /health:
+    get:
+      description: Returns html.StatusOK with time
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message + time
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Check if the backend is healthy
+      tags:
+      - health
+swagger: "2.0"

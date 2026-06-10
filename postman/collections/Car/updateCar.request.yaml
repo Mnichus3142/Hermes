@@ -1,0 +1,20 @@
+$kind: http-request
+name: updateCar
+url: localhost:8080/car/6a1437e99344031a57addc2f
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+        "engine": {
+            "type": "diesel",
+            "displacement": 2.5,
+            "horsepower": 803,
+            "torque": 100
+        }
+    }
+auth:
+  type: bearer
+  credentials:
+    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YTE0MmJhYjU2MGM4NGYwZTY0NjFmYzEiLCJ1c2VybmFtZSI6ImpvaG5fZG9lIiwiaWF0IjoxNzgwMDUxODIzLCJleHAiOjE3ODAwNTI3MjN9.NJzi2Vt60gyo0wZimgcNrfgur_nvDITjU1jPu_CgyP4
+order: 4340202712118417
