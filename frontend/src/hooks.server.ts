@@ -2,12 +2,16 @@ import { redirect, type Handle } from "@sveltejs/kit";
 
 const PUBLIC_ROUTES = ["/"];
 const API_PREFIX = "/api";
+const API_BASE_URL = (process.env.API_BASE_URL || "http://127.0.0.1:8080").replace(
+    /\/$/,
+    "",
+);
 
 export const handle: Handle = async ({ event, resolve }) => {
     const path = event.url.pathname;
 
     if (path.startsWith(API_PREFIX)) {
-        return resolve(event);
+        return proxyApiRequest(event);
     }
 
     event.locals.isLoggedIn = false;
@@ -191,4 +195,27 @@ const redirectToLogin = (
     });
 
     throw redirect(303, "/");
+};
+
+const proxyApiRequest = async (
+    event: Parameters<Handle>[0]["event"],
+): Promise<Response> => {
+    const targetPath = event.url.pathname.replace(API_PREFIX, "") || "/";
+    const targetUrl = `${API_BASE_URL}${targetPath}${event.url.search}`;
+
+    const headers = new Headers(event.request.headers);
+    headers.delete("host");
+    headers.delete("content-length");
+
+    const method = event.request.method.toUpperCase();
+    const body =
+        method === "GET" || method === "HEAD"
+            ? undefined
+            : await event.request.arrayBuffer();
+
+    return fetch(targetUrl, {
+        method,
+        headers,
+        body,
+    });
 };
